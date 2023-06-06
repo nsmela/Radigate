@@ -19,7 +19,7 @@
     private static List<Patient> Patients { get; set; } = new();
 
     protected override async Task OnInitializedAsync() {
-        var result = await Http.GetFromJsonAsync<List<Patient>>("/api/Patient");
-        if (result is not null) Patients = result;
+        var result = await Http.GetFromJsonAsync<ServiceResponse<List<Patient>>>("/api/Patient");
+        if (result is not null && result.Data is not null) Patients = result.Data;
     }
 }
