@@ -1,0 +1,25 @@
+﻿<h3>List of Patients</h3>
+
+<div>
+    @foreach(var patient in Patients){
+        <MudPaper Elevation="20">
+            <MudText Typo="Typo.h3"><b>Name:</b> @((patient.LastName + "," + patient.FirstName).ToUpper())</MudText>
+            <MudText Typo="Typo.h4"><b>ID</b>: @patient.Id</MudText>
+        </MudPaper>
+    }
+</div>
+
+<style>
+
+</style>
+
+@code {
+    [Inject] private HttpClient Http { get; set; }
+
+    private static List<Patient> Patients { get; set; } = new();
+
+    protected override async Task OnInitializedAsync() {
+        var result = await Http.GetFromJsonAsync<List<Patient>>("/api/Patient");
+        if (result is not null) Patients = result;
+    }
+}
