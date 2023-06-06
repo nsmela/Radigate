@@ -1,7 +1,11 @@
 ﻿<h3>List of Patients</h3>
 
+@if(PatientService.Patients is null || PatientService.Patients.Count == 0){
+    <span>Loading Patients</span>
+}
+
 <div>
-    @foreach(var patient in Patients){
+    @foreach(var patient in PatientService.Patients){
         <MudPaper Elevation="20">
             <MudText Typo="Typo.h3"><b>Name:</b> @((patient.LastName + "," + patient.FirstName).ToUpper())</MudText>
             <MudText Typo="Typo.h4"><b>ID</b>: @patient.Id</MudText>
@@ -14,12 +18,9 @@
 </style>
 
 @code {
-    [Inject] private HttpClient Http { get; set; }
-
-    private static List<Patient> Patients { get; set; } = new();
+    [Inject] private IPatientService PatientService { get; set; }
 
     protected override async Task OnInitializedAsync() {
-        var result = await Http.GetFromJsonAsync<ServiceResponse<List<Patient>>>("/api/Patient");
-        if (result is not null && result.Data is not null) Patients = result.Data;
+        await PatientService.GetPatients();
     }
 }
