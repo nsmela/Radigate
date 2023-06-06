@@ -1,10 +1,15 @@
 global using Radigate.Shared;
+global using Microsoft.EntityFrameworkCore;
+using Radigate.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddDbContext<DataContext>(options => {
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseMySQL(connectionString);
+});
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
