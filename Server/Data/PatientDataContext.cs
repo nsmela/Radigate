@@ -11,6 +11,9 @@
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<TaskBase>()
+                .UseTptMappingStrategy();
+
             modelBuilder.Entity<Patient>().HasData(
                 new Patient { Id = 1, LastName = "Stiles", FirstName = "Ryan" },
                 new Patient { Id = 2, LastName = "Proops", FirstName = "Greg" },
@@ -23,5 +26,7 @@
         }
 
         public DbSet<Patient> Patients { get; set; }
+        public DbSet<TaskGroup> TaskGroups { get; set; }
+        public DbSet<TaskBase> Tasks { get; set; }
     }
 }
