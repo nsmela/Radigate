@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 
 namespace Radigate.Server.Controllers {
     [Route("api/[controller]")]
@@ -11,11 +12,15 @@ namespace Radigate.Server.Controllers {
             new Patient {Id= 2, LastName = "Proops", FirstName="Greg"},
             new Patient {Id= 3, LastName = "Mocharie", FirstName="Colin"},
             new Patient {Id= 4, LastName = "Bradey", FirstName="Wayne"},
-            new Patient {Id= 5, LastName = "Taylor", FirstName="Aishia"}
+            new Patient {Id= 5, LastName = "Taylor", FirstName="Aishia"},
+            new Patient {Id= 5, LastName = "Owen", FirstName="Clive"}
         };
 
         [HttpGet]
         public async Task<ActionResult<List<Patient>>> GetPatient() {
+            await using var connection = new MySqlConnection("Server=myradigate.mysql.database.azure.com;User ID = dbadmin;Password = Microsoft1; database = radigate");
+            await connection.OpenAsync();
+
             return Ok(Patients);
         }
     }
