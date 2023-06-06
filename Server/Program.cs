@@ -6,16 +6,17 @@ using Microsoft.AspNetCore.ResponseCompression;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<DataContext>(options => {
-    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySQL(connectionString);
-});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 //packages
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// SQLLite
+var connectionString = builder.Configuration.GetConnectionString("SQLLiteConnection");
+builder.Services.AddDbContextFactory<PatientDataContext>(options => options.UseSqlite(connectionString));
 
 var app = builder.Build();
 

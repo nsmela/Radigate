@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MySqlConnector;
 
 namespace Radigate.Server.Controllers {
     [Route("api/[controller]")]
@@ -18,9 +17,6 @@ namespace Radigate.Server.Controllers {
 
         [HttpGet]
         public async Task<ActionResult<List<Patient>>> GetPatient() {
-            await using var connection = new MySqlConnection("Server=myradigate.mysql.database.azure.com;User ID = dbadmin;Password = Microsoft1; database = radigate");
-            await connection.OpenAsync();
-
             return Ok(Patients);
         }
     }
