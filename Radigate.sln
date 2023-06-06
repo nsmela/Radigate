@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radigate.Server", "Server\Radigate.Server.csproj", "{89C62B56-F3FF-4307-BBA0-F5E1A72922FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radigate.Server", "Server\Radigate.Server.csproj", "{89C62B56-F3FF-4307-BBA0-F5E1A72922FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radigate.Client", "Client\Radigate.Client.csproj", "{58D931B7-D6FB-48FF-A10D-E82A03E7906D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radigate.Client", "Client\Radigate.Client.csproj", "{58D931B7-D6FB-48FF-A10D-E82A03E7906D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radigate.Shared", "Shared\Radigate.Shared.csproj", "{74E46651-5DE2-4995-8E07-EB1A9D683349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radigate.Shared", "Shared\Radigate.Shared.csproj", "{74E46651-5DE2-4995-8E07-EB1A9D683349}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

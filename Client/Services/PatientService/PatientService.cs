@@ -9,16 +9,19 @@ namespace Radigate.Client.Services.PatientService {
             _http = http;
         }
 
-        public async Task GetPatient(string patientId) {
-            throw new NotImplementedException();
-        }
-
         public async Task GetPatients() {
             string requestString = $"/api/Patient";
             var result = await _http.GetFromJsonAsync<ServiceResponse<List<Patient>>>(requestString);
 
-            if (result is not null && 
-                result.Data is not null) Patients = result.Data;
+            if (result is not null && result.Data is not null) 
+                Patients = result.Data;
+        }
+
+        public async Task<ServiceResponse<Patient>> GetPatient(int patientId) {
+            string requestString = $"/api/Patient/{patientId}";
+            var result = await _http.GetFromJsonAsync<ServiceResponse<Patient>>(requestString);
+
+            return result;
         }
     }
 }

@@ -16,10 +16,18 @@ namespace Radigate.Server.Services.PatientService {
             return response;
         }
 
-        public async Task<ServiceResponse<Patient>> GetPatientsAsync(string patientId) {
-            var response = new ServiceResponse<Patient> {
-                Data = await _context.Patients.FindAsync(patientId)
-            };
+        public async Task<ServiceResponse<Patient>> GetPatientAsync(int patientId) {
+            var response = new ServiceResponse<Patient>();
+
+            var patient = await _context.Patients.FindAsync(patientId);
+
+            if (patient is null) {
+                response.Success = false;
+                response.Message = "Patient is not found";
+            }
+            else {
+                response.Data = patient;
+            }
 
             return response;
         }

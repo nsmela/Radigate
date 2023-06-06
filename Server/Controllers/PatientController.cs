@@ -14,8 +14,14 @@ namespace Radigate.Server.Controllers {
         }
 
         [HttpGet]
-        public async Task<ActionResult<ServiceResponse<List<Patient>>>> GetPatient() {
+        public async Task<ActionResult<ServiceResponse<List<Patient>>>> GetPatients() {
             var result = await _patientService.GetPatientsAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("{patientId}")]
+        public async Task<ActionResult<ServiceResponse<List<Patient>>>> GetPatient(int patientId) {
+            var result = await _patientService.GetPatientAsync(patientId);
             return Ok(result);
         }
     }

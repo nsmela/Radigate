@@ -1,0 +1,31 @@
+﻿@page "/patient/{id:int}"
+
+@if(patient is null){
+    <span>@message</span>
+} else {
+    <div>
+        <h2>@FullName</h2>
+        <p>Patient ID: @patient.Id</p>
+    </div>
+}
+
+@code {
+    [Inject] private IPatientService PatientService { get; set; }
+    [Parameter] public int Id { get; set; }
+
+    private Patient? patient = null;
+    private string message = string.Empty;
+
+    private string FullName => (patient.LastName + "," + patient.FirstName).ToUpper();
+
+    protected override async Task OnParametersSetAsync() {
+        message = "Loading Patient... ";
+        var result = await PatientService.GetPatient(Id);
+
+        if(!result.Success){
+            message = result.Message;
+        } else {
+            patient = result.Data;
+        }
+    }
+}
