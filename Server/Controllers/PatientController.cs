@@ -7,18 +7,16 @@ namespace Radigate.Server.Controllers {
     [ApiController]
     public class PatientController : ControllerBase {
         private readonly PatientDataContext _context;
+        private readonly IPatientService _patientService;
 
-        public PatientController(PatientDataContext context) {
-            _context = context;
+        public PatientController(IPatientService patientService) {
+            _patientService = patientService;
         }
 
         [HttpGet]
         public async Task<ActionResult<ServiceResponse<List<Patient>>>> GetPatient() {
-            var patients = await _context.Patients.ToListAsync();
-            var response = new ServiceResponse<List<Patient>> {
-                Data = patients
-            };
-            return Ok(response);
+            var result = await _patientService.GetPatientsAsync();
+            return Ok(result);
         }
     }
 }

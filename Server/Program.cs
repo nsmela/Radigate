@@ -1,5 +1,6 @@
 global using Radigate.Shared;
 global using Microsoft.EntityFrameworkCore;
+global using Radigate.Server.Services.PatientService;
 using Radigate.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 
@@ -13,6 +14,9 @@ builder.Services.AddRazorPages();
 //packages
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//custom services Dependancy Injection
+builder.Services.AddScoped<IPatientService, PatientService>();
 
 // SQLLite
 var connectionString = builder.Configuration.GetConnectionString("SQLLiteConnection");
