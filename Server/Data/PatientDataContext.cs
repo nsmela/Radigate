@@ -61,8 +61,6 @@ namespace Radigate.Server.Data {
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<TaskGroup> TaskGroups { get; set; }
-        public DbSet<TaskBool> TPCBool { get; set; }
-        public DbSet<TaskText> TPCText { get; set; }
-        public DbSet<TaskDouble> TPCDouble { get; set; }
+
     }
 }

@@ -48,11 +48,9 @@
                             <MudPaper MaxHeight="22px" Class="mud-theme-secondary mx-1 pl-1 mt-1 d-flex flex-grow-1 justify-space-between">
                                 <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:18px"><b>@task.Label</b></MudText>
                                 @if (task.Type == (int)TaskType.Bool) {
-                                    var value = task.Value == "true";
-                                    <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@value" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
-                                } else if (task.GetType() == typeof(TaskText)) {
-                                    var tText = task.Value;
-                                    <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@tText</MudText>
+                                    <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@task.IsTrue" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
+                                } else if (task.Type == (int)TaskType.Text) {
+                                    <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@task.Value</MudText>
                                 } else {
                                     <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">UNKNOWN TYPE</MudText>
                                 }
