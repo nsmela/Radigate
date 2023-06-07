@@ -21,11 +21,14 @@ namespace Radigate.Server.Services.PatientService {
         }
 
         //https://learn.microsoft.com/en-us/ef/ef6/fundamentals/relationships
-
         public async Task<ServiceResponse<Patient>> GetPatientAsync(int patientId) {
             var response = new ServiceResponse<Patient>();
 
-            var patient = await _context.Patients.FindAsync(patientId);
+            var patient = await _context.Patients
+                .Include(p => p.TaskGroups)
+                .ThenInclude(g => g.Tasks)
+                .FirstOrDefaultAsync(p => p.Id == patientId);
+                
 
             if (patient is null) {
                 response.Success = false;

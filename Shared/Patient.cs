@@ -9,6 +9,7 @@ namespace Radigate.Shared {
         public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string Identifier { get; set; } = string.Empty;
         public ICollection<TaskGroup> TaskGroups { get; set; } = new List<TaskGroup>(); //navigation property
     }
 }

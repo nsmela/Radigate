@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 namespace Radigate.Shared {
     public class TaskGroup {
         //parent
-        public Patient Patient { get; set; } = null!;
+        [JsonIgnore] public Patient Patient { get; set; } = null!;
         public int PatientId { get; set; }
+
+        [JsonPropertyName("tasks")]
         public ICollection<TaskBase> Tasks { get; set; } = new List<TaskBase>(); //dependants
 
         public int Id { get; set; }

@@ -10,6 +10,9 @@ namespace Radigate.Server.Data {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseSqlite(Configuration.GetConnectionString("SQLLiteConnection"));
+            optionsBuilder
+                .LogTo(Console.WriteLine)
+                .EnableDetailedErrors();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
@@ -17,16 +20,6 @@ namespace Radigate.Server.Data {
             //https://learn.microsoft.com/en-us/ef/core/modeling/inheritance
             //https://www.entityframeworktutorial.net/code-first/configure-one-to-many-relationship-in-code-first.aspx
             //https://learn.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
-
-            modelBuilder.Entity<TaskBase>().Property(t => t.Id).IsRequired();
-            modelBuilder.Entity<TaskBase>().UseTptMappingStrategy();
-
-            modelBuilder.Entity<TaskBool>().Property(t => t.Id).IsRequired();
-            modelBuilder.Entity<TaskText>().Property(t => t.Id).IsRequired();
-            modelBuilder.Entity<TaskDouble>().Property(t => t.Id).IsRequired();
-            modelBuilder.Entity<TaskList>().Property(t => t.Id).IsRequired();
-            modelBuilder.Entity<TaskDate>().Property(t => t.Id).IsRequired();
-            modelBuilder.Entity<TaskCalculation>().Property(t => t.Id).IsRequired();
 
             modelBuilder.Entity<Patient>()
                 .HasMany(p => p.TaskGroups)
@@ -40,17 +33,23 @@ namespace Radigate.Server.Data {
                 .HasForeignKey(t => t.Id)
                 .HasPrincipalKey(g => g.Id);
 
-            modelBuilder.Entity<TaskBool>().HasData(
-                new TaskBool { TaskGroupId = 1, Id = 1, Label = "Approved", Value = false }
-            );
+            modelBuilder.Entity<TaskBase>().ToTable("Tasks")
+                .HasDiscriminator<int>("TaskType")
+                .HasValue<TaskBool>((int)TaskType.Bool)
+                .HasValue<TaskText>((int)TaskType.Text)
+                .HasValue<TaskDouble>((int)TaskType.Number);
 
+            modelBuilder.Entity<TaskBool>().HasData(
+                new TaskBool { TaskGroupId = 1, Id = 1, Label = "Approved", Checked = false });
             modelBuilder.Entity<TaskText>().HasData(
-                new TaskText { TaskGroupId = 2, Id = 2, Label = "Assigned RO", Value = "None." }
-            );
+                new TaskText { TaskGroupId = 2, Id = 2, Label = "Assigned RO", Text = "None." });
+            modelBuilder.Entity<TaskDouble>().HasData(
+                new TaskDouble { TaskGroupId = 2, Id = 3, Label = "Mass Volume", Number = 150.1f });
 
             modelBuilder.Entity<TaskGroup>().HasData(
                 new TaskGroup { PatientId = 1, Id = 1, Label = "Standard"},
-                new TaskGroup { PatientId = 2, Id = 2, Label = "Standard" }
+                new TaskGroup { PatientId = 2, Id = 2, Label = "Standard" },
+                new TaskGroup { PatientId = 2, Id = 3, Label = "Physics Checks" }
             );
                 
             modelBuilder.Entity<Patient>().HasData(
@@ -68,6 +67,8 @@ namespace Radigate.Server.Data {
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<TaskGroup> TaskGroups { get; set; }
-        public DbSet<TaskBase> Tasks { get; set; }
+        public DbSet<TaskBool> TPCBool { get; set; }
+        public DbSet<TaskText> TPCText { get; set; }
+        public DbSet<TaskDouble> TPCDouble { get; set; }
     }
 }

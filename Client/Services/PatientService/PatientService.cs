@@ -9,6 +9,8 @@ namespace Radigate.Client.Services.PatientService {
             _http = http;
         }
 
+        //cannot deserialize the objects normally
+        //https://www.puresourcecode.com/dotnet/csharp/derived-classes-with-system-text-json/
         public async Task GetPatients() {
             string requestString = $"/api/Patient";
             var result = await _http.GetFromJsonAsync<ServiceResponse<List<Patient>>>(requestString);
