@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Radigate.Shared {
     public class TaskBase {
-        public TaskGroup TaskGroups { get; set; } = null!;//parent
+        public TaskGroup TaskGroup { get; set; } = null!;//parent
         public int TaskGroupId { get; set; }
         public int Id { get; set; }
         public string Label { get; set; } = string.Empty;

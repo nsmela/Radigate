@@ -8,13 +8,19 @@ namespace Radigate.Server.Services.PatientService {
             _context = context;
         }
 
+        //https://www.youtube.com/watch?v=UBNRcaw1bDk
         public async Task<ServiceResponse<List<Patient>>> GetPatientsAsync() {
             var response = new ServiceResponse<List<Patient>> {
-                Data = await _context.Patients.ToListAsync()
+                Data = await _context.Patients
+                    .Include(p => p.TaskGroups)
+                    .ThenInclude(g => g.Tasks)
+                    .ToListAsync()
             };
 
             return response;
         }
+
+        //https://learn.microsoft.com/en-us/ef/ef6/fundamentals/relationships
 
         public async Task<ServiceResponse<Patient>> GetPatientAsync(int patientId) {
             var response = new ServiceResponse<Patient>();

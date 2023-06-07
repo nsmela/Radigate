@@ -34,6 +34,12 @@ namespace Radigate.Server.Data {
                 .HasForeignKey(g => g.PatientId)
                 .HasPrincipalKey(t => t.Id);
 
+            modelBuilder.Entity<TaskGroup>()
+                .HasMany(g => g.Tasks)
+                .WithOne(t => t.TaskGroup)
+                .HasForeignKey(t => t.Id)
+                .HasPrincipalKey(g => g.Id);
+
             modelBuilder.Entity<TaskBool>().HasData(
                 new TaskBool { TaskGroupId = 1, Id = 1, Label = "Approved", Value = false }
             );

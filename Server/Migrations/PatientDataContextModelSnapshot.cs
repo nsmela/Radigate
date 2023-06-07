@@ -83,7 +83,6 @@ namespace Radigate.Server.Migrations
             modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Comments")
@@ -98,8 +97,6 @@ namespace Radigate.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TaskGroupId");
 
                     b.ToTable("Tasks");
 
@@ -228,13 +225,13 @@ namespace Radigate.Server.Migrations
 
             modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
                 {
-                    b.HasOne("Radigate.Shared.TaskGroup", "TaskGroups")
+                    b.HasOne("Radigate.Shared.TaskGroup", "TaskGroup")
                         .WithMany("Tasks")
-                        .HasForeignKey("TaskGroupId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TaskGroups");
+                    b.Navigation("TaskGroup");
                 });
 
             modelBuilder.Entity("Radigate.Shared.TaskGroup", b =>
