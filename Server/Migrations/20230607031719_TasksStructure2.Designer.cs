@@ -10,8 +10,8 @@ using Radigate.Server.Data;
 namespace Radigate.Server.Migrations
 {
     [DbContext(typeof(PatientDataContext))]
-    [Migration("20230607013937_TasksStructure")]
-    partial class TasksStructure
+    [Migration("20230607031719_TasksStructure2")]
+    partial class TasksStructure2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,6 +104,8 @@ namespace Radigate.Server.Migrations
                     b.HasIndex("TaskGroupId");
 
                     b.ToTable("Tasks");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Radigate.Shared.TaskGroup", b =>
@@ -124,6 +126,61 @@ namespace Radigate.Server.Migrations
                     b.HasIndex("PatientId");
 
                     b.ToTable("TaskGroups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Label = "Standard",
+                            PatientId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Label = "Standard",
+                            PatientId = 2
+                        });
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskBool", b =>
+                {
+                    b.HasBaseType("Radigate.Shared.TaskBase");
+
+                    b.Property<bool>("Value")
+                        .HasColumnType("INTEGER");
+
+                    b.ToTable("TaskBool");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Comments = "",
+                            Label = "Approved",
+                            TaskGroupId = 1,
+                            Value = false
+                        });
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskText", b =>
+                {
+                    b.HasBaseType("Radigate.Shared.TaskBase");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.ToTable("TaskText");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 2,
+                            Comments = "",
+                            Label = "Assigned RO",
+                            TaskGroupId = 2,
+                            Value = "None."
+                        });
                 });
 
             modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
@@ -146,6 +203,24 @@ namespace Radigate.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskBool", b =>
+                {
+                    b.HasOne("Radigate.Shared.TaskBase", null)
+                        .WithOne()
+                        .HasForeignKey("Radigate.Shared.TaskBool", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskText", b =>
+                {
+                    b.HasOne("Radigate.Shared.TaskBase", null)
+                        .WithOne()
+                        .HasForeignKey("Radigate.Shared.TaskText", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Radigate.Shared.Patient", b =>
