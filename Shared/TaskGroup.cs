@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Radigate.Shared {
     public class TaskGroup {
-        [JsonIgnore] public Patient Patient { get; set; }
+        //parent
+        public Patient Patient { get; set; } = null!;
         public int PatientId { get; set; }
+        public ICollection<TaskBase> Tasks { get; set; } = new List<TaskBase>(); //dependants
+
         public int Id { get; set; }
         public string Label { get; set; } = string.Empty;
-        public ICollection<TaskBase> Tasks { get; set; }
 
     }
 }

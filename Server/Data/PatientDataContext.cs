@@ -14,6 +14,12 @@
             //https://learn.microsoft.com/en-us/archive/msdn-magazine/2018/august/data-points-deep-dive-into-ef-core-hasdata-seeding
             //https://learn.microsoft.com/en-us/ef/core/modeling/inheritance
             //https://www.entityframeworktutorial.net/code-first/configure-one-to-many-relationship-in-code-first.aspx
+            //https://learn.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
+
+            modelBuilder.Entity<TaskBase>()
+                .HasOne(t => t.Id).IsRequired()
+                .WithMany(g => g.Tasks)
+                .HasForeignKey(t => t.Id);
 
             modelBuilder.Entity<Patient>().HasData(
                 new Patient { Id = 1, LastName = "Stiles", FirstName = "Ryan" },
