@@ -43,7 +43,8 @@ namespace Radigate.Server.Migrations
                 name: "Tasks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     TaskGroupId = table.Column<int>(type: "INTEGER", nullable: false),
                     Label = table.Column<string>(type: "TEXT", nullable: false),
                     Comments = table.Column<string>(type: "TEXT", nullable: false),
@@ -54,76 +55,7 @@ namespace Radigate.Server.Migrations
                 {
                     table.PrimaryKey("PK_Tasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_TaskGroups_Id",
-                        column: x => x.Id,
-                        principalTable: "TaskGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TPCBool",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Check = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    TaskGroupId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Label = table.Column<string>(type: "TEXT", nullable: false),
-                    Comments = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TPCBool", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TPCBool_TaskGroups_TaskGroupId",
-                        column: x => x.TaskGroupId,
-                        principalTable: "TaskGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TPCDouble",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Number = table.Column<double>(type: "REAL", nullable: false),
-                    TaskGroupId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Label = table.Column<string>(type: "TEXT", nullable: false),
-                    Comments = table.Column<string>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TPCDouble", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TPCDouble_TaskGroups_TaskGroupId",
-                        column: x => x.TaskGroupId,
-                        principalTable: "TaskGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TPCText",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Text = table.Column<string>(type: "TEXT", nullable: false),
-                    TaskGroupId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Label = table.Column<string>(type: "TEXT", nullable: false),
-                    Comments = table.Column<string>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TPCText", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TPCText_TaskGroups_TaskGroupId",
+                        name: "FK_Tasks_TaskGroups_TaskGroupId",
                         column: x => x.TaskGroupId,
                         principalTable: "TaskGroups",
                         principalColumn: "Id",
@@ -151,7 +83,7 @@ namespace Radigate.Server.Migrations
                 {
                     { 1, "Standard", 1 },
                     { 2, "Standard", 2 },
-                    { 3, "Physics Checks", 2 }
+                    { 3, "Physics Checks", 3 }
                 });
 
             migrationBuilder.InsertData(
@@ -159,8 +91,13 @@ namespace Radigate.Server.Migrations
                 columns: new[] { "Id", "Comments", "Label", "TaskGroupId", "Type", "Value" },
                 values: new object[,]
                 {
-                    { 1, "", "Approved", 1, 0, "false" },
-                    { 2, "", "Physics Approved", 1, 0, "true" }
+                    { 1, "", "Approved by RO", 1, 0, "false" },
+                    { 2, "", "Assigned RO", 1, 1, "No one" },
+                    { 3, "", "Mass Volume", 1, 2, "150.0" },
+                    { 4, "", "Patient Status", 1, 3, "1,Waiting,Assigned,Treating,Finished" },
+                    { 5, "", "Approved by RO", 2, 0, "false" },
+                    { 6, "", "Assigned RO", 2, 1, "No one" },
+                    { 7, "", "Mass Volume", 2, 2, "12.55" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -169,18 +106,8 @@ namespace Radigate.Server.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TPCBool_TaskGroupId",
-                table: "TPCBool",
-                column: "TaskGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TPCDouble_TaskGroupId",
-                table: "TPCDouble",
-                column: "TaskGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TPCText_TaskGroupId",
-                table: "TPCText",
+                name: "IX_Tasks_TaskGroupId",
+                table: "Tasks",
                 column: "TaskGroupId");
         }
 
@@ -189,15 +116,6 @@ namespace Radigate.Server.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Tasks");
-
-            migrationBuilder.DropTable(
-                name: "TPCBool");
-
-            migrationBuilder.DropTable(
-                name: "TPCDouble");
-
-            migrationBuilder.DropTable(
-                name: "TPCText");
 
             migrationBuilder.DropTable(
                 name: "TaskGroups");

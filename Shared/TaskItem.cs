@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -20,11 +21,13 @@ namespace Radigate.Shared {
 
     public partial class TaskItem {
         //need to remember these properties need to be bi-directional
+        [NotMapped]
         public bool IsTrue {
             get => Value == "true";
             set => Value = value ? "true" : "false";
         }
         //combo box values are a concatentated list starting with the index of the selection and seperated by commas
+        [NotMapped]
         public List<string> Options {
             get => Value.Split(',').Skip(1).ToList(); //the first value is an int, the index selected
             set {
@@ -33,9 +36,10 @@ namespace Radigate.Shared {
                 Value = options;
             }
         }
-        public int SelectedOption => int.Parse(Value.Split(',').First());
-        public double Number => double.Parse(Value);
-        public DateTime Date => DateTime.Parse(Value);
-        public string Formula => Value;
+
+        [NotMapped] public int SelectedOption => Type == (int)TaskType.List ? int.Parse(Value.Split(',').First()) : -1;
+        [NotMapped] public double Number => Type == (int)TaskType.Number ? double.Parse(Value) : 0.0f;
+        [NotMapped] public DateTime Date => Type == (int)TaskType.Date ? DateTime.Parse(Value) : DateTime.MinValue;
+        [NotMapped] public string Formula => Value;
     }
 }
