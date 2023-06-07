@@ -33,18 +33,12 @@ namespace Radigate.Server.Data {
                 .HasForeignKey(t => t.Id)
                 .HasPrincipalKey(g => g.Id);
 
-            modelBuilder.Entity<TaskBase>().ToTable("Tasks")
-                .HasDiscriminator<int>("TaskType")
-                .HasValue<TaskBool>((int)TaskType.Bool)
-                .HasValue<TaskText>((int)TaskType.Text)
-                .HasValue<TaskDouble>((int)TaskType.Number);
+            modelBuilder.Entity<TaskItem>().ToTable("Tasks");
 
-            modelBuilder.Entity<TaskBool>().HasData(
-                new TaskBool { TaskGroupId = 1, Id = 1, Label = "Approved", Checked = false });
-            modelBuilder.Entity<TaskText>().HasData(
-                new TaskText { TaskGroupId = 2, Id = 2, Label = "Assigned RO", Text = "None." });
-            modelBuilder.Entity<TaskDouble>().HasData(
-                new TaskDouble { TaskGroupId = 2, Id = 3, Label = "Mass Volume", Number = 150.1f });
+
+            modelBuilder.Entity<TaskItem>().HasData(
+                new TaskItem { Id = 1, Label = "Approved", TaskGroupId = 1, Type=(int)TaskType.Bool, Value = "false"},
+                new TaskItem { Id = 2, Label = "Physics Approved", TaskGroupId = 1, Type = (int)TaskType.Bool, Value = "true" });
 
             modelBuilder.Entity<TaskGroup>().HasData(
                 new TaskGroup { PatientId = 1, Id = 1, Label = "Standard"},

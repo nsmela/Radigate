@@ -11,8 +11,7 @@ namespace Radigate.Shared {
         [JsonIgnore] public Patient Patient { get; set; } = null!;
         public int PatientId { get; set; }
 
-        [JsonPropertyName("tasks")]
-        public ICollection<TaskBase> Tasks { get; set; } = new List<TaskBase>(); //dependants
+        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); //dependants
 
         public int Id { get; set; }
         public string Label { get; set; } = string.Empty;

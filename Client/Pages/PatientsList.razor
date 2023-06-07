@@ -47,12 +47,12 @@
                         @foreach (var task in group.Tasks) {
                             <MudPaper MaxHeight="22px" Class="mud-theme-secondary mx-1 pl-1 mt-1 d-flex flex-grow-1 justify-space-between">
                                 <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:18px"><b>@task.Label</b></MudText>
-                                @if (task.TaskType == (int)TaskType.Bool) {
-                                    var tBool = task as TaskBool;
-                                    <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@tBool.Checked" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
+                                @if (task.Type == (int)TaskType.Bool) {
+                                    var value = task.Value == "true";
+                                    <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@value" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
                                 } else if (task.GetType() == typeof(TaskText)) {
-                                    var tText = task as TaskText;
-                                    <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@tText.Text</MudText>
+                                    var tText = task.Value;
+                                    <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@tText</MudText>
                                 } else {
                                     <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">UNKNOWN TYPE</MudText>
                                 }

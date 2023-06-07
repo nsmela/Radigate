@@ -90,9 +90,13 @@ namespace Radigate.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
+            modelBuilder.Entity("Radigate.Shared.TaskBool", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Check")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Comments")
@@ -106,16 +110,44 @@ namespace Radigate.Server.Migrations
                     b.Property<int>("TaskGroupId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("TaskType")
+                    b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tasks", (string)null);
+                    b.HasIndex("TaskGroupId");
 
-                    b.HasDiscriminator<int>("TaskType");
+                    b.ToTable("TPCBool");
+                });
 
-                    b.UseTphMappingStrategy();
+            modelBuilder.Entity("Radigate.Shared.TaskDouble", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Number")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("TaskGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskGroupId");
+
+                    b.ToTable("TPCDouble");
                 });
 
             modelBuilder.Entity("Radigate.Shared.TaskGroup", b =>
@@ -158,14 +190,32 @@ namespace Radigate.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Radigate.Shared.TaskBool", b =>
+            modelBuilder.Entity("Radigate.Shared.TaskItem", b =>
                 {
-                    b.HasBaseType("Radigate.Shared.TaskBase");
-
-                    b.Property<bool>("Checked")
+                    b.Property<int>("Id")
                         .HasColumnType("INTEGER");
 
-                    b.HasDiscriminator().HasValue(0);
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TaskGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tasks", (string)null);
 
                     b.HasData(
                         new
@@ -174,59 +224,67 @@ namespace Radigate.Server.Migrations
                             Comments = "",
                             Label = "Approved",
                             TaskGroupId = 1,
-                            TaskType = 0,
-                            Checked = false
-                        });
-                });
-
-            modelBuilder.Entity("Radigate.Shared.TaskDouble", b =>
-                {
-                    b.HasBaseType("Radigate.Shared.TaskBase");
-
-                    b.Property<double>("Number")
-                        .HasColumnType("REAL");
-
-                    b.HasDiscriminator().HasValue(2);
-
-                    b.HasData(
+                            Type = 0,
+                            Value = "false"
+                        },
                         new
                         {
-                            Id = 3,
+                            Id = 2,
                             Comments = "",
-                            Label = "Mass Volume",
-                            TaskGroupId = 2,
-                            TaskType = 0,
-                            Number = 150.10000610351562
+                            Label = "Physics Approved",
+                            TaskGroupId = 1,
+                            Type = 0,
+                            Value = "true"
                         });
                 });
 
             modelBuilder.Entity("Radigate.Shared.TaskText", b =>
                 {
-                    b.HasBaseType("Radigate.Shared.TaskBase");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TaskGroupId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasDiscriminator().HasValue(1);
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 2,
-                            Comments = "",
-                            Label = "Assigned RO",
-                            TaskGroupId = 2,
-                            TaskType = 0,
-                            Text = "None."
-                        });
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskGroupId");
+
+                    b.ToTable("TPCText");
                 });
 
-            modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
+            modelBuilder.Entity("Radigate.Shared.TaskBool", b =>
                 {
                     b.HasOne("Radigate.Shared.TaskGroup", "TaskGroup")
-                        .WithMany("Tasks")
-                        .HasForeignKey("Id")
+                        .WithMany()
+                        .HasForeignKey("TaskGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaskGroup");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskDouble", b =>
+                {
+                    b.HasOne("Radigate.Shared.TaskGroup", "TaskGroup")
+                        .WithMany()
+                        .HasForeignKey("TaskGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -242,6 +300,28 @@ namespace Radigate.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskItem", b =>
+                {
+                    b.HasOne("Radigate.Shared.TaskGroup", "TaskGroup")
+                        .WithMany("Tasks")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaskGroup");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskText", b =>
+                {
+                    b.HasOne("Radigate.Shared.TaskGroup", "TaskGroup")
+                        .WithMany()
+                        .HasForeignKey("TaskGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaskGroup");
                 });
 
             modelBuilder.Entity("Radigate.Shared.Patient", b =>
