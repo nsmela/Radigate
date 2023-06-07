@@ -10,8 +10,8 @@ using Radigate.Server.Data;
 namespace Radigate.Server.Migrations
 {
     [DbContext(typeof(PatientDataContext))]
-    [Migration("20230606231824_TaskGroupSeeding")]
-    partial class TaskGroupSeeding
+    [Migration("20230607013937_TasksStructure")]
+    partial class TasksStructure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,6 +80,82 @@ namespace Radigate.Server.Migrations
                             FirstName = "Drew",
                             LastName = "Carey"
                         });
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TaskGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskGroupId");
+
+                    b.ToTable("Tasks");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("TaskGroups");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskBase", b =>
+                {
+                    b.HasOne("Radigate.Shared.TaskGroup", "TaskGroups")
+                        .WithMany("Tasks")
+                        .HasForeignKey("TaskGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaskGroups");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskGroup", b =>
+                {
+                    b.HasOne("Radigate.Shared.Patient", "Patient")
+                        .WithMany("TaskGroups")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.Patient", b =>
+                {
+                    b.Navigation("TaskGroups");
+                });
+
+            modelBuilder.Entity("Radigate.Shared.TaskGroup", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }
