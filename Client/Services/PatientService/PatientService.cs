@@ -37,27 +37,39 @@ namespace Radigate.Client.Services.PatientService {
             return result;
         }
 
+        public async Task GetPatientTaskUpdate(int taskId) {
+            string connection = $"/api/Task/{taskId}";
+            var result = await _http.GetFromJsonAsync<ServiceResponse<TaskItem>>(connection);
+            if (result is not null && result.Data is not null) {
+                for (int i = 0; i < Patients.Count; i++) {
+                    for (int j = 0; j < Patients[i].TaskGroups.Count; j++) {
+                        for(int k = 0; k < Patients[i].TaskGroups.ElementAt(j).Tasks.Count; k++) {
+                            if (Patients[i].TaskGroups.ElementAt(j).Tasks.ElementAt(k).Id == taskId) {
+                                var tasks = new List<TaskItem>();
+                                foreach(var t in Patients[i].TaskGroups.ElementAt(j).Tasks) {
+                                    if (t.Id == taskId) {
+                                        var task = TaskItem.Convert(result.Data);
+                                        task.TaskGroup = Patients[i].TaskGroups.ElementAt(j);
+                                        tasks.Add(task);
+                                    }
+                                    else {
+                                        tasks.Add(Patients[i].TaskGroups.ElementAt(j).Tasks.ElementAt(k));
+                                    }
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //TaskItem is converted into The relevent TaskType
         private Patient ConvertPatient(Patient patient) {
             foreach (var group in patient.TaskGroups) {
                 var tasks = new List<TaskItem>();
                 foreach (var task in group.Tasks) {
-                    switch (task.Type) {
-                        case (int)TaskType.Bool:
-                            tasks.Add(new TaskBool(task));
-                            break;
-                        case (int)TaskType.Text:
-                            tasks.Add(new TaskText(task));
-                            break;
-                        case (int)TaskType.Number:
-                            tasks.Add(new TaskNumber(task));
-                            break;
-                        case (int)TaskType.List:
-                            tasks.Add(new TaskList(task));
-                            break;
-                        default:
-                            tasks.Add((TaskItem)task);
-                            break;
-                    }
+                    tasks.Add(TaskItem.Convert(task));
                 }
                 group.Tasks = tasks;
             }
@@ -65,100 +77,6 @@ namespace Radigate.Client.Services.PatientService {
         }
     }
 
-    //Task classes
-    public class TaskBool : TaskItem {
-        public bool Checked { get; set; }
-        public TaskBool(TaskItem task) {
-            TaskGroup = task.TaskGroup;
-            Id = task.Id;
-            Label = task.Label;
-            Comments = task.Comments;
-            Type = task.Type;
 
-            Checked = task.Value == "true";
-        }
-    }
-
-    public class TaskText : TaskItem {
-        public string Text { get; set; }
-        public TaskText(TaskItem task) {
-            TaskGroup = task.TaskGroup;
-            Id = task.Id;
-            Label = task.Label;
-            Comments = task.Comments;
-            Type = task.Type;
-            Value = task.Value;
-
-            Text = task.Value;
-        }
-    }
-
-    public class TaskNumber : TaskItem {
-        public double Number { get; set; } = 0.0f;
-        public TaskNumber(TaskItem task) {
-            TaskGroup = task.TaskGroup;
-            Id = task.Id;
-            Label = task.Label;
-            Comments = task.Comments;
-            Type = task.Type;
-            Value=task.Value;
-
-            double number;
-            if(double.TryParse(task.Value, out number)) Number = number;
-        }
-    }
-
-    public class TaskList : TaskItem {
-        public List<string> Options { get; set; } = new List<string>();
-        public string SelectedOption { get; set; } = "No selection";
-        public TaskList(TaskItem task) {
-            TaskGroup = task.TaskGroup;
-            Id = task.Id;
-            Label = task.Label;
-            Comments = task.Comments;
-            Type = task.Type;
-
-            if (string.IsNullOrEmpty(task.Value)) return;
-
-            var options = task.Value.Split(',').ToList();
-            int result = -1;
-            if(int.TryParse(options[0], out result)) SelectedOption = options[result];
-            options.RemoveAt(0);
-            Options = options;
-
-            Value = SelectedOption;
-        }
-    }
-
-    public class TaskDate : TaskItem {
-        public DateTime? Date { get; set; } = new DateTime();
-        public TaskDate(TaskItem task) {
-            TaskGroup = task.TaskGroup;
-            Id = task.Id;
-            Label = task.Label;
-            Comments = task.Comments;
-            Type = task.Type;
-
-            if (string.IsNullOrEmpty(task.Value)) return;
-
-            var date = new DateTime();
-            if (DateTime.TryParse(task.Value, out date)) Date = date;
-
-        }
-    }
-
-    public class TaskCalculate : TaskItem {
-        public string Formula { get; set; } = "no formula";
-        public TaskCalculate(TaskItem task) {
-            TaskGroup = task.TaskGroup;
-            Id = task.Id;
-            Label = task.Label;
-            Comments = task.Comments;
-            Type = task.Type;
-            Value = task.Value;
-
-            Formula = task.Value;
-        }
-    }
 }
 

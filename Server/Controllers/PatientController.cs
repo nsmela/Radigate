@@ -24,5 +24,6 @@ namespace Radigate.Server.Controllers {
             var result = await _patientService.GetPatientAsync(patientId);
             return Ok(result);
         }
+
     }
 }

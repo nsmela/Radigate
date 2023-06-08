@@ -3,12 +3,14 @@ global using Microsoft.EntityFrameworkCore;
 global using Radigate.Server.Services.PatientService;
 using Radigate.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
+using Radigate.Server.Services.TaskService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(
+    options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true); //https://stackoverflow.com/questions/72060349/form-field-is-required-even-if-not-defined-so
 builder.Services.AddRazorPages();
 
 //packages
@@ -17,6 +19,7 @@ builder.Services.AddSwaggerGen();
 
 //custom services Dependancy Injection
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 // SQLLite
 var connectionString = builder.Configuration.GetConnectionString("SQLLiteConnection");

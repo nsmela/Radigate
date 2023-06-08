@@ -40,5 +40,6 @@ namespace Radigate.Server.Services.PatientService {
 
             return response;
         }
+
     }
 }

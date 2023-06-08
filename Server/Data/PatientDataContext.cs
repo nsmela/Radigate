@@ -119,6 +119,6 @@ namespace Radigate.Server.Data {
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<TaskGroup> TaskGroups { get; set; }
-
+        public DbSet<TaskItem> Tasks { get; set; }
     }
 }

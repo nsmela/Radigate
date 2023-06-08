@@ -4,36 +4,35 @@
     <MudPaper Class="mud-theme-primary pa-2 ml-2 mt-1 rounded-t-xl rounded-0" MinHeight="240px">
         <MudItem Class="d-flex justify-content-between">
             <MudItem>
-                <MudText Typo="Typo.h2">@(patient.LastName.ToUpper() + ", " + patient.FirstName.ToUpper())</MudText>
-                    <MudText Typo="Typo.h3">DUE: NO DATA</MudText>
-                    <MudText Typo="Typo.h3">PHYSICIAN: N/A</MudText>
+                <MudText Typo="Typo.h1">@(patient.LastName.ToUpper() + ", " + patient.FirstName.ToUpper())</MudText>
+                    <MudText Typo="Typo.h4">DUE: NO DATA</MudText>
+                    <MudText Typo="Typo.h4">PHYSICIAN: N/A</MudText>
                 </MudItem>
                 <MudItem Style="transform:rotateZ(270deg);height:200px;" Class="d-flex flex-column justify-content-end mr-10">
                     <MudButton Variant="Variant.Outlined">History</MudButton>
                     <MudButton Variant="Variant.Outlined">Compare</MudButton>
                 </MudItem>
             </MudItem>
-
         </MudPaper>
 
-        <MudContainer Class="mt-n12 ml-6 d-flex flex-row" > 
+        <MudContainer Class="mt-n10 ml-6 d-flex flex-row" > 
         @foreach (var group in patient.TaskGroups) {
                 <MudPaper Class="d-flex ma-2 pa-2 flex-column" Elevation="2" >
                     <MudText class="d-flex" Typo="Typo.h6">@group.Label</MudText>
                     <div style="min-width: 330px;">
                         <MudExpansionPanels DisableBorders="true" Dense="true">
                         @foreach (var task in group.Tasks) {
-                                    <!--<PatientTask TaskItem="@task" Edit="EditMode.DataEntry" />-->
-                            @switch (task.Type) {
-                                    <!-- CheckBox FIELD -->
+                                @switch (task.Type) {
+                                <!-- CheckBox FIELD -->
                                 case (int)TaskType.Bool:
                                     var check = task as TaskBool;    
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex align-self-center pl-2">@task.Label</MudText>
-                                        <MudCheckBox @bind-Checked="check.Checked" />
+                                        <MudCheckBox T="bool" Checked="@check.Checked" 
+                                            CheckedChanged="@((value) => {check.Checked = value; UpdatePatientTask(check, value ? "true" : "false");})"/>
                                     </MudPaper>
                                     break;
-                                            <!-- TEXT FIELD -->
+                                <!-- TEXT FIELD -->
                                 case (int)TaskType.Text:
                                     var result = task as TaskText;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
@@ -41,20 +40,22 @@
                                         <MudTextField Class="d-inline-flex align-self-center px-2 text-align-right"
                                             Style="margin-left:auto;padding-bottom:16px;height:24px;"
                                             Variant="Variant.Filled" DisableUnderLine="true" Margin="Margin.Dense"
-                                            T="string" @bind-Value="result.Text" />
+                                            T="string" Text="@result.Text" TextChanged="@((value) => { if(result.Text !=value){ result.Text = value; UpdatePatientTask(result, value);}})" />
                                     </MudPaper>
                                     break;
-                                            <!-- FORMULA FIELD -->
+                                <!-- NUMBER FIELD -->
                                 case (int)TaskType.Number:
                                     var number = task as TaskNumber;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true" >
                                         <MudText Class="d-inline-flex align-self-center pl-2">@number.Label</MudText>
                                             <MudNumericField Class="d-inline-flex align-self-center px-2 text-align-right"
-                                         Style="text-align:right;padding-bottom:16px;height:24px;"
-                                         Variant="Variant.Filled" DisableUnderLine="true" Margin="Margin.Dense" 
-                                         @bind-Value="number.Value" HideSpinButtons="true" />
+                                                 Style="text-align:right;padding-bottom:16px;height:24px;"
+                                                 Variant="Variant.Filled" DisableUnderLine="true" Margin="Margin.Dense" 
+                                                 HideSpinButtons="true" T="double" Value="@number.Number" 
+                                                 ValueChanged="@((value) => {number.Number = value; UpdatePatientTask(number, value.ToString());})" />
                                     </MudPaper>
                                     break;
+                                <!-- FORMULA FIELD -->
                                 case (int)TaskType.Calculation:
                                     var formula = task as TaskCalculate;
                                     <MudExpansionPanel Class="mt-2" HideIcon="true" Dense="true" >
@@ -71,7 +72,8 @@
                                                 <MudTextField Class="d-inline-flex align-self-center px-2 text-align-right"
                                                     Style="text-align:right;padding-bottom:16px;height:24px;"
                                                     Variant="Variant.Filled" DisableUnderLine="true" Margin="Margin.Dense"
-                                                    T="string" @bind-Value="formula.Formula" />
+                                                    T="string" Text="@formula.Formula" 
+                                                    TextChanged="@((value) => { if(formula.Formula !=value){ formula.Formula = value; UpdatePatientTask(formula, value);}})" />
                                             </MudPaper>
                                         </ChildContent>
                                     </MudExpansionPanel>
@@ -83,17 +85,18 @@
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex flex-grow-1 align-self-center px-2 ">@date.Label</MudText>
                                         <MudDatePicker Class="d-inline-flex align-self-center px-2 text-align-right" AutoClose="true"
-                                            Style="padding-bottom:12px;height:36px;width:200px" Margin="Margin.Dense" Variant="Variant.Filled"
-                                            @bind-Date="date.Date" />
+                                            Style="padding-bottom:12px;height:36px;width:200px" Margin="Margin.Dense" Variant="Variant.Filled" T="DateTime"
+                                            Date="@date.Date" DateChanged="@((value) => { date.Date = value; UpdatePatientTask(date, value.Value.ToShortDateString());})"/>
                                     </MudPaper>
                                     break;
-                                            <!-- List FIELD -->
+                                <!-- List FIELD -->
                                 case (int)TaskType.List:
                                     var list = task as TaskList;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex flex-grow-1 align-self-center px-2" T="string">@list.Label</MudText>
-                                        <MudSelect @bind-Value="list.SelectedOption" Class="d-inline-flex flex-grow-1  px-2 pb-14" TransformOrigin="Origin.CenterCenter"
-                                            Style="height:40px;">
+                                        <MudSelect Class="d-inline-flex flex-grow-1  px-2 pb-14" Style="height:40px;" TransformOrigin="Origin.CenterCenter"
+                                            T="string" Value="@list.SelectedOption" 
+                                            ValueChanged="@((value) => { list.SelectedOption = value; UpdatePatientTask(list, list.ValueString);})">
                                             @foreach (var option in list.Options) {
                                                 <MudSelectItem Value="@(option)">@option</MudSelectItem>
                                             }
@@ -117,8 +120,8 @@
                                         </ChildContent>
                                     </MudExpansionPanel>
                                     break;
+                                }
                             }
-                        }
                         </MudExpansionPanels>
                     </div>
                 </MudPaper>
@@ -137,6 +140,7 @@
 @code {
     [Inject] private IDialogService DialogService { get; set; }
     [Inject] private IPatientService PatientService { get; set; }
+    [Inject] private ITaskService TaskService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
 
     [Parameter] public int PatientId { get; set; }
@@ -151,7 +155,10 @@
         }
     }
 
-    private async Task UpdatePatientTask(string groupLabel, string label, object value) {
+    private async Task UpdatePatientTask(TaskItem task, string value) {
+        StateHasChanged();
+
+        await TaskService.UpdateTaskValue(task, value);
     }
 
     private async Task DeletePatient() {
