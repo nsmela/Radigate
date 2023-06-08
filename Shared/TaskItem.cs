@@ -19,27 +19,4 @@ namespace Radigate.Shared {
         public string Value { get; set; } = string.Empty;
     }
 
-    public partial class TaskItem {
-        //need to remember these properties need to be bi-directional
-        [NotMapped]
-        public bool IsTrue {
-            get => Value == "true";
-            set => Value = value ? "true" : "false";
-        }
-        //combo box values are a concatentated list starting with the index of the selection and seperated by commas
-        [NotMapped]
-        public List<string> Options {
-            get => Value.Split(',').Skip(1).ToList(); //the first value is an int, the index selected
-            set {
-                var options = SelectedOption.ToString();
-                foreach(var option in value) options = options + "," + option;
-                Value = options;
-            }
-        }
-
-        [NotMapped] public int SelectedOption => Type == (int)TaskType.List ? int.Parse(Value.Split(',').First()) : -1;
-        [NotMapped] public double Number => Type == (int)TaskType.Number ? double.Parse(Value) : 0.0f;
-        [NotMapped] public DateTime Date => Type == (int)TaskType.Date ? DateTime.Parse(Value) : DateTime.MinValue;
-        [NotMapped] public string Formula => Value;
-    }
 }
