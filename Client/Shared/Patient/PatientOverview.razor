@@ -1,0 +1,78 @@
+﻿@if (Patient == null) {
+    <MudProgressCircular Indeterminate=true>@message</MudProgressCircular>
+}
+else {
+    <MudPaper Class="mud-theme-primary pa-1 mb-2 ma-1" Width="360px">
+        <!-- Header -->
+        <MudExpansionPanel Class="mud-theme-primary" Dense="true" DisableGutters="true">
+            <TitleContent>
+                <MudToolBar Dense=true DisableGutters=true>
+                    <MudText>@Name.ToUpper()</MudText>
+                    <MudSpacer />
+                    <MudIconButton Icon="@Icons.Material.Filled.Preview" Size="Size.Small" OnClick="@(() => EditPatient())" />
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                        <MudMenuItem Icon="@Icons.Material.Filled.ModeEdit" OnClick="@(() => ModifyPatient())">Edit Tasks</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.Archive">Archive Patient</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.RemoveCircleOutline">Remove Patient</MudMenuItem>
+                    </MudMenu>
+                </MudToolBar>
+            </TitleContent>
+            <ChildContent>
+                <MudPaper Class="mud-theme-primary ma-n1 pl-1" Square="true" Elevation="0" Outlined="true">
+                    <MudText><b>Patient ID:</b> @Patient.Identifier</MudText>
+                </MudPaper>
+            </ChildContent>
+        </MudExpansionPanel>
+
+        @foreach (var group in Patient.TaskGroups) {
+            <!-- Task Group -->
+            <MudGrid Class="mud-theme-tertiary pa-1 mt-2 d-flex flex-column" Spacing="1">
+                <MudItem>
+                    <MudText>@group.Label</MudText>
+                </MudItem>
+                @foreach (var result in group.Tasks) {
+                    <MudPaper MaxHeight="22px" Class="mud-theme-secondary mx-1 pl-1 mt-1 d-flex flex-grow-1 justify-space-between">
+                        <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:18px"><b>@result.Label</b></MudText>
+                        @if (result.Type == (int)TaskType.Bool) {
+                            var task = result as TaskBool;
+                            <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@task.Checked" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
+                        }
+                        else {
+                            <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@result.Value</MudText>
+                        }
+
+                    </MudPaper>
+                }
+            </MudGrid>
+        }
+    </MudPaper>
+}
+
+@code {
+    [Inject] private IPatientService PatientService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    [Parameter] public int? PatientId { get; set; }
+
+    private Patient? Patient { get; set; } = null;
+    private string message { get; set; } = "Accessing patient";
+    string Name => Patient.LastName + ", " + Patient.FirstName;
+
+    protected override async Task OnParametersSetAsync() {
+        var response = await PatientService.GetPatient(PatientId.Value);
+
+        if(!response.Success){
+            message = response.Message;
+            return;
+        }
+
+        Patient = response.Data;
+    }
+
+    private async Task UpdatePatientTask(string groupLabel, string label, object value) {
+    }
+
+    private void EditPatient() => NavigationManager.NavigateTo($"patients/{Patient.Id}");
+    private async Task ModifyPatient() => NavigationManager.NavigateTo($"patients/edit/{Patient.Id}");
+
+}

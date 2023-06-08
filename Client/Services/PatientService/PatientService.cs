@@ -131,7 +131,7 @@ namespace Radigate.Client.Services.PatientService {
     }
 
     public class TaskDate : TaskItem {
-        public DateTime Date { get; set; } = new DateTime();
+        public DateTime? Date { get; set; } = new DateTime();
         public TaskDate(TaskItem task) {
             TaskGroup = task.TaskGroup;
             Id = task.Id;

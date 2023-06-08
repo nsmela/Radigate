@@ -9,64 +9,20 @@
     </MudPaper>
 </div>
 
-@if(patients == null){
-    <p><em><MudProgressCircular /></em></p>
+@if(PatientService.Patients == null){
+    <MudProgressCircular />
 }else {
     <!-- List of Patients -->
     <MudStack Row="true" Class="pa-2 overflow-x-scroll">
         @foreach(var patient in patients) {
-            <MudPaper Class="mud-theme-primary pa-1 mb-2 ma-1" Width="360px">
-                <!-- Header -->
-                <MudExpansionPanel Class="mud-theme-primary" Dense="true" DisableGutters="true">
-                    <TitleContent>
-                        <MudToolBar Dense=true DisableGutters=true>
-                            <MudText>@Name(patient)</MudText>
-                            <MudSpacer />
-                            <MudIconButton Icon="@Icons.Material.Filled.Preview" Size="Size.Small"  />
-                            <MudMenu Icon="@Icons.Material.Filled.MoreVert">
-                                <MudMenuItem Icon="@Icons.Material.Filled.ModeEdit" >Edit Tasks</MudMenuItem>
-                                <MudMenuItem Icon="@Icons.Material.Filled.Archive">Archive Patient</MudMenuItem>
-                                <MudMenuItem Icon="@Icons.Material.Filled.RemoveCircleOutline">Remove Patient</MudMenuItem>
-                            </MudMenu>
-                        </MudToolBar>
-                    </TitleContent>
-                    <ChildContent>
-                        <MudPaper Class="mud-theme-primary ma-n1 pl-1" Square="true" Elevation="0" Outlined="true">
-                            <MudText><b>Patient ID: </b>@patient.Identifier</MudText>
-                            <MudText><b>Start Date: </b>@DateTime.Today.ToLongDateString()</MudText>
-                        </MudPaper>
-                    </ChildContent>
-                </MudExpansionPanel>
-
-                @foreach (var group in patient.TaskGroups) {
-                    <!-- Task Group -->
-                    <MudGrid Class="mud-theme-tertiary pa-1 mt-2 d-flex flex-column" Spacing="1">
-                        <MudItem>
-                            <MudText>@group.Label</MudText>
-                        </MudItem>
-                        @foreach (var task in group.Tasks) {
-                            <MudPaper MaxHeight="22px" Class="mud-theme-secondary mx-1 pl-1 mt-1 d-flex flex-grow-1 justify-space-between">
-                                <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:18px"><b>@task.Label</b></MudText>
-                                @if (task.Type == (int)TaskType.Bool) {
-                                    var tb = task as TaskBool;
-                                    <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@tb.Checked" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
-                                } else {
-                                    <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@task.Value</MudText>
-                                }
-
-                            </MudPaper>
-                        }
-                    </MudGrid>
-                }
-            </MudPaper>
+            <Radigate.Client.Shared.Patient.PatientOverview PatientId="@patient.Id" />
         }
-        
     </MudStack>
 }
 
 @code {
-    [Inject] private IPatientService PatientService { get; set; }
-    [Inject] private NavigationManager navigationManager { get; set; }
+        [Inject] private IPatientService PatientService { get; set; }
+        [Inject] private NavigationManager NavigationManager { get; set; }
 
     protected override async Task OnInitializedAsync() {
         await PatientService.GetPatients();
@@ -75,5 +31,6 @@
     private List<Patient> patients => PatientService.Patients;
     private string Name(Patient patient) => (patient.LastName + "," + patient.FirstName).ToUpper();
 
-    private void AddPatient() => navigationManager.NavigateTo($"newpatient");
+    private void AddPatient() => NavigationManager.NavigateTo($"newpatient");
+    private void PatientDataEntry(int id) => NavigationManager.NavigateTo($"patients/{id}");
 }

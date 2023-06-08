@@ -1,12 +1,9 @@
-﻿@page "/patient/{id:int}"
+﻿@page "/patients/{id:int}"
 
 @if(patient is null){
-    <span>@message</span>
+    <MudProgressCircular>@message</MudProgressCircular>
 } else {
-    <div>
-        <h2>@FullName</h2>
-        <p>Patient ID: @patient.Id</p>
-    </div>
+    <PatientDetailedView PatientId="@Id" />
 }
 
 @code {
