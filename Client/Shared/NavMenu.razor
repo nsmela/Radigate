@@ -1,34 +1,23 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Application</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-    </nav>
-</div>
+﻿﻿<MudNavMenu>
+    <MudNavLink Icon="@Icons.Material.Filled.Dashboard" Href="/" Match="NavLinkMatch.All">DASHBOARD</MudNavLink>
+    <MudNavGroup Icon="@Icons.Material.Filled.People" Title="PATIENTS" Expanded="false">
+        <MudNavLink Href="/patients" Match="NavLinkMatch.Prefix">Overview</MudNavLink>
+        <MudNavLink Href="/patients/pending" Match="NavLinkMatch.Prefix">Pending</MudNavLink>
+        <MudNavLink Href="/patients/archive" Match="NavLinkMatch.Prefix">Archived</MudNavLink>
+        <MudNavLink Href="/patients/management" Match="NavLinkMatch.Prefix">Manage</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Icon="@Icons.Material.Filled.Groups" Href="/staff" Match="NavLinkMatch.All">STAFF</MudNavLink>
+    <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="SETTINGS" Expanded="false">
+        <MudNavLink Href="/account" Match="NavLinkMatch.All">Account</MudNavLink>
+        <MudNavGroup Title="Templates" Expanded="false">
+            <MudNavLink Href="/templates" Match="NavLinkMatch.Prefix">Patient Templates</MudNavLink>
+            <MudNavLink Href="/templates/groups" Match="NavLinkMatch.Prefix">Group Templates</MudNavLink>
+        </MudNavGroup>
+        <MudNavLink Href="/display" Match="NavLinkMatch.All">Display</MudNavLink>
+        <MudNavLink Href="/admin" Match="NavLinkMatch.All">Admin</MudNavLink>
+    </MudNavGroup>
+</MudNavMenu>
 
 @code {
-    private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
 }
