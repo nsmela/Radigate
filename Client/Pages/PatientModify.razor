@@ -1,0 +1,9 @@
+﻿@page "/patients/edit/{id:int}"
+
+    <PatientModifyView PatientId="@Id" />
+
+@code {
+    [Inject] private IPatientService PatientService { get; set; }
+    [Parameter] public int Id { get; set; }
+
+}

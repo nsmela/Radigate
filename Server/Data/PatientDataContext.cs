@@ -36,10 +36,10 @@ namespace Radigate.Server.Data {
             modelBuilder.Entity<TaskItem>().ToTable("Tasks");
 
             modelBuilder.Entity<TaskItem>().HasData(
-                new TaskItem { Id = 1, Label = "Assigned RO", TaskGroupId = 1, Type = (int)TaskType.Text, Value = "No one" },
-                new TaskItem { Id = 2, Label = "Approved by RO", TaskGroupId = 1, Type = (int)TaskType.Bool, Value = "false" },
-                new TaskItem { Id = 3, Label = "Mass Volume", TaskGroupId = 1, Type = (int)TaskType.Number, Value = "150.0" },
-                new TaskItem { Id = 4, Label = "Patient Status", TaskGroupId = 1, Type = (int)TaskType.List, Value = "2,Waiting,Assigned,Treating,Finished" },
+                new TaskItem { Id = 1, Label = "Assigned RO", TaskGroupId = 1, Type = (int)TaskType.Text, Value = "No one", SortingOrder = 0 },
+                new TaskItem { Id = 2, Label = "Approved by RO", TaskGroupId = 1, Type = (int)TaskType.Bool, Value = "false", SortingOrder = 1 },
+                new TaskItem { Id = 3, Label = "Mass Volume", TaskGroupId = 1, Type = (int)TaskType.Number, Value = "150.0", SortingOrder = 2 },
+                new TaskItem { Id = 4, Label = "Patient Status", TaskGroupId = 1, Type = (int)TaskType.List, Value = "2,Waiting,Assigned,Treating,Finished", SortingOrder = 3 },
                 new TaskItem { Id = 5, Label = "Approved by RO", TaskGroupId = 2, Type = (int)TaskType.Bool, Value = "false" },
                 new TaskItem { Id = 6, Label = "Assigned Physicist", TaskGroupId = 2, Type = (int)TaskType.Text, Value = "No one" },
                 new TaskItem { Id = 7, Label = "Mass Volume", TaskGroupId = 2, Type = (int)TaskType.Number, Value = "12.55" },
