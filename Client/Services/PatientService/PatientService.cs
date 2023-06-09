@@ -1,4 +1,6 @@
 ﻿
+using System.Threading.Tasks;
+
 namespace Radigate.Client.Services.PatientService {
     public class PatientService : IPatientService {
         private readonly HttpClient _http;
@@ -69,6 +71,13 @@ namespace Radigate.Client.Services.PatientService {
             var result = await _http.GetFromJsonAsync<ServiceResponse<List<int>>>(requestString);
 
             return result;
+        }
+
+        public async Task UpdatePatient(PatientValueItem newPatient) {
+            string connection = $"/api/Patient/Add";
+            var result = await _http.PutAsJsonAsync(connection, newPatient);
+
+
         }
 
         //TaskItem is converted into The relevent TaskType

@@ -239,7 +239,28 @@
     }
 
     private async Task SavePatientData() {
-        var newPatient = new Patient
+        var newPatient = new PatientValueItem {
+            PatientId = patient.Id,
+            FirstName = patient.FirstName,
+            LastName = patient.LastName,
+            Identifier = patient.Identifier
+        };
+
+        Groups.ForEach(g => {
+            var group = new PatientValueItem.GroupValueItem { Id = g.Group.Id, Label = g.Group.Label };
+            g.Tasks.ForEach(t => group.Tasks.Add(new PatientValueItem.TaskItemValue { 
+                Id = t.Task.Id, 
+                Label = t.Task.Label,
+                Comments = t.Task.Comments,
+                Type = t.Task.Type,
+                Value = t.Task.Value
+            }));
+            
+            newPatient.Groups.Add(group);
+        });
+
+
+
     }
 
     private class TaskGroupModifier {
