@@ -72,7 +72,8 @@
                                         <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {group.NewTaskType = TaskType.Number;}) />
                                         <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {group.NewTaskType = TaskType.Calculation;})></MudButton>
                                     </MudMenu>
-                                    <MudTextField @bind-Value="group.NewTaskLabel" Placeholder="New Task" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"></MudTextField>
+                                    <MudTextField @bind-Value="group.NewTaskLabel" Placeholder="New Task" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
+                                        TextChanged="@(() => {if(!String.IsNullOrEmpty(group.NewTaskLabel)) { AddTaskItem(group); }})"></MudTextField>
                                 </MudToolBar>
                                 <MudButton OnClick="@(() => AddTaskItem(group))" Size="Size.Small" Color="Color.Primary" FullWidth="true">Add Task</MudButton>
                                 <MudButton OnClick="@(() => group.IsNewTaskOpen = false)" Size="Size.Small" Color="Color.Primary" FullWidth="true">Hide</MudButton>
@@ -183,7 +184,9 @@
             Task = new TaskItem {
                 Label = group.NewTaskLabel,
                 Type = (int)group.NewTaskType
-            }
+            },
+            NewLabel = group.NewTaskLabel,
+            Parent = group
         };
 
         group.IsNewTaskOpen = false;
@@ -223,6 +226,7 @@
 
     private void OnValidSectionSubmit(EditContext context) {
         var group = new TaskGroup { Label = NewTaskGroup.Label, PatientId = patient.Id };
+        Groups.Add(new TaskGroupModifier { Group = group, Tasks = new(), NewLabel = group.Label });
         NewTaskGroup.Label = string.Empty;
         AddGroupOpen = false;
     }

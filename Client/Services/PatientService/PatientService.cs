@@ -64,6 +64,13 @@ namespace Radigate.Client.Services.PatientService {
             }
         }
 
+        public async Task<ServiceResponse<List<int>>> GetPatientsId() {
+            string requestString = $"/api/Patient/ids";
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<int>>>(requestString);
+
+            return result;
+        }
+
         //TaskItem is converted into The relevent TaskType
         private Patient ConvertPatient(Patient patient) {
             foreach (var group in patient.TaskGroups) {

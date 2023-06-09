@@ -20,6 +20,16 @@ namespace Radigate.Server.Services.PatientService {
             return response;
         }
 
+        public async Task<ServiceResponse<List<int>>> GetPatientsIdAsync() {
+            var response = new ServiceResponse<List<int>> {
+                Data = await _context.Patients
+                    .Select(Patient => Patient.Id) //grab only the id
+                    .ToListAsync()
+            };
+
+            return response;
+        }
+
         //https://learn.microsoft.com/en-us/ef/ef6/fundamentals/relationships
         public async Task<ServiceResponse<Patient>> GetPatientAsync(int patientId) {
             var response = new ServiceResponse<Patient>();

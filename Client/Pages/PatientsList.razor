@@ -9,27 +9,29 @@
     </MudPaper>
 </div>
 
-@if(PatientService.Patients == null){
-    <MudProgressCircular />
-}else {
-    <!-- List of Patients -->
+<!-- List of Patients -->
+@if (patientIds is not null) {
+
     <MudStack Row="true" Class="pa-2 overflow-x-scroll">
-        @foreach(var patient in patients) {
-            <Radigate.Client.Shared.Patient.PatientOverview PatientId="@patient.Id" />
+        @foreach (var patientId in patientIds)
+        {
+            <Radigate.Client.Shared.Patient.PatientOverview PatientId="@patientId" />
         }
     </MudStack>
 }
 
 @code {
-        [Inject] private IPatientService PatientService { get; set; }
-        [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IPatientService PatientService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    private List<int> patientIds { get; set; }
 
     protected override async Task OnInitializedAsync() {
-        await PatientService.GetPatients();
-    }
+        var response = await PatientService.GetPatientsId();
 
-    private List<Patient> patients => PatientService.Patients;
-    private string Name(Patient patient) => (patient.LastName + "," + patient.FirstName).ToUpper();
+        if (!response.Success || response.Data is null || response.Data.Count < 1) return;
+        patientIds = response.Data;
+    }
 
     private void AddPatient() => NavigationManager.NavigateTo($"newpatient");
     private void PatientDataEntry(int id) => NavigationManager.NavigateTo($"patients/{id}");
