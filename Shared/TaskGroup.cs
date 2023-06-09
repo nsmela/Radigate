@@ -10,10 +10,10 @@ namespace Radigate.Shared {
         //parent
         [JsonIgnore] public Patient Patient { get; set; } = null!;
         public int PatientId { get; set; }
-
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); //dependants
 
         public int Id { get; set; }
+        public int SortingOrder { get; set; }
         public string Label { get; set; } = string.Empty;
 
     }

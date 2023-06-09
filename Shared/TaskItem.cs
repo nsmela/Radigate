@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -12,6 +13,17 @@ namespace Radigate.Shared {
     public enum TaskType { Bool, Text, Number, List, Date, Calculation, Base }
 
     public class TaskItem {
+        [JsonIgnore] public TaskGroup TaskGroup { get; set; } = null!;//parent
+        public int TaskGroupId { get; set; }
+        public int SortingOrder { get; set; }
+        public int Id { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public string Comments { get; set; } = string.Empty;
+        public int Type { get; set; }
+        public string Value { get; set; } = string.Empty;
+
+        public virtual TaskItem ToTaskItem() => this;
+
         public static TaskItem Convert(TaskItem task) {
             switch (task.Type) {
                 case (int)TaskType.Bool:
@@ -25,18 +37,7 @@ namespace Radigate.Shared {
                 default:
                     return (TaskItem)task;
             }
-
         }
-
-        [JsonIgnore] public TaskGroup TaskGroup { get; set; } = null!;//parent
-        public int TaskGroupId { get; set; }
-        public int Id { get; set; }
-        public string Label { get; set; } = string.Empty;
-        public string Comments { get; set; } = string.Empty;
-        public int Type { get; init; }
-        public string Value { get; set; } = string.Empty;
-
-        public virtual TaskItem ToTaskItem() => this;
     }
 
     //Task classes

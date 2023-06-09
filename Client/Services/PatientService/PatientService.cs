@@ -36,7 +36,7 @@ namespace Radigate.Client.Services.PatientService {
 
             return result;
         }
-
+        
         public async Task GetPatientTaskUpdate(int taskId) {
             string connection = $"/api/Task/{taskId}";
             var result = await _http.GetFromJsonAsync<ServiceResponse<TaskItem>>(connection);

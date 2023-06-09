@@ -1,0 +1,241 @@
+﻿﻿<MudStack>
+    <MudPaper Width="440px">
+        <!-- Patient info Header -->
+        <MudPaper Elevation="2" Class="pa-2 ma-2 --mud-palette-dark">
+            <MudTextField @bind-Value="patient.LastName" Label="Last Name" />
+            <MudTextField @bind-Value="patient.FirstName" Label="First Name" />
+            <MudTextField @bind-Value="patient.Identifier" Label="Patient ID" />
+        </MudPaper>
+        @foreach (var group in Groups) {
+            <MudPaper Elevation="0" MinHeight="80px" Class="pa-2 ma-4 d-flex flex-column mud-background-gray rounded-lg">
+                <MudToolBar DisableGutters="true" Class="@(group.Edit ? "mud-secondary pa-4 ma-n2" : "mud-primary pa-4 ma-n2")">
+                    @if (group.Edit) {
+                        <MudTextField @bind-Value="group.NewLabel" Placeholder="@group.Group.Label" Label="Edit Group Name"
+                              DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2" TextChanged="(() => OnTextFieldChangedHandler(group))" />
+                    }
+                    else {
+                        <MudText Typo="Typo.subtitle1"><b>@group.Group.Label</b></MudText>
+                    }
+                    <MudSpacer />
+                    <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                        <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="(()=> DeleteGroup(group))">Delete Section</MudButton>
+                        <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="(()=> EditGroupName(group))">Rename Section</MudButton>
+                    </MudMenu>
+                </MudToolBar>
+                <MudStack Class="pt-4">
+                    <!-- Each task listing -->
+                    @foreach (var task in group.Tasks) {
+                        <MudToolBar Class="ma-n4">
+                            <!-- to see if the task is open -->
+                            @if (group.Edit && task.Edit) {
+                                <MudMenu Icon="@TypeToIcon(task.Task.Type)" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {task.Task.Type = (int)TaskType.Bool; task.Task.Value = "false";})></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {task.Task.Type = (int)TaskType.Text; task.Task.Value = string.Empty;})></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {task.Task.Type = (int)TaskType.Date; task.Task.Value = DateTime.Today.ToShortDateString();}) />
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> {task.Task.Type = (int)TaskType.List; task.Task.Value = "0,Option 1,Option 2";}) />
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {task.Task.Type = (int)TaskType.Number; task.Task.Value = "0.0";}) />
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {task.Task.Type = (int)TaskType.Calculation; task.Task.Value = string.Empty;})></MudButton>
+                                </MudMenu>
+                                <MudTextField @bind-Value="task.Task.Label" Placeholder="@task.Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"></MudTextField>
+                                <MudSpacer />
+                                <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="(()=> EditTask(task))" Size="Size.Small" />
+                                <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
+                                   Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
+                            }
+                            else {
+                                <!-- Normal Task View -->
+                                <MudIcon Icon="@TypeToIcon(task.Task.Type)" Size="Size.Small" Class="pr-1" />
+                                <MudText Typo="Typo.body1"><b>@task.Label</b></MudText>
+                                <MudSpacer />
+                                <MudIconButton Icon="@Icons.Material.Sharp.Edit" OnClick="(()=> group.EditTaskIndex = group.Tasks.IndexOf(task))" Size="Size.Small" />
+                                <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(()=> RaiseTask(group, task))" />
+                                <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(()=> LowerTask(group, task))" />
+                                <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
+                                   Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
+                            }
+
+                        </MudToolBar>
+                    }
+                    <!-- Add Task Section -->
+                    @if (group.NewTaskOpen) {
+                        <MudPaper Elevation="25" Class="pa-2 rounded-lg">
+                            <MudToolBar Dense="true">
+                                <MudMenu Icon="@TypeToIcon(group.NewTaskType)" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> group.NewTaskType = "Checkbox")></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> group.NewTaskType = "Text")></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> group.NewTaskType = "Date")></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> group.NewTaskType = "List")></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> group.NewTaskType = "Number")></MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> group.NewTaskType = "Calculation")></MudButton>
+                                </MudMenu>
+                                <MudTextField @bind-Value="group.NewTaskName" Placeholder="New Task" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"></MudTextField>
+                            </MudToolBar>
+                            <MudButton OnClick="@(() => AddTaskItem(group))" Size="Size.Small" Color="Color.Primary" FullWidth="true">Add Task</MudButton>
+                            <MudButton OnClick="@(() => group.NewTaskOpen = !group.NewTaskOpen)" Size="Size.Small" Color="Color.Primary" FullWidth="true">Hide</MudButton>
+                        </MudPaper>
+                    }
+                    else {
+                        <MudButton OnClick="@(() => group.NewTaskOpen = !group.NewTaskOpen)" StartIcon="@Icons.Material.Filled.Add" FullWidth="true" Class="rounded-lg py-2">Add Task</MudButton>
+                    }
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudPaper Class="pa-4" Elevation="0">
+            @if (AddGroupOpen) {
+                <MudPaper Elevation="0" Class="pa-4 d-flex flex-column mud-background-gray rounded-lg">
+                    <EditForm Model="@newTaskGroup" OnValidSubmit="OnValidSectionSubmit">
+                        <DataAnnotationsValidator />
+                        <MudTextField @bind-Value="newTaskGroup.Name" For="@(() => newTaskGroup.Name)" Placeholder="New Group" DisableUnderLine="true"></MudTextField>
+                        <MudButton ButtonType="ButtonType.Submit" Size="Size.Small" Color="Color.Primary" FullWidth="true">Add Section</MudButton>
+                    </EditForm>
+                </MudPaper>
+            }
+            else {
+                <MudButton OnClick="(()=> AddGroupOpen = true)" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Class="rounded-lg py-2" FullWidth="true">Add Group</MudButton>
+            }
+        </MudPaper>
+        <MudPaper Elevation="2" Class="pa-2 ma-4 d-flex flex-1">
+            <MudButton Variant="Variant.Filled" Class="ma-2 d-flex flex-1" OnClick="(() => CancelPatientEdit())"
+                       Color="Color.Info" Size="Size.Small">Cancel</MudButton>
+            <MudButton Variant="Variant.Filled" Class="ma-2 d-flex flex-1" OnClick="(() => ResetPatientData())"
+                       Color="Color.Info" Size="Size.Small">Reset</MudButton>
+            <MudButton Variant="Variant.Filled" Class="ma-2 d-flex flex-1" OnClick="(() => SavePatientData())"
+                       Color="Color.Warning" Size="Size.Small">Save</MudButton>
+        </MudPaper>
+
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Inject] IPatientService PatientService { get; set; }
+    [Inject] NavigationManager NavManager { get; set; }
+    [Parameter] public int PatientId { get; set; }
+
+    //patient info
+    Patient? patient { get; set; }
+    List<TaskGroupModifier> Groups {get;set;} = new();
+
+    //controls
+    private bool AddGroupOpen { get; set; }
+
+    private string GroupHeaderClass(TaskGroup group) => string.Empty;//group.EditNameOpen ? "mud-secondary pa-4 ma-n2" : "mud-primary pa-4 ma-n2";
+
+    private string TypeToIcon(int type) {
+        if (type == (int)TaskType.Bool) return Icons.Material.Outlined.CheckBox;
+        if (type == (int)TaskType.Text) return Icons.Material.Filled.TextSnippet;
+        if (type == (int)TaskType.Date) return Icons.Material.Filled.CalendarMonth;
+        if (type == (int)TaskType.List) return Icons.Material.Filled.List;
+        if (type == (int)TaskType.Number) return Icons.Material.Filled.Numbers;
+        if (type == (int)TaskType.Calculation) return Icons.Material.Filled.Calculate;
+        return Icons.Material.Filled.QuestionMark;
+    }
+
+    protected override async Task OnParametersSetAsync() {
+        var response = await PatientService.GetPatient(PatientId);
+        if(!response.Success || response.Data is null) return;
+
+        patient = response.Data;
+
+        Groups = new();
+
+        foreach(var group in patient.TaskGroups){
+            var modGroup = new TaskGroupModifier { Group = group, Tasks = new()};
+            foreach (var task in group.Tasks){
+                modGroup.Tasks.Add(new TaskItemModifier { Task = task, Parent = modGroup });
+            }
+            Groups.Add(modGroup);
+        }
+    }
+
+    //task methods
+    private void RaiseTask(TaskGroup group, TaskItem task) {
+        var index = group.Tasks.IndexOf(task);
+        if (index == 0) return;
+
+        group.Tasks.RemoveAt(index);
+        group.Tasks.Insert(index - 1, task);
+    }
+
+    private void LowerTask(TaskGroup group, TaskItem task) {
+        var index = group.Tasks.IndexOf(task);
+        if (index == group.Tasks.Count - 1) return;
+
+        group.Tasks.RemoveAt(index);
+        group.Tasks.Insert(index + 1, task);
+    }
+
+    private void DeleteTask(TaskGroupModifer group, TaskItemModifer task) {
+        group.Tasks.Remove(task);
+    }
+
+    private void AddTaskItem(TaskGroup group) {
+        if (group.NewTaskName == null) return;
+        if (group.Tasks.FindAll(t => t.Label == group.NewTaskName).Count() > 0) return; //if any tasks have the same label
+        if (group.NewTaskType is null) return;
+
+        var task = new TaskItem {
+                Label = group.NewTaskName,
+                Type = group.NewTaskType
+            };
+
+        group.NewTaskOpen = false;
+        group.NewTaskName = null;
+        group.NewTaskType = null;
+        group.Tasks.Add(task);
+    }
+
+    private void EditTask(TaskItemModifier task) {
+        task.Parent.Tasks.ForEach(t => t.Edit = false);
+
+        task.Edit = true;
+    }
+
+    //group methods
+    private void EditGroupName(TaskGroupModifier group) {
+        foreach(var g in Groups) g.Edit = false; //close all group name edits
+
+        group.Edit = true;
+    }
+
+    private void OnTextFieldChangedHandler(TaskGroupModifier group) {
+        if (group.Group.Label == group.NewLabel) return;
+
+        group.Edit = false;
+    }
+
+    private void DeleteGroup(TaskGroupModifier group) {
+        Groups.Remove(group);
+    }
+
+    private void OnValidSectionSubmit(EditContext context) {
+        groups.Add(new TaskGroup { Name = newTaskGroup.Name, NewName = newTaskGroup.Name, Tasks = new() });
+        newTaskGroup.Name = string.Empty;
+        AddGroupOpen = false;
+    }
+
+    //patient info
+    private void CancelPatientEdit() => NavManager.NavigateTo($"/patients/{PatientId}");
+
+    private async Task ResetPatientData() {
+        await OnParametersSetAsync(); //reloads patient from server based on patient ID
+    }
+
+    private async Task SavePatientData() {
+
+    }
+
+    private class TaskGroupModifier {
+        public bool Edit { get; set; } = false;
+        public string NewLabel { get; set; } = string.Empty;
+        public TaskGroup Group {get;set;}
+        public List<TaskItemModifier> Tasks { get; set; }
+    }
+
+    private class TaskItemModifier {
+        public bool Edit { get; set; }
+        public string NewLabel { get; set; } = string.Empty; 
+        public TaskItem Task { get; set; }
+        public TaskGroupModifier Parent { get; set; }
+    }
+}
