@@ -74,10 +74,8 @@ namespace Radigate.Client.Services.PatientService {
         }
 
         public async Task UpdatePatient(PatientValueItem newPatient) {
-            string connection = $"/api/Patient/Add";
-            var result = await _http.PutAsJsonAsync(connection, newPatient);
-
-
+            string connection = $"/api/Patient/update";
+            await _http.PutAsJsonAsync(connection, newPatient);
         }
 
         //TaskItem is converted into The relevent TaskType

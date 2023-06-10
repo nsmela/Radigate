@@ -30,5 +30,11 @@ namespace Radigate.Server.Controllers {
             var result = await _patientService.GetPatientsIdAsync();
             return Ok(result);
         }
+
+        [HttpPut("update")]
+        public async Task<ActionResult<ServiceResponse<bool>>> UpdatePatient(PatientValueItem patient) {
+            var result = await _patientService.UpdatePatientAsync(patient); 
+            return Ok(result);
+        }
     }
 }

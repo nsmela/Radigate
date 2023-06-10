@@ -255,11 +255,11 @@
                 Type = t.Task.Type,
                 Value = t.Task.Value
             }));
-            
+
             newPatient.Groups.Add(group);
         });
 
-
+        await PatientService.UpdatePatient(newPatient);
 
     }
 

@@ -134,7 +134,7 @@ namespace Radigate.Shared {
             int result = -1;
             int.TryParse(options[0], out result);
             options.RemoveAt(0);
-            SelectedOption = options[result];
+            SelectedOption = options.Count > 0 ? options[result] : "N/A";
             Options = options;
 
             Value = SelectedOption;

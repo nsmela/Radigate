@@ -51,5 +51,106 @@ namespace Radigate.Server.Services.PatientService {
             return response;
         }
 
+        public async Task<ServiceResponse<bool>> UpdatePatientAsync(PatientValueItem patient) {
+            var samePatient = await _context.Patients
+                .FirstOrDefaultAsync(p => p.Id == patient.PatientId);
+
+            if (samePatient is null) {
+                return new ServiceResponse<bool> {
+                    Data = false,
+                    Success = false,
+                    Message = $"Patient does not exist! (Id:{patient.PatientId}, Name:{patient.LastName + ", " + patient.FirstName})"
+                };
+            }
+
+            //update the patient
+            //patient info
+            if(!String.IsNullOrEmpty(patient.FirstName)) samePatient.FirstName = patient.FirstName;
+            if(!String.IsNullOrEmpty(patient.LastName)) samePatient.LastName = patient.LastName;
+            if(!String.IsNullOrEmpty(patient.Identifier)) samePatient.Identifier = patient.Identifier;
+
+            //group info
+            var oldGroups = samePatient.TaskGroups;
+            var groups = new List<TaskGroup>();
+            int groupIndex = 0;
+            foreach(var group in patient.Groups) {
+                var taskGroup = samePatient.TaskGroups.FirstOrDefault(g => g.Id == group.Id);
+
+                //group is new
+                if(taskGroup is null) {
+                    var tasks = new List<TaskItem>();
+                    foreach (var task in group.Tasks) tasks.Add(new TaskItem {
+                        Value= task.Value,
+                        Comments= task.Comments,
+                        Type= task.Type,
+
+                        TaskGroup = taskGroup,
+                        SortingOrder = tasks.Count()
+                    });
+
+                    taskGroup = new TaskGroup {
+                        Label= group.Label,
+                        Tasks = tasks,
+
+                        Patient = samePatient,
+                        PatientId = samePatient.Id
+                    };
+
+                    groups.Add(taskGroup);
+                    groupIndex++;
+                    continue;
+                }
+
+                //group exists in patient and record
+                if(taskGroup is not null) {
+                    taskGroup.Label = group.Label;
+                    taskGroup.SortingOrder = groupIndex;
+                    groupIndex++;
+
+                    //edit tasks
+                    var tasks = new List<TaskItem>();
+                    int taskIndex = 0;
+                    foreach(var task in tasks) {
+                        var taskItem = tasks.FirstOrDefault(t => t.Id == task.Id);
+
+                        //task is new
+                        if (taskItem is null) {
+                            taskItem = new TaskItem {
+                                Value = task.Value,
+                                Comments = task.Comments,
+                                Type = task.Type,
+
+                                TaskGroup = taskGroup,
+                                SortingOrder = taskIndex
+                            };
+                            taskIndex++;
+                            tasks.Add(taskItem);
+                            continue;
+                        }
+
+                        //if task exist
+                        taskItem.SortingOrder = taskIndex;
+                        taskIndex++;
+
+                        taskItem.Label = task.Label;
+                        taskItem.Value = task.Value;
+                        taskItem.Type= task.Type;
+                        taskItem.Comments = task.Comments;
+
+                        tasks.Add(taskItem);
+
+                        //remaining tasks are discarded
+                    }
+
+                    taskGroup.Tasks = tasks;
+                    groups.Add(taskGroup);
+                }
+            }
+
+            samePatient.TaskGroups = groups;
+            
+            await _context.SaveChangesAsync();
+            return new ServiceResponse<bool> { Data = true };
+        }
     }
 }
