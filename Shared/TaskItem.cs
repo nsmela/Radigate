@@ -132,8 +132,9 @@ namespace Radigate.Shared {
 
             var options = task.Value.Split(',').ToList();
             int result = -1;
-            if (int.TryParse(options[0], out result)) SelectedOption = options[result];
+            int.TryParse(options[0], out result);
             options.RemoveAt(0);
+            SelectedOption = options[result];
             Options = options;
 
             Value = SelectedOption;

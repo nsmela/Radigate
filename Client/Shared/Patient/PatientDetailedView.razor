@@ -156,8 +156,6 @@
     }
 
     private async Task UpdatePatientTask(TaskItem task, string value) {
-        StateHasChanged();
-
         await TaskService.UpdateTaskValue(task, value);
     }
 
