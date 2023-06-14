@@ -38,16 +38,6 @@
             return response;
         }
 
-        public async Task<PatientDisplay> GetPatientDisplay(int patientId) {
-            string requestString = $"/api/Patient/{patientId}";
-            var result = await _http.GetFromJsonAsync<ServiceResponse<Patient>>(requestString);
-
-            if (result is not null && result.Data is not null)
-                return new PatientDisplay(result.Data);
-
-            return null;
-        }
-
         //refactored
         /// <summary>
         /// Have the patient Service update itself by looking for a new specific task
@@ -85,20 +75,6 @@
             string connection = $"/api/Patient/update";
             await _http.PutAsJsonAsync(connection, newPatient);
         }
-
-        //TaskItem is converted into The relevent TaskType
-        private Patient ConvertPatient(Patient patient) {
-            foreach (var group in patient.TaskGroups) {
-                var tasks = new List<TaskItem>();
-                foreach (var task in group.Tasks) {
-                    tasks.Add(TaskItem.Convert(task));
-                }
-                group.Tasks = tasks;
-            }
-            return patient;
-        }
     }
-
-
 }
 
