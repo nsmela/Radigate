@@ -65,21 +65,14 @@ else {
 
     [Parameter] public int? PatientId { get; set; }
 
-    private Patient? Patient { get; set; } = null;
+    private PatientDisplay? Patient { get; set; } = null;
     private string message { get; set; } = "Accessing patient";
     string Name => Patient.LastName + ", " + Patient.FirstName;
 
     protected override async Task OnParametersSetAsync() {
         if(PatientId is null) return;
 
-        var response = await PatientService.GetPatient(PatientId.Value);
-
-        if(!response.Success){
-            message = response.Message;
-            return;
-        }
-
-        Patient = response.Data;
+        Patient = await PatientService.GetPatientDisplay(PatientId.Value);
     }
 
     private async Task UpdatePatientTask(string groupLabel, string label, object value) {

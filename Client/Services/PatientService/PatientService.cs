@@ -1,11 +1,10 @@
-﻿using Radigate.Client.Data.TaskItems;
-
-namespace Radigate.Client.Services.PatientService {
+﻿namespace Radigate.Client.Services.PatientService {
     public class PatientService : IPatientService {
         private readonly HttpClient _http;
 
         public List<Patient> Patients { get; set; } = new();
-        
+        public List<PatientDisplay> PatientDisplays { get; set; } = new();  //refactored patients
+
         public PatientService(HttpClient http) {
             _http = http;
         }
@@ -18,8 +17,10 @@ namespace Radigate.Client.Services.PatientService {
 
             if (result is not null && result.Data is not null) {
                 var patients = new List<Patient>();
+                PatientDisplays = new();
                 foreach(var patient in result.Data) {
                     patients.Add(ConvertPatient(patient));
+                    PatientDisplays.Add(new PatientDisplay(patient)); //refactored
                 }
                 Patients = patients;
                 return;
@@ -37,7 +38,17 @@ namespace Radigate.Client.Services.PatientService {
 
             return result;
         }
-        
+
+        public async Task<PatientDisplay> GetPatientDisplay(int patientId) {
+            string requestString = $"/api/Patient/{patientId}";
+            var result = await _http.GetFromJsonAsync<ServiceResponse<Patient>>(requestString);
+
+            if (result is not null && result.Data is not null)
+                return new PatientDisplay(result.Data);
+
+            return null;
+        }
+
         public async Task GetPatientTaskUpdate(int taskId) {
             string connection = $"/api/Task/{taskId}";
             var result = await _http.GetFromJsonAsync<ServiceResponse<TaskItem>>(connection);
@@ -62,6 +73,32 @@ namespace Radigate.Client.Services.PatientService {
                         }
                     }
                 }
+            }
+        }
+
+        //refactored
+        /// <summary>
+        /// Have the patient Service update itself by looking for a new specific task
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        public async Task UpdatePatientTask(int taskId) {
+            string connection = $"/api/Task/{taskId}";
+            var result = await _http.GetFromJsonAsync<ServiceResponse<TaskItem>>(connection);
+
+            if (result is null || result.Data is null) return;
+            var task = GroupDisplay.Convert(result.Data); //had to store the static method somewhere
+            foreach(var patient in PatientDisplays) {
+                patient.TaskGroups.ForEach(g => {
+                    if (g.Id == task.TaskGroupId) {
+                        var oldTask = g.Tasks.FirstOrDefault(t => t.Id == task.Id);
+                        if (oldTask is null) g.Tasks.Add(task);
+                        else oldTask = task;
+
+                        g.Tasks.OrderBy(t => t.SortOrder).ToList(); //sort by order
+                        return;
+                    }
+                });
             }
         }
 

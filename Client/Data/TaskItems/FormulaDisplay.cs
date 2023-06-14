@@ -2,7 +2,7 @@
 
 namespace Radigate.Client.Data.TaskItems {
     public class FormulaDisplay : ITaskItem {
-        public Radigate.Shared.GroupDisplay TaskGroup { get; set; }
+        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
         public int Id { get; set; }
         public string Label { get; set; }
         public string Comments { get; set; }

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Radigate.Shared {
-    public class GroupDisplay {
+    public class TaskGroup {
         //parent
         [JsonIgnore] public Patient Patient { get; set; } = null!;
         public int PatientId { get; set; }

@@ -73,7 +73,7 @@ namespace Radigate.Server.Services.PatientService {
 
             //group info
             var oldGroups = samePatient.TaskGroups;
-            var groups = new List<GroupDisplay>();
+            var groups = new List<TaskGroup>();
             int groupIndex = 0;
             foreach(var group in patient.Groups) {
                 var taskGroup = samePatient.TaskGroups.FirstOrDefault(g => g.Id == group.Id);
@@ -91,7 +91,7 @@ namespace Radigate.Server.Services.PatientService {
                         SortingOrder = tasks.Count()
                     });
 
-                    taskGroup = new GroupDisplay {
+                    taskGroup = new TaskGroup {
                         Label= group.Label,
                         Tasks = tasks,
 

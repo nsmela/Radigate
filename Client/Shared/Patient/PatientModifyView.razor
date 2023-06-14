@@ -162,7 +162,7 @@
     //patient info
     Patient? patient { get; set; } = null;
     List<TaskGroupModifier> Groups { get; set; } = new();
-        Radigate.Shared.GroupDisplay NewTaskGroup { get; set; } = new();
+        Radigate.Shared.TaskGroup NewTaskGroup { get; set; } = new();
 
     //controls
     private bool AddGroupOpen { get; set; }
@@ -280,7 +280,7 @@
     }
 
     private void OnValidSectionSubmit(EditContext context) {
-        var group = new Radigate.Shared.GroupDisplay { Label = NewTaskGroup.Label, PatientId = patient.Id };
+        var group = new Radigate.Shared.TaskGroup { Label = NewTaskGroup.Label, PatientId = patient.Id };
         Groups.Add(new TaskGroupModifier { Group = group, Tasks = new(), NewLabel = group.Label });
         NewTaskGroup.Label = string.Empty;
         AddGroupOpen = false;
@@ -327,7 +327,7 @@
         public string NewTaskLabel { get; set; } = string.Empty;
         public TaskType NewTaskType { get; set; }
         public string NewLabel { get; set; } = string.Empty;
-        public Radigate.Shared.GroupDisplay Group {get;set;}
+        public Radigate.Shared.TaskGroup Group {get;set;}
         public List<TaskItemModifier> Tasks { get; set; }
     }
 

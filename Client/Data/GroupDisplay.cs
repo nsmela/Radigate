@@ -9,5 +9,37 @@ namespace Radigate.Client.Data {
         public int Id { get; set; }
         public int SortingOrder { get; set; }
         public string Label { get; set; }
+
+        public GroupDisplay() {
+
+        }
+
+        public GroupDisplay(TaskGroup group) {
+            this.Id = group.Id;
+            this.SortingOrder = group.SortingOrder;
+            this.Label = group.Label;
+
+            Tasks = new();
+            foreach (var task in group.Tasks) Tasks.Add(Convert(task));
+        }
+
+        public static ITaskItem Convert(TaskItem task) {
+            switch (task.Type) {
+                case (int)TaskType.Bool:
+                    return new CheckboxDisplay(task);
+                case (int)TaskType.Text:
+                    return new TextDisplay(task);
+                case (int)TaskType.Number:
+                    return new NumberDisplay(task);
+                case (int)TaskType.List:
+                    return new ListDisplay(task);
+                case (int)TaskType.Date:
+                    return new DateDisplay(task);
+                case (int)TaskType.Calculation:
+                    return new FormulaDisplay(task);
+                default:
+                    return null;
+            }
+        }
     }
 }

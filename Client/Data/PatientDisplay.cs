@@ -6,5 +6,21 @@
         public string Identifier { get; set; } = string.Empty;
 
         public List<GroupDisplay> TaskGroups { get; set; } = new();
+
+        public PatientDisplay() {
+
+        }
+
+        public PatientDisplay(Patient? patient) {
+            if (patient is null) return;
+
+            this.Id = patient.Id;
+            this.FirstName = patient.FirstName;
+            this.LastName = patient.LastName;
+            this.Identifier = patient.Identifier;
+
+            TaskGroups = new();
+            foreach(var group in patient.TaskGroups) TaskGroups.Add(new GroupDisplay(group));
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace Radigate.Server.Data {
                 .HasForeignKey(g => g.PatientId)
                 .HasPrincipalKey(t => t.Id);
 
-            modelBuilder.Entity<GroupDisplay>()
+            modelBuilder.Entity<TaskGroup>()
                 .HasMany(g => g.Tasks)
                 .WithOne(t => t.TaskGroup)
                 .HasForeignKey(t => t.TaskGroupId)
@@ -86,21 +86,21 @@ namespace Radigate.Server.Data {
                 new TaskItem { Id = 48, Label = "Assigned Physicist", TaskGroupId = 14, Type = (int)TaskType.Text, Value = "No one" },
                 new TaskItem { Id = 49, Label = "Mass Volume", TaskGroupId = 14, Type = (int)TaskType.Number, Value = "1.26" });
 
-            modelBuilder.Entity<GroupDisplay>().HasData(
-                new GroupDisplay { PatientId = 1, Id = 1, Label = "Standard" },
-                new GroupDisplay { PatientId = 1, Id = 2, Label = "Physics Checks" },
-                new GroupDisplay { PatientId = 2, Id = 3, Label = "Standard" },
-                new GroupDisplay { PatientId = 2, Id = 4, Label = "Physics Checks" },
-                new GroupDisplay { PatientId = 3, Id = 5, Label = "Standard" },
-                new GroupDisplay { PatientId = 3, Id = 6, Label = "Physics Checks" },
-                new GroupDisplay { PatientId = 4, Id = 7, Label = "Standard" },
-                new GroupDisplay { PatientId = 4, Id = 8, Label = "Physics Checks" },
-                new GroupDisplay { PatientId = 5, Id = 9, Label = "Standard" },
-                new GroupDisplay { PatientId = 5, Id = 10, Label = "Physics Checks" },
-                new GroupDisplay { PatientId = 6, Id = 11, Label = "Standard" },
-                new GroupDisplay { PatientId = 6, Id = 12, Label = "Physics Checks" },
-                new GroupDisplay { PatientId = 7, Id = 13, Label = "Standard" },
-                new GroupDisplay { PatientId = 7, Id = 14, Label = "Physics Checks" }
+            modelBuilder.Entity<TaskGroup>().HasData(
+                new TaskGroup { PatientId = 1, Id = 1, Label = "Standard" },
+                new TaskGroup { PatientId = 1, Id = 2, Label = "Physics Checks" },
+                new TaskGroup { PatientId = 2, Id = 3, Label = "Standard" },
+                new TaskGroup { PatientId = 2, Id = 4, Label = "Physics Checks" },
+                new TaskGroup { PatientId = 3, Id = 5, Label = "Standard" },
+                new TaskGroup { PatientId = 3, Id = 6, Label = "Physics Checks" },
+                new TaskGroup { PatientId = 4, Id = 7, Label = "Standard" },
+                new TaskGroup { PatientId = 4, Id = 8, Label = "Physics Checks" },
+                new TaskGroup { PatientId = 5, Id = 9, Label = "Standard" },
+                new TaskGroup { PatientId = 5, Id = 10, Label = "Physics Checks" },
+                new TaskGroup { PatientId = 6, Id = 11, Label = "Standard" },
+                new TaskGroup { PatientId = 6, Id = 12, Label = "Physics Checks" },
+                new TaskGroup { PatientId = 7, Id = 13, Label = "Standard" },
+                new TaskGroup { PatientId = 7, Id = 14, Label = "Physics Checks" }
 
             );
 
@@ -118,7 +118,7 @@ namespace Radigate.Server.Data {
         }
 
         public DbSet<Patient> Patients { get; set; }
-        public DbSet<GroupDisplay> TaskGroups { get; set; }
+        public DbSet<TaskGroup> TaskGroups { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
     }
 }

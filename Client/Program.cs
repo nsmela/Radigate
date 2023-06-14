@@ -2,6 +2,8 @@ global using Radigate.Shared;
 global using System.Net.Http.Json;
 global using Radigate.Client.Services.PatientService;
 global using Radigate.Client.Services.TaskService;
+global using Radigate.Client.Data;
+global using Radigate.Client.Data.TaskItems;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radigate.Client;

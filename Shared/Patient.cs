@@ -10,6 +10,6 @@ namespace Radigate.Shared {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Identifier { get; set; } = string.Empty;
-        public ICollection<GroupDisplay> TaskGroups { get; set; } = new List<GroupDisplay>(); //navigation property
+        public ICollection<TaskGroup> TaskGroups { get; set; } = new List<TaskGroup>(); //navigation property
     }
 }
