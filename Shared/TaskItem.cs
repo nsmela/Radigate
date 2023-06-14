@@ -13,7 +13,7 @@ namespace Radigate.Shared {
     public enum TaskType { Bool, Text, Number, List, Date, Calculation, Base }
 
     public class TaskItem {
-        [JsonIgnore] public TaskGroup TaskGroup { get; set; } = null!;//parent
+        [JsonIgnore] public GroupDisplay TaskGroup { get; set; } = null!;//parent
         public int TaskGroupId { get; set; }
         public int SortingOrder { get; set; }
         public int Id { get; set; }

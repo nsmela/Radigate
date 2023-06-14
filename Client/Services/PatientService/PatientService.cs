@@ -1,12 +1,11 @@
-﻿
-using System.Threading.Tasks;
+﻿using Radigate.Client.Data.TaskItems;
 
 namespace Radigate.Client.Services.PatientService {
     public class PatientService : IPatientService {
         private readonly HttpClient _http;
 
         public List<Patient> Patients { get; set; } = new();
-
+        
         public PatientService(HttpClient http) {
             _http = http;
         }
