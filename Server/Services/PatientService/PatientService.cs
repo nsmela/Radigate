@@ -53,6 +53,8 @@ namespace Radigate.Server.Services.PatientService {
 
         public async Task<ServiceResponse<bool>> UpdatePatientAsync(PatientValueItem patient) {
             var samePatient = await _context.Patients
+                .Include(p => p.TaskGroups)
+                .ThenInclude(g => g.Tasks)
                 .FirstOrDefaultAsync(p => p.Id == patient.PatientId);
 
             if (samePatient is null) {
@@ -110,12 +112,13 @@ namespace Radigate.Server.Services.PatientService {
                     //edit tasks
                     var tasks = new List<TaskItem>();
                     int taskIndex = 0;
-                    foreach(var task in tasks) {
-                        var taskItem = tasks.FirstOrDefault(t => t.Id == task.Id);
+                    foreach(var task in group.Tasks) {
+                        var taskItem = taskGroup.Tasks.FirstOrDefault(t => t.Id == task.Id);
 
                         //task is new
                         if (taskItem is null) {
                             taskItem = new TaskItem {
+                                Label= task.Label,
                                 Value = task.Value,
                                 Comments = task.Comments,
                                 Type = task.Type,
