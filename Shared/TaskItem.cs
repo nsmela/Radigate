@@ -21,6 +21,7 @@ namespace Radigate.Shared {
         public string Comments { get; set; } = string.Empty;
         public int Type { get; set; }
         public string Value { get; set; } = string.Empty;
+        public virtual string ValueString { get;}
 
         public virtual TaskItem ToTaskItem() => this;
 
@@ -53,7 +54,7 @@ namespace Radigate.Shared {
 
             Checked = task.Value == "true";
         }
-        public string ValueString => Value;
+        public new string ValueString => Value;
         public override TaskItem ToTaskItem() {
             return new TaskItem {
                 Id = this.Id,
@@ -78,7 +79,7 @@ namespace Radigate.Shared {
 
             Text = task.Value;
         }
-        public string ValueString => Text;
+        public new string ValueString => Text;
         public override TaskItem ToTaskItem() {
             return new TaskItem {
                 Id = this.Id,
@@ -105,7 +106,7 @@ namespace Radigate.Shared {
             double number;
             if (double.TryParse(task.Value, out number)) Number = number;
         }
-        public string ValueString => Value;
+        public new string ValueString => Value;
         public override TaskItem ToTaskItem() {
             return new TaskItem {
                 Id = this.Id,
@@ -131,15 +132,20 @@ namespace Radigate.Shared {
             if (string.IsNullOrEmpty(task.Value)) return;
 
             var options = task.Value.Split(',').ToList();
-            int result = -1;
-            int.TryParse(options[0], out result);
-            options.RemoveAt(0);
-            SelectedOption = options.Count > 0 ? options[result] : "N/A";
-            Options = options;
 
+            if (options.Count < 1) {
+                SelectedOption = "No Options";
+                Options = new();
+            } else {
+                int result = -1;
+                int.TryParse(options[0], out result);
+                options.RemoveAt(0);
+                SelectedOption = options.Count > 0 && result >= 0? options[result] : "N/A";
+                Options = options;
+            }
             Value = SelectedOption;
         }
-        public string ValueString {
+        public new string ValueString {
             get {
                 var text = Options.IndexOf(SelectedOption).ToString();
                 Options.ForEach(o => text += "," + o);
@@ -176,7 +182,7 @@ namespace Radigate.Shared {
             if (DateTime.TryParse(task.Value, out date)) Date = date;
 
         }
-        public string ValueString => Date is null ? null : Date.Value.ToShortDateString();
+        public new string ValueString => Date is null ? null : Date.Value.ToShortDateString();
         public override TaskItem ToTaskItem() {
             return new TaskItem {
                 Id = this.Id,
@@ -201,7 +207,7 @@ namespace Radigate.Shared {
 
             Formula = task.Value;
         }
-        public string ValueString => Formula;
+        public new string ValueString => Formula;
         public override TaskItem ToTaskItem() {
             return new TaskItem {
                 Id = this.Id,
