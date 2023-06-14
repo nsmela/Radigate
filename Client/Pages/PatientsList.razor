@@ -10,8 +10,23 @@
 </div>
 
 <!-- List of Patients -->
-@if (patientIds is not null) {
-
+@if(patientIds is null){
+    <MudStack Row="true" Class="pa-2 overflow-x-scroll">
+        @for(int i = 0; i < 10; i++){
+            <MudCard>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle"  Height="240px" Width="360px"/>
+                    <MudCardContent>
+                        <MudStack>
+                            <MudSkeleton Width="30%" Height="64px;" />
+                            <MudSkeleton Width="100%" />
+                            <MudSkeleton Width="100%" />
+                            <MudSkeleton Width="100%" />
+                        </MudStack>
+                    </MudCardContent>
+            </MudCard>
+        }
+    </MudStack>
+}else{
     <MudStack Row="true" Class="pa-2 overflow-x-scroll">
         @foreach (var patientId in patientIds)
         {
