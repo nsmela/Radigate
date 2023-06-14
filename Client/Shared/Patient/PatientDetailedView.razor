@@ -24,16 +24,16 @@
                         @foreach (var task in group.Tasks) {
                                 @switch (task.Type) {
                                 <!-- CheckBox FIELD -->
-                                case (int)TaskType.Bool:
-                                    var check = task as TaskBool;    
+                                case TaskType.Bool:
+                                    var check = task as CheckboxDisplay;    
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex align-self-center pl-2">@task.Label</MudText>
-                                        <MudCheckBox T="bool" Checked="@check.Checked" 
-                                            CheckedChanged="@((value) => {check.Checked = value; UpdatePatientTask(check, value ? "true" : "false");})"/>
+                                        <MudCheckBox T="bool" Checked="@check.IsChecked" 
+                                            CheckedChanged="@((value) => {check.IsChecked = value; UpdatePatientTask(check, value ? "true" : "false");})"/>
                                     </MudPaper>
                                     break;
                                 <!-- TEXT FIELD -->
-                                case (int)TaskType.Text:
+                                case TaskType.Text:
                                     var result = task as TaskText;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex align-self-center px-2">@result.Label</MudText>
@@ -44,7 +44,7 @@
                                     </MudPaper>
                                     break;
                                 <!-- NUMBER FIELD -->
-                                case (int)TaskType.Number:
+                                case TaskType.Number:
                                     var number = task as TaskNumber;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true" >
                                         <MudText Class="d-inline-flex align-self-center pl-2">@number.Label</MudText>
@@ -56,7 +56,7 @@
                                     </MudPaper>
                                     break;
                                 <!-- FORMULA FIELD -->
-                                case (int)TaskType.Calculation:
+                                case TaskType.Calculation:
                                     var formula = task as TaskCalculate;
                                     <MudExpansionPanel Class="mt-2" HideIcon="true" Dense="true" >
                                         <TitleContent>
@@ -80,7 +80,7 @@
                                     <!-- TODO: Add expansion panel to allow editing the values -->
                                     break;
                                 <!-- DATE FIELD -->
-                                case (int)TaskType.Date:
+                                case TaskType.Date:
                                     var date = task as TaskDate;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex flex-grow-1 align-self-center px-2 ">@date.Label</MudText>
@@ -90,7 +90,7 @@
                                     </MudPaper>
                                     break;
                                 <!-- List FIELD -->
-                                case (int)TaskType.List:
+                                case TaskType.List:
                                     var list = task as TaskList;
                                     <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
                                         <MudText Class="d-inline-flex flex-grow-1 align-self-center px-2" T="string">@list.Label</MudText>
@@ -145,7 +145,7 @@
 
     [Parameter] public int PatientId { get; set; }
 
-    Patient? patient = null;
+    PatientDisplay? patient = null;
 
     protected override async Task OnParametersSetAsync() {
         var response = await PatientService.GetPatient(PatientId);
@@ -155,7 +155,7 @@
         }
     }
 
-    private async Task UpdatePatientTask(TaskItem task, string value) {
+    private async Task UpdatePatientTask(ITaskItem task, string value) {
         await TaskService.UpdateTaskValue(task, value);
     }
 

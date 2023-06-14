@@ -1,6 +1,6 @@
 ﻿@page "/patients/{id:int}"
 
-@if(patient is null){
+@if(Patient is null){
     <MudProgressCircular>@message</MudProgressCircular>
 } else {
     <PatientDetailedView PatientId="@Id" />
@@ -10,10 +10,8 @@
     [Inject] private IPatientService PatientService { get; set; }
     [Parameter] public int Id { get; set; }
 
-    private Patient? patient = null;
+    private PatientDisplay? Patient { get; set; }
     private string message = string.Empty;
-
-    private string FullName => (patient.LastName + "," + patient.FirstName).ToUpper();
 
     protected override async Task OnParametersSetAsync() {
         message = "Loading Patient... ";
@@ -22,7 +20,7 @@
         if(!result.Success){
             message = result.Message;
         } else {
-            patient = result.Data;
+            Patient = result.Data;
         }
     }
 

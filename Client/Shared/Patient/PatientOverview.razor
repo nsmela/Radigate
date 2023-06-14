@@ -74,7 +74,13 @@ else {
     protected override async Task OnParametersSetAsync() {
         if(PatientId is null) return;
 
-        Patient = await PatientService.GetPatientDisplay(PatientId.Value);
+        var result = await PatientService.GetPatient(PatientId.Value);
+
+        message = string.Empty;
+        if (result is null) return;
+        if (!result.Success) message = result.Message;
+
+        Patient = result.Data;
     }
 
     private async Task UpdatePatientTask(string groupLabel, string label, object value) {

@@ -2,8 +2,7 @@
     public class PatientService : IPatientService {
         private readonly HttpClient _http;
 
-        public List<Patient> Patients { get; set; } = new();
-        public List<PatientDisplay> PatientDisplays { get; set; } = new();  //refactored patients
+        public List<PatientDisplay> Patients { get; set; } = new();
 
         public PatientService(HttpClient http) {
             _http = http;
@@ -15,28 +14,28 @@
             string requestString = $"/api/Patient";
             var result = await _http.GetFromJsonAsync<ServiceResponse<List<Patient>>>(requestString);
 
+            Patients = new();
+
             if (result is not null && result.Data is not null) {
-                var patients = new List<Patient>();
-                PatientDisplays = new();
-                foreach(var patient in result.Data) {
-                    patients.Add(ConvertPatient(patient));
-                    PatientDisplays.Add(new PatientDisplay(patient)); //refactored
-                }
-                Patients = patients;
-                return;
+                foreach(var patient in result.Data) Patients.Add(new PatientDisplay(patient)); //refactored
             }
 
-            Patients = new();
         }
 
-        public async Task<ServiceResponse<Patient>> GetPatient(int patientId) {
+        public async Task<ServiceResponse<PatientDisplay>> GetPatient(int patientId) {
             string requestString = $"/api/Patient/{patientId}";
             var result = await _http.GetFromJsonAsync<ServiceResponse<Patient>>(requestString);
 
-            if(result is not null && result.Data is not null) 
-                result.Data = ConvertPatient(result.Data);
+            var response = new ServiceResponse<PatientDisplay>();
 
-            return result;
+            if(result is not null && result.Data is not null) {
+                //converting from Patient to PatientDisplay
+                response.Success = result.Success;
+                response.Message = result.Message;
+                response.Data = result.Data is null ? null : new PatientDisplay(result.Data);
+            }
+
+            return response;
         }
 
         public async Task<PatientDisplay> GetPatientDisplay(int patientId) {
@@ -47,33 +46,6 @@
                 return new PatientDisplay(result.Data);
 
             return null;
-        }
-
-        public async Task GetPatientTaskUpdate(int taskId) {
-            string connection = $"/api/Task/{taskId}";
-            var result = await _http.GetFromJsonAsync<ServiceResponse<TaskItem>>(connection);
-            if (result is not null && result.Data is not null) {
-                for (int i = 0; i < Patients.Count; i++) {
-                    for (int j = 0; j < Patients[i].TaskGroups.Count; j++) {
-                        for(int k = 0; k < Patients[i].TaskGroups.ElementAt(j).Tasks.Count; k++) {
-                            if (Patients[i].TaskGroups.ElementAt(j).Tasks.ElementAt(k).Id == taskId) {
-                                var tasks = new List<TaskItem>();
-                                foreach(var t in Patients[i].TaskGroups.ElementAt(j).Tasks) {
-                                    if (t.Id == taskId) {
-                                        var task = TaskItem.Convert(result.Data);
-                                        task.TaskGroup = Patients[i].TaskGroups.ElementAt(j);
-                                        tasks.Add(task);
-                                    }
-                                    else {
-                                        tasks.Add(Patients[i].TaskGroups.ElementAt(j).Tasks.ElementAt(k));
-                                    }
-                                }
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         //refactored
@@ -88,7 +60,7 @@
 
             if (result is null || result.Data is null) return;
             var task = GroupDisplay.Convert(result.Data); //had to store the static method somewhere
-            foreach(var patient in PatientDisplays) {
+            foreach(var patient in Patients) {
                 patient.TaskGroups.ForEach(g => {
                     if (g.Id == task.TaskGroupId) {
                         var oldTask = g.Tasks.FirstOrDefault(t => t.Id == task.Id);

@@ -182,7 +182,7 @@
         var response = await PatientService.GetPatient(PatientId);
         if(!response.Success || response.Data is null) return;
 
-        patient = response.Data;
+        //patient = response.Data;
 
         Groups = new();
 

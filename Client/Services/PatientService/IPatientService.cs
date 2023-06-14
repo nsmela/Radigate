@@ -2,11 +2,10 @@
 
 namespace Radigate.Client.Services.PatientService {
     public interface IPatientService {
-        List<Patient> Patients { get; set; }
+        List<PatientDisplay> Patients { get; set; }
         Task GetPatients();
-        Task<ServiceResponse<Patient>> GetPatient(int patientId);
-        Task<PatientDisplay> GetPatientDisplay(int patientId);
-        Task GetPatientTaskUpdate(int taskId);
+        Task<ServiceResponse<PatientDisplay>> GetPatient(int patientId);
+        Task UpdatePatientTask(int taskId);
         Task<ServiceResponse<List<int>>> GetPatientsId();
         Task UpdatePatient(PatientValueItem newPatient);
     }
