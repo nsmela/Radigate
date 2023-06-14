@@ -82,6 +82,7 @@ namespace Radigate.Server.Services.PatientService {
                 if(taskGroup is null) {
                     var tasks = new List<TaskItem>();
                     foreach (var task in group.Tasks) tasks.Add(new TaskItem {
+                        Label = task.Label,
                         Value= task.Value,
                         Comments= task.Comments,
                         Type= task.Type,

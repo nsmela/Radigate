@@ -43,6 +43,8 @@
                                         TextChanged="(() => EditTaskName(task))"></MudTextField>
                                     <MudSpacer />
                                     <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="(()=> {EditTaskName(task); task.Edit = false;})" Size="Size.Small" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(()=> RaiseTask(task))" Class="invisible"/>
+                                    <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(()=> LowerTask(task))" Class="invisible"/>
                                     <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
                                        Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
                                 }
@@ -260,7 +262,7 @@
         });
 
         await PatientService.UpdatePatient(newPatient);
-
+        NavManager.NavigateTo($"patients/{PatientId}");
     }
 
     private class TaskGroupModifier {
