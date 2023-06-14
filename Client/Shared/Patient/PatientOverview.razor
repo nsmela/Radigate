@@ -1,6 +1,6 @@
 ﻿@if (PatientId is null || Patient is null) {
     <MudCard>
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="360px" Width="360px"/>
         <MudCardContent>
             <MudSkeleton Width="30%" Height="42px;" />
             <MudSkeleton Width="80%" />
@@ -13,7 +13,7 @@
     </MudCard>
 }
 else {
-    <MudPaper Class="mud-theme-primary pa-1 mb-2 ma-1" Width="360px">
+    <MudPaper Class="mud-theme-primary pa-1 mb-2 ma-1" Style="min-width:360px" Width="440px">
         <!-- Header -->
         <MudExpansionPanel Class="mud-theme-primary" Dense="true" DisableGutters="true">
             <TitleContent>
@@ -43,13 +43,15 @@ else {
                 </MudItem>
                 @foreach (var result in group.Tasks) {
                     <MudPaper MaxHeight="22px" Class="mud-theme-secondary mx-1 pl-1 mt-1 d-flex flex-grow-1 justify-space-between">
-                        <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:18px"><b>@result.Label</b></MudText>
-                        @if (result.Type == (int)TaskType.Bool) {
-                            var task = result as TaskBool;
-                            <MudCheckBox Class="mt-n4 mr-n2 d-inline-flex" Checked="@task.Checked" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
-                        }
-                        else {
-                            <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@result.Value</MudText>
+                        <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:24px"><b>@result.Label</b></MudText>
+                        @if (result.Type == TaskType.Bool) {
+                            var checkbox = (CheckboxDisplay)result;
+                            <MudCheckBox Class="mt-n3 mr-n2 d-inline-flex" Checked="@checkbox.IsChecked" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
+                        } else if (result.Type == TaskType.List) {
+                            var list = (ListDisplay)result;
+                            <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@list.SelectedOption</MudText>
+                        } else {
+                            <MudText Class="mr-1 d-inline-flex flex-nowrap" Typo="Typo.body2" Style="height:18px;">@result.Value</MudText>
                         }
 
                     </MudPaper>

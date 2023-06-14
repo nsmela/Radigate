@@ -4,6 +4,7 @@ namespace Radigate.Client.Data.TaskItems {
     public class TextDisplay : ITaskItem {
         public Radigate.Shared.TaskGroup TaskGroup { get; set; }
         public int Id { get; set; }
+        public int SortOrder { get; set; }
         public string Label { get; set; }
         public string Comments { get; set; }
         public string Value { get; set; }
