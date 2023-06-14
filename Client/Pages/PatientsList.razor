@@ -10,12 +10,17 @@
 </div>
 
 <!-- List of Patients -->
-@if (patientIds is not null) {
-
+@if(patientIds is null){
+    <MudStack Row="true" Class="pa-2 overflow-x-scroll">
+        @for(int i = 0; i < 10; i++){
+            <PatientOverview />
+        }
+    </MudStack>
+}else{
     <MudStack Row="true" Class="pa-2 overflow-x-scroll">
         @foreach (var patientId in patientIds)
         {
-            <Radigate.Client.Shared.Patient.PatientOverview PatientId="@patientId" />
+            <PatientOverview PatientId="@patientId" />
         }
     </MudStack>
 }

@@ -1,5 +1,16 @@
-﻿@if (Patient == null) {
-    <MudProgressCircular Style="height:120px;width:120px;" Indeterminate=true>@message</MudProgressCircular>
+﻿@if (PatientId is null || Patient is null) {
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+            <MudStack Row="true">
+                <MudSkeleton Width="128px" Height="40px" Class="ml-2" />
+                <MudSkeleton Width="48px" Height="40px" Class="ml-2" />
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
 }
 else {
     <MudPaper Class="mud-theme-primary pa-1 mb-2 ma-1" Width="360px">
@@ -59,6 +70,8 @@ else {
     string Name => Patient.LastName + ", " + Patient.FirstName;
 
     protected override async Task OnParametersSetAsync() {
+        if(PatientId is null) return;
+
         var response = await PatientService.GetPatient(PatientId.Value);
 
         if(!response.Success){
