@@ -3,7 +3,7 @@
 namespace Radigate.Client.Data {
     public class GroupDisplay {
         public Patient Parent { get; init; }
-        public int PatientId => Parent.Id;
+        public int PatientId { get; set; }
         public List<ITaskItem> Tasks { get; set; }
 
         public int Id { get; set; }
@@ -18,6 +18,7 @@ namespace Radigate.Client.Data {
             this.Id = group.Id;
             this.SortingOrder = group.SortingOrder;
             this.Label = group.Label;
+            this.PatientId = group.PatientId;
 
             Tasks = new();
             foreach (var task in group.Tasks) Tasks.Add(Convert(task));

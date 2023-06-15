@@ -31,17 +31,17 @@
                             <!-- to see if the task is open -->
                             @if (task.Edit) {
                                 <!-- task list editing view -->
-                                @if(task.Task.Type == (int)TaskType.List){
+                                @if(task.Task.Type == TaskType.List){
                                     <MudPaper >
                                         <!-- Type Menu -->
                                         <MudToolBar Class="ma-n4">
-                                            <MudMenu Icon="@TypeToIcon(task.Task.Type)" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {task.Task.Type = (int)TaskType.Bool; task.Task.Value = "false";})></MudButton>
-                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {task.Task.Type = (int)TaskType.Text; task.Task.Value = string.Empty;})></MudButton>
-                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {task.Task.Type = (int)TaskType.Date; task.Task.Value = DateTime.Today.ToShortDateString();}) />
-                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> {task.Task.Type = (int)TaskType.List; task.Task.Value = "0,Option 1,Option 2";}) />
-                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {task.Task.Type = (int)TaskType.Number; task.Task.Value = "0.0";}) />
-                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {task.Task.Type = (int)TaskType.Calculation; task.Task.Value = string.Empty;})></MudButton>
+                                            <MudMenu Icon="@task.Task.Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {task.Type = TaskType.Bool; task.Task.Value = "false";})></MudButton>
+                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {task.Type = TaskType.Text; task.Task.Value = string.Empty;})></MudButton>
+                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {task.Type = TaskType.Date; task.Task.Value = DateTime.Today.ToShortDateString();}) />
+                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> {task.Type = TaskType.List; task.Task.Value = "0,Option 1,Option 2";}) />
+                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {task.Type = TaskType.Number; task.Task.Value = "0.0";}) />
+                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {task.Type = TaskType.Calculation; task.Task.Value = string.Empty;})></MudButton>
                                             </MudMenu>
                                             <MudTextField @bind-Value="task.NewLabel" Placeholder="@task.Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
                                                 TextChanged="(() => {EditTaskName(task); task.Edit = true;})"></MudTextField>
@@ -66,13 +66,13 @@
                                 <!-- default view for editing a task -->
                                 <!-- Type Menu -->
                                     <MudToolBar Class="ma-n4">
-                                        <MudMenu Icon="@TypeToIcon(task.Task.Type)" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {task.Task.Type = (int)TaskType.Bool; task.Task.Value = "false";})></MudButton>
-                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {task.Task.Type = (int)TaskType.Text; task.Task.Value = string.Empty;})></MudButton>
-                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {task.Task.Type = (int)TaskType.Date; task.Task.Value = DateTime.Today.ToShortDateString();}) />
-                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> {task.Task.Type = (int)TaskType.List; task.Task.Value = "0,Option 1,Option 2";}) />
-                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {task.Task.Type = (int)TaskType.Number; task.Task.Value = "0.0";}) />
-                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {task.Task.Type = (int)TaskType.Calculation; task.Task.Value = string.Empty;})></MudButton>
+                                        <MudMenu Icon="@task.Task.Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {task.Type = TaskType.Bool; task.Task.Value = "false";})></MudButton>
+                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {task.Type = TaskType.Text; task.Task.Value = string.Empty;})></MudButton>
+                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {task.Type = TaskType.Date; task.Task.Value = DateTime.Today.ToShortDateString();}) />
+                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> {task.Type = TaskType.List; task.Task.Value = "0,Option 1,Option 2";}) />
+                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {task.Type = TaskType.Number; task.Task.Value = "0.0";}) />
+                                            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {task.Type = TaskType.Calculation; task.Task.Value = string.Empty;})></MudButton>
                                         </MudMenu>
                                         <MudTextField @bind-Value="task.NewLabel" Placeholder="@task.Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
                                             TextChanged="(() => EditTaskName(task))"></MudTextField>
@@ -88,7 +88,7 @@
                             else {
                                 <!-- Normal Task View -->
                                 <MudToolBar Class="ma-n4">
-                                    <MudIcon Icon="@TypeToIcon(task.Task.Type)" Size="Size.Small" Class="pr-1" />
+                                    <MudIcon Icon="@task.Task.Icon" Size="Size.Small" Class="pr-1" />
                                     <MudText Typo="Typo.body1"><b>@task.Task.Label</b></MudText>
                                     <MudSpacer />
                                     <MudIconButton Icon="@Icons.Material.Sharp.Edit" OnClick="(()=> EditTask(task))" Size="Size.Small" />
@@ -105,7 +105,7 @@
                         @if (group.IsNewTaskOpen) {
                             <MudPaper Elevation="25" Class="pa-2 rounded-lg">
                                 <MudToolBar Dense="true">
-                                    <MudMenu Icon="@TypeToIcon(group.NewTaskType)" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                    <MudMenu Icon="@group.NewTaskIcon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
                                         <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {group.NewTaskType = TaskType.Bool;})></MudButton>
                                         <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {group.NewTaskType = TaskType.Text;})></MudButton>
                                         <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {group.NewTaskType = TaskType.Date;}) />
@@ -162,21 +162,10 @@
     //patient info
     PatientDisplay? patient { get; set; } = null;
     List<TaskGroupModifier> Groups { get; set; } = new();
-        Radigate.Shared.TaskGroup NewTaskGroup { get; set; } = new();
+    TaskGroup NewTaskGroup { get; set; } = new();
 
     //controls
     private bool AddGroupOpen { get; set; }
-
-    private string TypeToIcon(TaskType type) => TypeToIcon((int)type);
-    private string TypeToIcon(int type) {
-        if (type == (int)TaskType.Bool) return Icons.Material.Outlined.CheckBox;
-        if (type == (int)TaskType.Text) return Icons.Material.Filled.TextSnippet;
-        if (type == (int)TaskType.Date) return Icons.Material.Filled.CalendarMonth;
-        if (type == (int)TaskType.List) return Icons.Material.Filled.List;
-        if (type == (int)TaskType.Number) return Icons.Material.Filled.Numbers;
-        if (type == (int)TaskType.Calculation) return Icons.Material.Filled.Calculate;
-        return Icons.Material.Filled.QuestionMark;
-    }
 
     protected override async Task OnParametersSetAsync() {
         var response = await PatientService.GetPatient(PatientId);
@@ -222,10 +211,6 @@
         if (group.NewTaskType < 0) return; //didn't choose a proper type
 
         var task = new TaskItemModifier {
-            Task = TaskItem.Convert(new TaskItem {
-                Label = group.NewTaskLabel,
-                Type = (int)group.NewTaskType
-            }),
             NewLabel = group.NewTaskLabel,
             Parent = group
         };
@@ -280,7 +265,7 @@
     }
 
     private void OnValidSectionSubmit(EditContext context) {
-        var group = new Radigate.Shared.TaskGroup { Label = NewTaskGroup.Label, PatientId = patient.Id };
+        var group = new GroupDisplay { Label = NewTaskGroup.Label, PatientId = patient.Id };
         Groups.Add(new TaskGroupModifier { Group = group, Tasks = new(), NewLabel = group.Label });
         NewTaskGroup.Label = string.Empty;
         AddGroupOpen = false;
@@ -305,11 +290,11 @@
             var group = new PatientValueItem.GroupValueItem { Id = g.Group.Id, Label = g.Group.Label };
             foreach(var t in g.Tasks){
                 group.Tasks.Add(new PatientValueItem.TaskItemValue {
-                        Id = t.Task.Id,
-                        Label = t.Task.Label,
-                        Comments = t.Task.Comments,
-                        Type = t.Task.Type,
-                        Value = t.Task.Value
+                    Id = t.Task.Id,
+                    Label = t.Task.Label,
+                    Comments = t.Task.Comments,
+                    Type = (int)t.Task.Type,
+                    Value = t.Task.Value
                 });
             }
             newPatient.Groups.Add(group);
@@ -326,15 +311,17 @@
         public bool IsNewTaskOpen { get; set; } = false;
         public string NewTaskLabel { get; set; } = string.Empty;
         public TaskType NewTaskType { get; set; }
+        public string NewTaskIcon => (GroupDisplay.Convert(new TaskItem { Type = (int)NewTaskType })).Icon;
         public string NewLabel { get; set; } = string.Empty;
-        public Radigate.Shared.TaskGroup Group {get;set;}
+        public GroupDisplay Group {get;set;}
         public List<TaskItemModifier> Tasks { get; set; }
     }
 
     private class TaskItemModifier {
         public bool Edit { get; set; }
         public string NewLabel { get; set; } = string.Empty; 
-        public TaskItem Task { get; set; }
+        public TaskType Type { get; set; }
+        public ITaskItem Task { get; set; }
         public TaskGroupModifier Parent { get; set; }
     }
 }
