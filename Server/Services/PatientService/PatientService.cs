@@ -150,8 +150,34 @@ namespace Radigate.Server.Services.PatientService {
                 }
             }
 
+            //check for tasks and groups to delete
+            foreach(var group in samePatient.TaskGroups) {
+                //if this group isn't in the new groups
+                if(!groups.Any(g => g.Id == group.Id)) {
+                    //delete all group tasks
+                    foreach(var task in group.Tasks) {
+                        var result = await _context.Tasks.FindAsync(task.Id);
+                        if (result is not null) _context.Tasks.Remove(result);
+                    }
+
+                    //delete group
+                    var gResult = await _context.TaskGroups.FindAsync(group.Id);
+                    if(gResult is not null) _context.TaskGroups.Remove(gResult);
+                }
+
+                //if the group is not being deleted, check for tasks to delete
+                var newGroup = groups.Find(g => g.Id == group.Id);
+                foreach(var task in group.Tasks) {
+                    if(!newGroup.Tasks.Any(t => t.Id == task.Id)) {
+                        var tResult = await _context.Tasks.FindAsync(task.Id);
+                        if (tResult is not null) _context.Tasks.Remove(tResult);
+                    }
+                }
+            }
+
             samePatient.TaskGroups = groups;
             
+
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool> { Data = true };
         }
