@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Radigate.Client.Data.TaskItems {
     public class ListDisplay : ITaskItem {
         public TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; } = -1;
+        public int? Id { get; set; } = null;
         public int SortOrder { get; set; }
         public string Label { get; set; } = string.Empty;
         public string Comments { get; set; } = string.Empty;

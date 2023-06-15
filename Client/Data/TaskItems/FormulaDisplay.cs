@@ -3,7 +3,7 @@
 namespace Radigate.Client.Data.TaskItems {
     public class FormulaDisplay : ITaskItem {
         public Radigate.Shared.TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; } = -1;
+        public int? Id { get; set; } = null;
         public int SortOrder { get; set; }
         public string Label { get; set; }
         public string Comments { get; set; }

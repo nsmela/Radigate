@@ -3,7 +3,7 @@
 namespace Radigate.Client.Data.TaskItems {
     public class CheckboxDisplay : ITaskItem {
         public TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; } = -1;
+        public int? Id { get; set; } = null;
         public int SortOrder { get; set; }
         public string Label { get; set; } = string.Empty;
         public string Comments { get; set; } = string.Empty;
@@ -34,7 +34,7 @@ namespace Radigate.Client.Data.TaskItems {
 
         public CheckboxDisplay(TaskItem task) {
             this.TaskGroup = task.TaskGroup;
-            this.Id =task.Id;
+            this.Id = task.Id;
             this.Label = task.Label;
             this.Comments = task.Comments;
             this.Value = task.Value;

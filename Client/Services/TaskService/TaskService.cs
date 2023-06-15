@@ -10,13 +10,15 @@ namespace Radigate.Client.Services.TaskService {
             _patientService = patientService;
         }
 
-        public async Task UpdateTaskValue(int taskId, string value) {
-            var taskValueItem = new TaskValueItem { TaskId = taskId, TaskValue = value };
+        public async Task UpdateTaskValue(int? taskId, string value) {
+            if (taskId == null) return;
+
+            var taskValueItem = new TaskValueItem { TaskId = taskId.Value, TaskValue = value };
 
             var connection = $"/api/Task/update";
             await  _http.PutAsJsonAsync(connection, taskValueItem); //converts the subclass into the base class
 
-            _patientService.UpdatePatientTask(taskId);
+            _patientService.UpdatePatientTask(taskId.Value);
         }
     }
 }

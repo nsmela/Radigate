@@ -1,4 +1,7 @@
 ﻿using Radigate.Server.Data;
+using Radigate.Server.Migrations;
+using Radigate.Shared;
+using System.Reflection.Emit;
 
 namespace Radigate.Server.Services.PatientService {
     public class PatientService : IPatientService {
@@ -73,112 +76,122 @@ namespace Radigate.Server.Services.PatientService {
 
             //group info
             var oldGroups = samePatient.TaskGroups;
-            var groups = new List<TaskGroup>();
-            int groupIndex = 0;
-            foreach(var group in patient.Groups) {
-                var taskGroup = samePatient.TaskGroups.FirstOrDefault(g => g.Id == group.Id);
+            var newGroups = new List<TaskGroup>();
 
-                //group is new
-                if(taskGroup is null) {
-                    taskGroup = new TaskGroup {
-                        Label= group.Label,
-                        Patient = samePatient,
-                        PatientId = samePatient.Id
-                    };
+            //update existing group
+            foreach(var newGroup in patient.Groups) {
+                var taskGroup = samePatient.TaskGroups.FirstOrDefault(g => g.Id == newGroup.Id);
+                if (taskGroup is null) continue;
 
-                    var tasks = new List<TaskItem>();
-                    foreach (var task in group.Tasks) tasks.Add(new TaskItem {
+                //group
+                taskGroup.Label = newGroup.Label;
+                taskGroup.SortingOrder = patient.Groups.IndexOf(newGroup);
+
+                //tasks
+                var oldTasks = new List<TaskItem>();
+                foreach (var task in taskGroup.Tasks) oldTasks.Add(new TaskItem {Id = task.Id });
+
+                //create, update or delete?
+                foreach (var newTask in newGroup.Tasks) {
+                    //create
+                    if(newTask.Id is null) {
+                        var task = new TaskItem {
+                            Label = newTask.Label,
+                            Value = newTask.Value,
+                            Type = newTask.Type,
+                            SortingOrder = newGroup.Tasks.IndexOf(newTask),
+                            TaskGroup = taskGroup,
+                            TaskGroupId = taskGroup.Id
+                        };
+                        taskGroup.Tasks.Add(task);
+                        _context.Tasks.Add(task);
+                        continue;
+                    }
+
+                    var oldTask = _context.Tasks.Find(newTask.Id);
+
+                    //filters out tasks to be deleted
+                    int index = oldTasks.FindIndex(t => t.Id == newTask.Id);
+                    if ( index >= 0) oldTasks.RemoveAt(index);
+
+                    //update
+                    if (oldTask is not null) {
+                        var task = new TaskItem {
+                            Id = oldTask.Id,
+                            TaskGroup = taskGroup,
+                            TaskGroupId = taskGroup.Id,
+                            Label = newTask.Label,
+                            Value = newTask.Value,
+                            Type = newTask.Type,
+                            SortingOrder = newGroup.Tasks.IndexOf(newTask)
+                        };
+                        _context.Tasks.Entry(oldTask).CurrentValues.SetValues(task);
+                        continue;
+                    }
+                }
+                //delete tasks leftover from the filter from before
+                foreach(var task in oldTasks) {
+                    var entity = await _context.Tasks.FindAsync(task.Id);
+                    if(entity is not null ) _context.Tasks.Remove(entity);
+                }
+
+                //save it
+                _context.TaskGroups.Entry(samePatient.TaskGroups.First(g => g.Id == taskGroup.Id)).CurrentValues.SetValues(taskGroup);
+            }
+
+            //generate new groups and tasks
+            foreach(var newGroup in patient.Groups) {
+                var taskGroup = samePatient.TaskGroups.FirstOrDefault(g => g.Id == newGroup.Id);
+                if (taskGroup is not null) continue;//group exists
+
+                //group
+                taskGroup = new TaskGroup {
+                    Patient = samePatient,
+                    PatientId = samePatient.Id,
+                    Label = newGroup.Label,
+                    SortingOrder = patient.Groups.IndexOf(newGroup)
+                };
+
+                //tasks
+                var tasks = new List<TaskItem>();
+                foreach(var task in newGroup.Tasks) {
+                    var taskItem = new TaskItem {
                         Label = task.Label,
-                        Value= task.Value,
-                        Comments= task.Comments,
-                        Type= task.Type,
-
-                        TaskGroup = taskGroup,
-                        SortingOrder = tasks.Count()
-                    });
-
-                    taskGroup.Tasks = tasks;
-                    groups.Add(taskGroup);
-                    groupIndex++;
-                    continue;
+                        Value = task.Value,
+                        Type = task.Type,
+                        SortingOrder = newGroup.Tasks.IndexOf(task),
+                        TaskGroup = taskGroup
+                    };
+                    tasks.Add(taskItem);
                 }
 
-                //group exists in patient and record
-                if(taskGroup is not null) {
-                    taskGroup.Label = group.Label;
-                    taskGroup.SortingOrder = groupIndex;
-                    groupIndex++;
-
-                    //edit tasks
-                    var tasks = new List<TaskItem>();
-                    int taskIndex = 0;
-                    foreach(var task in group.Tasks) {
-                        var taskItem = taskGroup.Tasks.FirstOrDefault(t => t.Id == task.Id);
-
-                        //task is new
-                        if (taskItem is null) {
-                            taskItem = new TaskItem {
-                                Label= task.Label,
-                                Value = task.Value,
-                                Comments = task.Comments,
-                                Type = task.Type,
-
-                                TaskGroup = taskGroup,
-                                SortingOrder = taskIndex
-                            };
-                            taskIndex++;
-                            tasks.Add(taskItem);
-                            continue;
-                        }
-
-                        //if task exist
-                        taskItem.SortingOrder = taskIndex;
-                        taskIndex++;
-
-                        taskItem.Label = task.Label;
-                        taskItem.Value = task.Value;
-                        taskItem.Type= task.Type;
-                        taskItem.Comments = task.Comments;
-
-                        tasks.Add(taskItem);
-
-                        //remaining tasks are discarded
-                    }
-
-                    taskGroup.Tasks = tasks;
-                    groups.Add(taskGroup);
-                }
+                //save it
+                taskGroup.Tasks = tasks;
+                _context.TaskGroups.Add(taskGroup);
+                samePatient.TaskGroups.Add(taskGroup);
             }
 
-            //check for tasks and groups to delete
-            foreach(var group in samePatient.TaskGroups) {
-                //if this group isn't in the new groups
-                if(!groups.Any(g => g.Id == group.Id)) {
-                    //delete all group tasks
-                    foreach(var task in group.Tasks) {
-                        var result = await _context.Tasks.FindAsync(task.Id);
-                        if (result is not null) _context.Tasks.Remove(result);
-                    }
+            //delete the group and all tasks within it
+            //have to use a for loop, foreach faults because you're deleting the collection it's looping through
+            for (int i = samePatient.TaskGroups.Count - 1; i >= 0; i--) { 
+                var group = samePatient.TaskGroups.ElementAt(i);
+                if (group is null || group.Id <= 0) continue;
+                if (patient.Groups.Any(g => g.Id == group.Id)) continue;
 
-                    //delete group
-                    var gResult = await _context.TaskGroups.FindAsync(group.Id);
-                    if(gResult is not null) _context.TaskGroups.Remove(gResult);
-                    continue;
+                //delete tasks
+                for(int j = group.Tasks.Count - 1; j >= 0; j--) {
+                    var task = group.Tasks.ElementAt(j);
+                    var entity = _context.Tasks.Find(task.Id);
+                    if (entity is not null) _context.Tasks.Remove(entity);
                 }
 
-                //if the group is not being deleted, check for tasks to delete
-                var newGroup = groups.Find(g => g.Id == group.Id);
-                foreach(var task in group.Tasks) {
-                    if(!newGroup.Tasks.Any(t => t.Id == task.Id)) {
-                        var tResult = await _context.Tasks.FindAsync(task.Id);
-                        if (tResult is not null) _context.Tasks.Remove(tResult);
-                    }
-                }
+                //delete group
+                samePatient.TaskGroups.Remove(group);
+                var groupEntity = await _context.TaskGroups.FindAsync(group.Id);
+                if(groupEntity is not null) _context.TaskGroups.Remove(groupEntity);
             }
 
-            samePatient.TaskGroups = groups;
-            
-
+            _context.Patients.Entry(samePatient).CurrentValues.SetValues(samePatient);
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool> { Data = true };
         }
