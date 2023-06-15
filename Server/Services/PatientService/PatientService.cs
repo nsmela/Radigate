@@ -163,6 +163,7 @@ namespace Radigate.Server.Services.PatientService {
                     //delete group
                     var gResult = await _context.TaskGroups.FindAsync(group.Id);
                     if(gResult is not null) _context.TaskGroups.Remove(gResult);
+                    continue;
                 }
 
                 //if the group is not being deleted, check for tasks to delete
