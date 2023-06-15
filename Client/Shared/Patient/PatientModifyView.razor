@@ -52,7 +52,7 @@
                                             <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
                                                 Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
                                         </MudToolBar>
-                                        @foreach(var option in ((TaskList)task.Task).Options){
+                                        @foreach(var option in ((ListDisplay)task.Task).Options){
                                             <MudStack Row="true" Class="width:48px;">
                                                 <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
                                                 Color="Color.Error" Size="Size.Small" />
@@ -66,7 +66,7 @@
                                 <!-- default view for editing a task -->
                                 <!-- Type Menu -->
                                     <MudToolBar Class="ma-n4">
-                                        <MudMenu Icon="@task.Task.Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                        <MudMenu Icon="@task.Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
                                             <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {task.Type = TaskType.Bool; task.Task.Value = "false";})></MudButton>
                                             <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {task.Type = TaskType.Text; task.Task.Value = string.Empty;})></MudButton>
                                             <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {task.Type = TaskType.Date; task.Task.Value = DateTime.Today.ToShortDateString();}) />
@@ -212,13 +212,16 @@
 
         var task = new TaskItemModifier {
             NewLabel = group.NewTaskLabel,
+            Type = group.NewTaskType,
             Parent = group
         };
+        task.Task = NewTask(task);
+
+        group.Tasks.Add(task);
 
         group.IsNewTaskOpen = false;
         group.NewTaskLabel = string.Empty;
         group.NewTaskType = new();
-        group.Tasks.Add(task);
     }
 
     private void EditTask(TaskItemModifier task) {
@@ -235,16 +238,14 @@
 
     //list task items
     private void EditTaskListLabel(TaskItemModifier task, string originalValue, string value) {
-        var list = (TaskList)task.Task;
+        var list = (ListDisplay)task.Task;
         int index = list.Options.FindIndex(o => o == originalValue);
         list.Options[index] = value;
-        list.Value = list.ValueString;
     }
 
     private void AddTaskListItem(TaskItemModifier task){
-        var list = (TaskList)task.Task;
+        var list = (ListDisplay)task.Task;
         list.Options.Add($"Option {list.Options.Count + 1}");
-        list.Value = list.ValueString;
     }
 
     //group methods
@@ -305,6 +306,23 @@
         NavManager.NavigateTo($"patients/{PatientId}");
     }
 
+    private ITaskItem NewTask(TaskItemModifier task) {
+        switch(task.Type){
+            case TaskType.Bool:
+                return new CheckboxDisplay(task.NewLabel);
+            case TaskType.Number:
+                return new NumberDisplay(task.NewLabel);
+            case TaskType.Calculation:
+                return new FormulaDisplay(task.NewLabel);
+            case TaskType.Date:
+                return new DateDisplay(task.NewLabel);
+            case TaskType.List:
+                return new ListDisplay(task.NewLabel);
+            default:
+                return new TextDisplay(task.NewLabel);
+        }
+    }
+
     private class TaskGroupModifier {
         public bool Edit { get; set; } = false;
         public bool EditName { get; set; } = false;
@@ -323,5 +341,8 @@
         public TaskType Type { get; set; }
         public ITaskItem Task { get; set; }
         public TaskGroupModifier Parent { get; set; }
+        public string Icon => (GroupDisplay.Convert(new TaskItem { Type = (int)Type })).Icon;
     }
+
+   
 }

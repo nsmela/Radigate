@@ -4,7 +4,7 @@ namespace Radigate.Client.Data.TaskItems
 {
     public interface ITaskItem
     {
-        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
+        public TaskGroup TaskGroup { get; set; }
         public int TaskGroupId => TaskGroup.Id;
         public int Id { get; set; }
         public int SortOrder { get; set; }

@@ -2,11 +2,11 @@
 
 namespace Radigate.Client.Data.TaskItems {
     public class CheckboxDisplay : ITaskItem {
-        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; }
+        public TaskGroup TaskGroup { get; set; }
+        public int Id { get; set; } = -1;
         public int SortOrder { get; set; }
-        public string Label { get; set; }
-        public string Comments { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public string Comments { get; set; } = string.Empty;
         public string Value {
             get => IsChecked ? "true" : "false";
             set => IsChecked = value == "true";
@@ -27,6 +27,10 @@ namespace Radigate.Client.Data.TaskItems {
 
         //non-inherited
         public bool IsChecked { get; set; } = false;
+        public CheckboxDisplay(string label) {
+            this.Label = label;
+            Value = "false";
+        }
 
         public CheckboxDisplay(TaskItem task) {
             this.TaskGroup = task.TaskGroup;

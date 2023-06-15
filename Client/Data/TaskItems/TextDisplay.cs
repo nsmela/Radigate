@@ -2,8 +2,8 @@
 
 namespace Radigate.Client.Data.TaskItems {
     public class TextDisplay : ITaskItem {
-        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; }
+        public TaskGroup TaskGroup { get; set; }
+        public int Id { get; set; } = -1;
         public int SortOrder { get; set; }
         public string Label { get; set; }
         public string Comments { get; set; }
@@ -23,6 +23,10 @@ namespace Radigate.Client.Data.TaskItems {
             }
 
         //non-inherited
+        public TextDisplay(string label) {
+            Label = label;
+            Value = string.Empty;
+        }
         public TextDisplay(TaskItem task) {
             this.TaskGroup = task.TaskGroup;
             this.Id = task.Id;

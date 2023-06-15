@@ -16,7 +16,7 @@ namespace Radigate.Shared {
         [JsonIgnore] public TaskGroup TaskGroup { get; set; } = null!;//parent
         public int TaskGroupId { get; set; }
         public int SortingOrder { get; set; }
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         public string Label { get; set; } = string.Empty;
         public string Comments { get; set; } = string.Empty;
         public int Type { get; set; }

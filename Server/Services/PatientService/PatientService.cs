@@ -80,6 +80,12 @@ namespace Radigate.Server.Services.PatientService {
 
                 //group is new
                 if(taskGroup is null) {
+                    taskGroup = new TaskGroup {
+                        Label= group.Label,
+                        Patient = samePatient,
+                        PatientId = samePatient.Id
+                    };
+
                     var tasks = new List<TaskItem>();
                     foreach (var task in group.Tasks) tasks.Add(new TaskItem {
                         Label = task.Label,
@@ -91,14 +97,7 @@ namespace Radigate.Server.Services.PatientService {
                         SortingOrder = tasks.Count()
                     });
 
-                    taskGroup = new TaskGroup {
-                        Label= group.Label,
-                        Tasks = tasks,
-
-                        Patient = samePatient,
-                        PatientId = samePatient.Id
-                    };
-
+                    taskGroup.Tasks = tasks;
                     groups.Add(taskGroup);
                     groupIndex++;
                     continue;

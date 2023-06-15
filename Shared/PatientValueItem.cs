@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Radigate.Shared {
     public class PatientValueItem {
-        public int PatientId { get; set; }
+        public int? PatientId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Identifier { get; set; } = string.Empty;
@@ -14,13 +14,13 @@ namespace Radigate.Shared {
 
 
         public class GroupValueItem {
-            public int Id { get; set; }
+            public int? Id { get; set; } = null;
             public string Label { get; set; } = string.Empty;
             public List<TaskItemValue> Tasks { get; set; } = new();
         }
 
         public class TaskItemValue {
-            public int Id { get; set; }
+            public int? Id { get; set; } = null;
             public string Label { get; set; } = string.Empty;
             public string Comments { get; set; } = string.Empty;
             public int Type { get; set; }

@@ -2,8 +2,8 @@
 
 namespace Radigate.Client.Data.TaskItems {
     public class DateDisplay : ITaskItem {
-        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; }
+        public TaskGroup TaskGroup { get; set; }
+        public int Id { get; set; } = -1;
         public int SortOrder { get; set; }
         public string Label { get; set; }
         public string Comments { get; set; }
@@ -30,7 +30,10 @@ namespace Radigate.Client.Data.TaskItems {
 
         //non-inherited
         public DateTime? DateValue { get; set; } = DateTime.Today;
-
+        public DateDisplay(string label) {
+            Label = label;
+            DateValue = DateTime.Today;
+        }
         public DateDisplay(TaskItem task) {
             this.TaskGroup = task.TaskGroup;
             this.Id = task.Id;

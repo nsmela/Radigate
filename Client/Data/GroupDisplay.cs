@@ -6,7 +6,7 @@ namespace Radigate.Client.Data {
         public int PatientId { get; set; }
         public List<ITaskItem> Tasks { get; set; }
 
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         public int SortingOrder { get; set; }
         public string Label { get; set; }
 

@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace Radigate.Client.Data.TaskItems {
     public class ListDisplay : ITaskItem {
-        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
-        public int Id { get; set; }
+        public TaskGroup TaskGroup { get; set; }
+        public int Id { get; set; } = -1;
         public int SortOrder { get; set; }
-        public string Label { get; set; }
-        public string Comments { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public string Comments { get; set; } = string.Empty;
         public string Value {
             get {
                 string text = Options.FindIndex(o => o == SelectedOption).ToString();
@@ -47,6 +47,10 @@ namespace Radigate.Client.Data.TaskItems {
         //non-inherited
         public List<string> Options { get; set; } = new();
         public string SelectedOption { get; set; } = string.Empty;
+        public ListDisplay(string label) {
+            Options = new List<string> { "Option 1", "Option 2", "Option 3" };
+            SelectedOption = Options[0];
+        }
         public ListDisplay(TaskItem task) {
             this.TaskGroup = task.TaskGroup;
             this.Id = task.Id;
