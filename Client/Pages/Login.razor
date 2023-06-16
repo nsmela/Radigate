@@ -1,6 +1,7 @@
 ﻿@page "/signin"
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.WebUtilities
 
 <PageTitle>Sign In</PageTitle>
 
@@ -33,16 +34,25 @@
 </MudGrid>
 
 @code {
-    [Inject] private IAuthService AuthService { get; set; }
-    [Inject] private ILocalStorageService LocalStorage { get; set; }
-    [Inject] private NavigationManager NavManager { get; set; }
-    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] private IAuthService AuthService { get; set; }
+        [Inject] private ILocalStorageService LocalStorage { get; set; }
+        [Inject] private NavigationManager NavManager { get; set; }
+        [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; }
+
     private UserLogin user = new();
+    private string returnUrl = string.Empty;
 
     bool success;
     string[] errors = { };
     string errorMessage = string.Empty;
     MudForm? form = new();
+
+    protected override void OnInitialized() {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url)){
+            returnUrl = url;
+        }
+    }
 
     private IEnumerable<string> PasswordStrength(string pw) {
         if (string.IsNullOrWhiteSpace(pw)) {
@@ -70,7 +80,7 @@
         }
 
         await LocalStorage.SetItemAsync("authToken", result.Data);
-        await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        NavManager.NavigateTo("");
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        NavManager.NavigateTo(returnUrl);
     }
 }

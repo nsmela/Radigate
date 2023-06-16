@@ -10,7 +10,7 @@
                 <MudMenuItem OnClick="Logout">Logout</MudMenuItem>
             </Authorized>
             <NotAuthorized>
-                <MudMenuItem><MudLink Href="/signin">Sign In</MudLink></MudMenuItem>
+                <MudMenuItem><MudLink Href="@ReturnPath()">Sign In</MudLink></MudMenuItem>
                 <MudMenuItem><MudLink Href="/register">Register</MudLink></MudMenuItem>
             </NotAuthorized>
         </AuthorizeView>
@@ -20,11 +20,13 @@
 @code {
     [Inject] private ILocalStorageService LocalStorage { get; set; }
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-    [Inject] private NavigationManager NavManager { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    private string ReturnPath() => "/signin?returnUrl=" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
 
     private async Task Logout(){
         await LocalStorage.RemoveItemAsync("authToken");
         await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        NavManager.NavigateTo("");
+        NavigationManager.NavigateTo("");
     }
 }
