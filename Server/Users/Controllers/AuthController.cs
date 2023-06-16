@@ -18,5 +18,13 @@ namespace Radigate.Server.Users.Controllers {
             if(response.Success) return Ok(response);
             else return BadRequest(response);
         }
+
+        [HttpPost("signin")]
+        public async Task<ActionResult<ServiceResponse<string>>> Signin(UserLogin request) {
+            var response = await _authService.Login(request.Email, request.Password);
+
+            if (response.Success) return Ok(response);
+            else return BadRequest(response);
+        }
     }
 }

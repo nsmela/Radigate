@@ -1,0 +1,74 @@
+﻿@page "/signin"
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+
+<PageTitle>Sign In</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @bind-Value="user.Email"
+                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+                <MudTextField T="string" Label="Password" HelperText="Enter the account's password'" 
+                              InputType="InputType.Password"
+                              Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                              RequiredError="Password is required!" @bind-Value="user.Password"  />
+                <div class="d-flex align-center justify-space-between">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto"
+                        OnClick="HandleLogin">Sign In</MudButton>
+                </div>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+             <MudText Color="@Color.Error">@errorMessage</MudText>
+            @foreach (var error in errors) {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Inject] private IAuthService AuthService { get; set; }
+    [Inject] private ILocalStorageService LocalStorage { get; set; }
+    [Inject] private NavigationManager NavManager { get; set; }
+    private UserLogin user = new();
+
+    bool success;
+    string[] errors = { };
+    string errorMessage = string.Empty;
+    MudForm? form = new();
+
+    private IEnumerable<string> PasswordStrength(string pw) {
+        if (string.IsNullOrWhiteSpace(pw)) {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 6)
+            yield return "Password must be at least of length 6";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private async Task HandleLogin(){
+        errorMessage = string.Empty;
+
+        var result = await AuthService.Signin(user);
+
+        if(!result.Success){
+            errorMessage = result.Message;
+            return;
+        }
+
+        await LocalStorage.SetItemAsync("authToken", result.Data);
+        NavManager.NavigateTo("");
+    }
+}

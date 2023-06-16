@@ -6,6 +6,13 @@
             _http = http;
         }
 
+        public async Task<ServiceResponse<string>> Signin(UserLogin request) {
+            var connection = $"api/Auth/signin";
+            var response = await _http.PostAsJsonAsync(connection, request);
+
+            return await response.Content.ReadFromJsonAsync<ServiceResponse<string>>();
+        }
+
         public async Task<ServiceResponse<int>> Register(UserRegisteration request) {
             var connection = $"api/Auth/register";
             var response = await _http.PostAsJsonAsync(connection, request);
