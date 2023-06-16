@@ -10,9 +10,6 @@ namespace Radigate.Server.Data {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseSqlite(Configuration.GetConnectionString("SQLLiteConnection"));
-            //optionsBuilder
-                //.LogTo(Console.WriteLine)
-                //.EnableDetailedErrors();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {

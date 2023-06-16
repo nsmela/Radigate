@@ -1,9 +1,11 @@
 global using Radigate.Shared;
 global using Microsoft.EntityFrameworkCore;
 global using Radigate.Server.Services.PatientService;
+global using Radigate.Server.Users.Services;
 using Radigate.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 using Radigate.Server.Services.TaskService;
+using Radigate.Server.Users.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +22,12 @@ builder.Services.AddSwaggerGen();
 //custom services Dependancy Injection
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // SQLLite
 var connectionString = builder.Configuration.GetConnectionString("SQLLiteConnection");
 builder.Services.AddDbContextFactory<PatientDataContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddDbContextFactory<UsersContext>(options => options.UseSqlite(connectionString));
 
 var app = builder.Build();
 
