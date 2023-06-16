@@ -20,6 +20,8 @@ namespace Radigate.Server.Services.PatientService {
                     .ToListAsync()
             };
 
+            response.Data.ForEach(p => p.Sort()); //aligns the groups and tasks
+
             return response;
         }
 
@@ -29,6 +31,8 @@ namespace Radigate.Server.Services.PatientService {
                     .Select(Patient => Patient.Id) //grab only the id
                     .ToListAsync()
             };
+
+            response.Data.Sort(); //aligns the groups and tasks
 
             return response;
         }
@@ -48,6 +52,7 @@ namespace Radigate.Server.Services.PatientService {
                 response.Message = "Patient is not found";
             }
             else {
+                patient.Sort();
                 response.Data = patient;
             }
 
@@ -195,5 +200,6 @@ namespace Radigate.Server.Services.PatientService {
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool> { Data = true };
         }
+
     }
 }
