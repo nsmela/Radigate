@@ -5,6 +5,7 @@ global using Radigate.Client.Services.TaskService;
 global using Radigate.Client.Services.AuthService;
 global using Radigate.Client.Data;
 global using Radigate.Client.Data.TaskItems;
+global using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radigate.Client;
@@ -21,5 +22,10 @@ builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddMudServices();
+
+//auth state
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 await builder.Build().RunAsync();

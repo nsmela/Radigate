@@ -36,6 +36,7 @@
     [Inject] private IAuthService AuthService { get; set; }
     [Inject] private ILocalStorageService LocalStorage { get; set; }
     [Inject] private NavigationManager NavManager { get; set; }
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     private UserLogin user = new();
 
     bool success;
@@ -69,6 +70,7 @@
         }
 
         await LocalStorage.SetItemAsync("authToken", result.Data);
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
         NavManager.NavigateTo("");
     }
 }
