@@ -8,18 +8,19 @@
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
             <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @bind-Value="user.Email"
                               Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
                 <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="password"
                               InputType="InputType.Password"
                               Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
-                              RequiredError="Password is required!" />
+                              RequiredError="Password is required!" @bind-Value="user.Password"  />
                 <MudTextField T="string"
                               Label="Password" HelperText="Confirm the password" InputType="InputType.Password"
-                              Validation="@(new Func<string, string>(PasswordMatch))" />
+                              Validation="@(new Func<string, string>(PasswordMatch))" @bind-Value="user.ConfirmPassword" />
                 <div class="d-flex align-center justify-space-between">
                     <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto"
+                        OnClick="HandleRegisteration">Register</MudButton>
                 </div>
             </MudForm>
         </MudPaper>
@@ -27,6 +28,7 @@
     <MudItem xs="12" sm="5">
         <MudPaper Class="pa-4 mud-height-full">
             <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+             <MudText Color="@Color.Error">@errorMessage</MudText>
             @foreach (var error in errors) {
                 <MudText Color="@Color.Error">@error</MudText>
             }
@@ -35,10 +37,12 @@
 </MudGrid>
 
 @code {
+    [Inject] private IAuthService AuthService { get; set; }
     UserRegisteration user = new();
 
     bool success;
     string[] errors = { };
+    string errorMessage = string.Empty;
     MudTextField<string>? password;
     MudForm? form = new();
 
@@ -62,7 +66,10 @@
             return "Passwords don't match";
         return null;
     }
-    void HandleRegisteration(){
-        Console.WriteLine($"Rsgiter user with Email{user.Email}");
+    async Task HandleRegisteration(){
+        var result = await AuthService.Register(user);
+        if (result.Success) errorMessage = string.Empty;
+        else errorMessage = result.Message;
+
     }
 }

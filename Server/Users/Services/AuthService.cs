@@ -1,6 +1,7 @@
 ﻿using Radigate.Server.Data;
 using Radigate.Server.Users.Data;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace Radigate.Server.Users.Services {
     public class AuthService : IAuthService {
@@ -11,9 +12,16 @@ namespace Radigate.Server.Users.Services {
         }
 
         public async Task<ServiceResponse<int>> Register(User user, string password) {
-            if(await UserExists(user.Email)) {
+            if(await UserExists(user.Email)) 
                 return new ServiceResponse<int> { Success = false, Message = "User already exists!" };
-            }
+            if (password.Length < 6)
+                return new ServiceResponse<int> { Success = false, Message = "Password must be at least of length 6" };
+            if (!Regex.IsMatch(password, @"[A-Z]"))
+                return new ServiceResponse<int> { Success = false, Message = "Password must contain at least one capital letter" };
+            if (!Regex.IsMatch(password, @"[a-z]"))
+                return new ServiceResponse<int> { Success = false, Message = "Password must contain at least one lowercase letter" };
+            if (!Regex.IsMatch(password, @"[0-9]"))
+                return new ServiceResponse<int> { Success = false, Message = "Password must contain at least one digit" };
 
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
