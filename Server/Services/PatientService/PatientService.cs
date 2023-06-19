@@ -204,5 +204,49 @@ namespace Radigate.Server.Services.PatientService {
             return new ServiceResponse<bool> { Data = true };
         }
 
+        public async Task<ServiceResponse<List<Patient>>> AdminGetPatientsAsync() {
+            var response = new ServiceResponse<List<Patient>> {
+                Data = await _context.Patients
+                    .Where(p => !p.Deleted)
+                    .Include(p => p.TaskGroups)
+                    .ThenInclude(g => g.Tasks)
+                    .ToListAsync()
+            };
+
+            response.Data.ForEach(p => p.Sort()); //aligns the groups and tasks
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<int>>> AdminGetPatientsIdAsync() {
+            var response = new ServiceResponse<List<int>> {
+                Data = await _context.Patients
+                    .Where(p => !p.Deleted)
+                    .Select(Patient => Patient.Id) //grab only the id
+                    .ToListAsync()
+            };
+
+            response.Data.Sort(); //aligns the groups and tasks
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<Patient>>> AddPatient(Patient patient) {
+            patient.Editing = false;
+            patient.IsNew = false;
+
+            _context.Patients.Add(patient);
+            await _context.SaveChangesAsync();
+            return await AdminGetPatientsAsync();
+        }
+
+        public async Task<ServiceResponse<List<Patient>>> DeletePatient(int patientId) {
+            var patient = await _context.Patients.FindAsync(patientId);
+            if (patient is null) return new ServiceResponse<List<Patient>> { Success = false, Message = "Patient Id does not exist." };
+
+            patient.Deleted = true;
+            await _context.SaveChangesAsync();
+            return await AdminGetPatientsAsync();
+        }
     }
 }
