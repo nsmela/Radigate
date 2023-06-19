@@ -7,6 +7,7 @@
     <ChildContent>
         <AuthorizeView>
             <Authorized>
+                <MudMenuItem OnClick="GoToProfile">Profile</MudMenuItem>
                 <MudMenuItem OnClick="Logout">Logout</MudMenuItem>
             </Authorized>
             <NotAuthorized>
@@ -23,6 +24,8 @@
     [Inject] private NavigationManager NavigationManager { get; set; }
 
     private string ReturnPath() => "/signin?returnUrl=" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+    private async Task GoToProfile() => NavigationManager.NavigateTo("/profile");
 
     private async Task Logout(){
         await LocalStorage.RemoveItemAsync("authToken");
