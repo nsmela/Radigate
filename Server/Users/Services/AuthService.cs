@@ -64,6 +64,8 @@ namespace Radigate.Server.Users.Services {
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
+            await _context.SaveChangesAsync();
+
             return new ServiceResponse<bool> { Data = true, Message = "Password has been changed" };
         }
 

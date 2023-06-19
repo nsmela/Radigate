@@ -40,7 +40,7 @@ namespace Radigate.Server.Migrations.Users
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

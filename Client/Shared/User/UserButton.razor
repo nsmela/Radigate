@@ -1,7 +1,16 @@
 ﻿<MudMenu Label="Full Menu Width" Variant="Variant.Filled"
     ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopLeft">
     <ActivatorContent>
-        <MudAvatar Color="Color.Tertiary">?</MudAvatar>
+        <MudAvatar Color="Color.Tertiary">
+            <AuthorizeView>
+                <Authorized>
+                    @context.User.Identity.Name.Substring(0,1).ToUpper()
+                </Authorized>
+                <NotAuthorized>
+                    ?
+                </NotAuthorized>
+            </AuthorizeView>
+        </MudAvatar>
         <MudText Class="pt-2 pl-2" > Account</MudText>
     </ActivatorContent>
     <ChildContent>
