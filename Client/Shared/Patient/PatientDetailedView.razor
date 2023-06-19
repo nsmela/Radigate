@@ -1,10 +1,15 @@
 ﻿@if(patient is null){
 
 }else{
-    <MudPaper Class="mud-theme-primary pa-2 ml-2 mt-1 rounded-t-xl rounded-0" MinHeight="240px">
+    <MudPaper Class="pa-2 ml-2 mt-1 rounded-t-xl rounded-0" MinHeight="240px"
+          Style="background-image: linear-gradient( 109.6deg,  rgba(0,182,255,1) 11.2%, rgba(102,51,153,1) 91.1% );">
         <MudItem Class="d-flex justify-content-between">
             <MudItem>
-                <MudText Typo="Typo.h1">@(patient.LastName.ToUpper() + ", " + patient.FirstName.ToUpper())</MudText>
+                <MudStack Row=true >
+                    <MudText Typo="Typo.h1">@(patient.LastName.ToUpper() + ", " + patient.FirstName.ToUpper())</MudText>
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="ModifyPatient" 
+                            Style="width:64px;height:64px;"/>
+                </MudStack>
                     <MudText Typo="Typo.h4">DUE: NO DATA</MudText>
                     <MudText Typo="Typo.h4">PHYSICIAN: N/A</MudText>
                 </MudItem>
@@ -162,8 +167,7 @@
     private async Task DeletePatient() {
     }
 
-    private async Task EditPatient() {
-        NavigationManager.NavigateTo($"patients/edit/{PatientId}");
-    }
+    private async Task EditPatient() => NavigationManager.NavigateTo($"patients/edit/{PatientId}");
+    private async Task ModifyPatient() => NavigationManager.NavigateTo($"patients/edit/{PatientId}");
 
 }

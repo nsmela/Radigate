@@ -9,7 +9,7 @@
 @code {
     [Inject] private IPatientService PatientService { get; set; }
     [Parameter] public int Id { get; set; }
-
+    
     private PatientDisplay? Patient { get; set; }
     private string message = string.Empty;
 
