@@ -1,9 +1,40 @@
 ﻿@page "/profile"
+@attribute [Authorize]
+@using System.ComponentModel.DataAnnotations
 
 <AuthorizeView>
     <h3>You're logged in under <i>@context.User.Identity.Name</i>. </h3> 
 </AuthorizeView>
 
-@code {
+<EditForm Model="@request" OnValidSubmit="ChangePassword">
+    <DataAnnotationsValidator />
+        <MudCard Outlined="true" Class="ma-2" Style="max-width:560px">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Change Password</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                @if(!string.IsNullOrEmpty(message)){
+                    <MudText Typo="Typo.h5" Color="Color.Error">@message</MudText>
+                }
+                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                              @bind-Value="request.Password" For="@(() => request.Password)" InputType="InputType.Password" />
+                <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"
+                              @bind-Value="request.ConfirmPassword" For="@(() => request.ConfirmPassword)" InputType="InputType.Password" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
+            </MudCardActions>
+        </MudCard>
+</EditForm>
 
+@code {
+    [Inject] private IAuthService AuthService { get; set; }
+    UserChangePassword request = new();
+
+    string message = string.Empty;
+
+    private async Task ChangePassword(){
+        var result = await AuthService.ChangePassword(request);
+        message = result.Message;
+    }
 }

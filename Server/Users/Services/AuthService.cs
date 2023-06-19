@@ -55,6 +55,18 @@ namespace Radigate.Server.Users.Services {
             return await _context.Users.AnyAsync(user => user.Email.ToLower().Equals(email));
         }
 
+        public async Task<ServiceResponse<bool>> ChangePassword(int userId, string newPassword) {
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null) return new ServiceResponse<bool> { Success = false, Message = "User is not found." };
+
+            CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            return new ServiceResponse<bool> { Data = true, Message = "Password has been changed" };
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) {
             using (var hmac = new HMACSHA512()) {
                 passwordSalt = hmac.Key;
@@ -88,5 +100,7 @@ namespace Radigate.Server.Users.Services {
 
             return jwt;
         }
+
+
     }
 }
