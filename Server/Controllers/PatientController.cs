@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Radigate.Server.Data;
+using Radigate.Server.Users;
 using Radigate.Shared;
 
 namespace Radigate.Server.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase {
-        private readonly PatientDataContext _context;
         private readonly IPatientService _patientService;
 
         public PatientController(IPatientService patientService) {
@@ -21,7 +21,7 @@ namespace Radigate.Server.Controllers {
             return Ok(result);
         }
 
-        [HttpGet("admin"), Authorize(Roles = "Admin")]
+        [HttpGet("admin"), Authorize(Roles = CustomRoles.Admin)]
         public async Task<ActionResult<ServiceResponse<List<Patient>>>> AdminGetPatients() {
             var result = await _patientService.AdminGetPatientsAsync();
             return Ok(result);
@@ -39,7 +39,7 @@ namespace Radigate.Server.Controllers {
             return Ok(result);
         }
 
-        [HttpGet("admin/ids"), Authorize(Roles = "Admin")]
+        [HttpGet("admin/ids"), Authorize(Roles = CustomRoles.Admin)]
         public async Task<ActionResult<ServiceResponse<List<int>>>> AdminGetPatientsId() {
             var result = await _patientService.AdminGetPatientsIdAsync();
             return Ok(result);
@@ -51,13 +51,19 @@ namespace Radigate.Server.Controllers {
             return Ok(result);
         }
 
-        [HttpDelete("admin"), Authorize("Admin")]
+        [HttpPut("archive")]
+        public async Task<ActionResult<ServiceResponse<List<Patient>>>> ArchivePatient(int patientId, bool archive) {
+            var result = await _patientService.ArchivePatient(patientId, archive);
+            return Ok(result);
+        }
+
+        [HttpDelete("admin"), Authorize(Roles = CustomRoles.Admin)]
         public async Task<ActionResult<ServiceResponse<List<Patient>>>> DeletePatient(int patientId) {
             var result = await _patientService.DeletePatient(patientId);
             return Ok(result);
         }
 
-        [HttpPost("admin"), Authorize("Admin")]
+        [HttpPost("admin"), Authorize(Roles = CustomRoles.Admin)]
         public async Task<ActionResult<ServiceResponse<List<Patient>>>> AddPatient(Patient patient) {
             var result = await _patientService.AddPatient(patient);
             return Ok(result);
