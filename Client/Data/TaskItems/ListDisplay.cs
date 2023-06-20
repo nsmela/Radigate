@@ -48,6 +48,7 @@ namespace Radigate.Client.Data.TaskItems {
         public List<string> Options { get; set; } = new();
         public string SelectedOption { get; set; } = string.Empty;
         public ListDisplay(string label) {
+            Label = label;
             Options = new List<string> { "Option 1", "Option 2", "Option 3" };
             SelectedOption = Options[0];
         }
