@@ -15,7 +15,7 @@ namespace Radigate.Server.Services.PatientService {
         public async Task<ServiceResponse<List<Patient>>> GetPatientsAsync() {
             var response = new ServiceResponse<List<Patient>> {
                 Data = await _context.Patients
-                    .Where( p => !p.Deleted && p.Visible)
+                    .Where( p => !p.Deleted && p.Archived)
                     .Include(p => p.TaskGroups)
                     .ThenInclude(g => g.Tasks)
                     .ToListAsync()
@@ -29,7 +29,7 @@ namespace Radigate.Server.Services.PatientService {
         public async Task<ServiceResponse<List<int>>> GetPatientsIdAsync() {
             var response = new ServiceResponse<List<int>> {
                 Data = await _context.Patients
-                    .Where(p => !p.Deleted && p.Visible)
+                    .Where(p => !p.Deleted && p.Archived)
                     .Select(Patient => Patient.Id) //grab only the id
                     .ToListAsync()
             };
@@ -44,7 +44,7 @@ namespace Radigate.Server.Services.PatientService {
             var response = new ServiceResponse<Patient>();
 
             var patient = await _context.Patients
-                .Where(p => !p.Deleted && p.Visible)
+                .Where(p => !p.Deleted && p.Archived)
                 .Include(p => p.TaskGroups)
                 .ThenInclude(g => g.Tasks)
                 .FirstOrDefaultAsync(p => p.Id == patientId);
