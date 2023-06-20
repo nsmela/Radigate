@@ -1,5 +1,5 @@
-﻿@page "/newpatient"
-@attribute [Authorize(CustomRoles.Admin)]
+﻿@page "/patients/new"
+@attribute [Authorize(Roles = CustomRoles.Admin)]
 
 <PageTitle>New Patient</PageTitle>
 <MudGrid>
@@ -53,7 +53,7 @@
                         </MudMenu>
                     </MudToolBar>
                     @foreach (var task in group.Tasks) {
-                        <TaskEditBase Task="@task" GroupChanged="@OnGroupUpdated" Editing="true" />
+                        <TaskEditBase Task="@task" Editing="true" />
                     }
                     <MudPaper Outlined="true" Class="ma-1 pa-1">
                         <MudButton FullWidth="true" OnClick="() => AddTask(group)"> Add Task </MudButton>
@@ -81,7 +81,7 @@
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] AuthenticationStateProvider AuthState {get; set; }
-    [Inject] private PatientService PatientService { get; set; }
+    [Inject] private IPatientService PatientService { get; set; }
 
     private string newGroupLabel = string.Empty;
 
@@ -157,7 +157,7 @@
         }
         patient.Groups = newGroups;
         patient.Tasks = newTasks;
-        PatientService.AddPatient(patient);
+        await PatientService.AddPatient(patient);
         NavigationManager.NavigateTo("patients");
     }
 

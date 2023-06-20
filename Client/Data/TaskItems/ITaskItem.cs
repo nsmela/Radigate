@@ -1,9 +1,8 @@
 ﻿using MudBlazor;
+using System.Threading.Tasks;
 
-namespace Radigate.Client.Data.TaskItems
-{
-    public interface ITaskItem
-    {
+namespace Radigate.Client.Data.TaskItems {
+    public interface ITaskItem {
         public TaskGroup TaskGroup { get; set; }
         public int TaskGroupId => TaskGroup.Id;
         public int? Id { get; set; }
@@ -15,5 +14,26 @@ namespace Radigate.Client.Data.TaskItems
         public string Value { get; set; }
 
         public TaskItem ToTaskItem();
+    }
+
+    public static class TaskTypeExtensions {
+        public static string ToIcon(TaskType type) {
+            switch (type) {
+                case TaskType.Bool:
+                    return Icons.Material.Outlined.CheckBox;
+                case TaskType.Text:
+                    return Icons.Material.Filled.TextSnippet;
+                case TaskType.Number:
+                    return Icons.Material.Filled.Numbers;
+                case TaskType.List:
+                    return Icons.Material.Outlined.List;
+                case TaskType.Date:
+                    return Icons.Material.Filled.CalendarMonth;
+                case TaskType.Calculation:
+                    return Icons.Material.Filled.Calculate;
+                default:
+                    return @Icons.Material.Filled.QuestionMark;
+            }
+        }
     }
 }

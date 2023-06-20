@@ -11,6 +11,7 @@ namespace Radigate.Shared {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Identifier { get; set; } = string.Empty;
+        public DateTime CreationDate { get; set; } = DateTime.Now;
         public bool Archived { get; set; } = false;
         public bool Deleted { get; set; } = false;
 

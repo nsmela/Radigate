@@ -231,13 +231,34 @@ namespace Radigate.Server.Services.PatientService {
             return response;
         }
 
-        public async Task<ServiceResponse<Patient>> AddPatient(Patient patient) {
-            patient.Editing = false;
-            patient.IsNew = false;
+        public async Task<ServiceResponse<Patient>> AddPatient(NewPatient patient) {
+            var newPatient = new Patient {
+                Identifier = patient.Identifier,
+                FirstName = patient.FirstName,
+                LastName = patient.LastName,
+                Editing = false,
+                IsNew = false
+            };
 
-            _context.Patients.Add(patient);
+            //groups and tasks
+            foreach (var newGroup in patient.Groups) {
+                var group = new TaskGroup { Label = newGroup, Patient = newPatient };
+                foreach(var task in patient.Tasks) {
+                    if(task.Group == newGroup) {
+                        group.Tasks.Add(new TaskItem {
+                            Label = task.Label,
+                            TaskGroup = group,
+                            Type = (int)task.Type,
+                            Value = task.Value
+                        });
+                    }
+                }
+                newPatient.TaskGroups.Add(group);
+            }
+
+            _context.Patients.Add(newPatient);
             await _context.SaveChangesAsync();
-            return await GetPatientAsync(patient.Id);
+            return await GetPatientAsync(newPatient.Id);
         }
 
         public async Task<ServiceResponse<List<Patient>>> DeletePatient(int patientId) {

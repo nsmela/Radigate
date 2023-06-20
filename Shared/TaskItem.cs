@@ -10,7 +10,9 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Radigate.Shared {
-    public enum TaskType { Bool, Text, Number, List, Date, Calculation, Base }
+    public enum TaskType { 
+        Bool, Text, Number, List, Date, Calculation, Base 
+    }
 
     public class TaskItem {
         [JsonIgnore] public TaskGroup TaskGroup { get; set; } = null!;//parent

@@ -19,7 +19,7 @@ namespace Radigate.Shared {
         [Required] public string Label { get; set; } = String.Empty;
         [Required] public TaskType Type { get; set; } = TaskType.Bool;
         [Required] public string Group { get; set; } = String.Empty;
-        [Required] public string Value { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
 
     }
 }
