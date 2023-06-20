@@ -1,7 +1,9 @@
 global using Radigate.Shared;
+global using Radigate.Shared.Templates;
 global using Microsoft.EntityFrameworkCore;
 global using Radigate.Server.Services.PatientService;
 global using Radigate.Server.Users.Services;
+global using Radigate.Server.Templates.Services;
 using Radigate.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,6 +27,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {

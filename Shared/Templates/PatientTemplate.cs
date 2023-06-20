@@ -1,4 +1,4 @@
-﻿namespace Radigate.Server.Templates.Data.Models {
+﻿namespace Radigate.Shared.Templates {
     public class PatientTemplate {
         public int Id { get; set; }
         public string Label { get; set; } = "New Patient";

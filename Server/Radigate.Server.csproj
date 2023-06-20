@@ -27,8 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Templates\Controllers\" />
-    <Folder Include="Templates\Services\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,4 @@
-﻿using Radigate.Server.Templates.Data.Models;
-
-namespace Radigate.Server.Templates.Data {
+﻿namespace Radigate.Server.Templates.Data {
     public class TemplatesDataContext : DbContext {
         protected readonly IConfiguration Configuration;
 
