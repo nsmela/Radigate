@@ -1,4 +1,7 @@
-﻿@if(patient is null){
+﻿@attribute [Authorize]
+@inject AuthenticationStateProvider AuthState
+
+@if(patient is null){
 
 }else{
     <MudPaper Class="pa-2 ml-2 mt-1 rounded-t-xl rounded-0" MinHeight="240px"
@@ -7,8 +10,12 @@
             <MudItem>
                 <MudStack Row=true >
                     <MudText Typo="Typo.h1">@(patient.LastName.ToUpper() + ", " + patient.FirstName.ToUpper())</MudText>
-                        <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="ModifyPatient" 
-                            Style="width:64px;height:64px;"/>
+                    <AuthorizeView Roles="@CustomRoles.Admin">
+                        <Authorized>
+                            <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="ModifyPatient" 
+                                Style="width:64px;height:64px;"/>
+                        </Authorized>
+                    </AuthorizeView>
                 </MudStack>
                     <MudText Typo="Typo.h4">DUE: NO DATA</MudText>
                     <MudText Typo="Typo.h4">PHYSICIAN: N/A</MudText>

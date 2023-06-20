@@ -1,6 +1,6 @@
 ﻿@page "/addpatient"
 @inject AuthenticationStateProvider AuthState
-
+@attribute [Authorize(CustomRoles.Admin)]
 
 <h3>AddPatient</h3>
 

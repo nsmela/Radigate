@@ -1,4 +1,5 @@
 ﻿@page "/patients/{id:int}"
+@attribute [Authorize]
 
 @if(Patient is null){
     <MudProgressCircular>@message</MudProgressCircular>

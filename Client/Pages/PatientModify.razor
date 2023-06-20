@@ -1,4 +1,5 @@
 ﻿@page "/patients/edit/{id:int}"
+@attribute [Authorize(Roles = CustomRoles.Admin)]
 
     <PatientModifyView PatientId="@Id" />
 
