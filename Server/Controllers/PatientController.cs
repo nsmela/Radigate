@@ -63,8 +63,8 @@ namespace Radigate.Server.Controllers {
             return Ok(result);
         }
 
-        [HttpPost("admin"), Authorize(Roles = CustomRoles.Admin)]
-        public async Task<ActionResult<ServiceResponse<List<Patient>>>> AddPatient(Patient patient) {
+        [HttpPost, Authorize(Roles = CustomRoles.Admin)]
+        public async Task<ActionResult<ServiceResponse<Patient>>> AddPatient(Patient patient) {
             var result = await _patientService.AddPatient(patient);
             return Ok(result);
         }

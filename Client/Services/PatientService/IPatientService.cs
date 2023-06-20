@@ -8,5 +8,6 @@ namespace Radigate.Client.Services.PatientService {
         Task UpdatePatientTask(int taskId);
         Task<ServiceResponse<List<int>>> GetPatientsId();
         Task UpdatePatient(PatientValueItem newPatient);
+        Task<ServiceResponse<Patient>> AddPatient(NewPatient patient);
     }
 }

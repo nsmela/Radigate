@@ -231,13 +231,13 @@ namespace Radigate.Server.Services.PatientService {
             return response;
         }
 
-        public async Task<ServiceResponse<List<Patient>>> AddPatient(Patient patient) {
+        public async Task<ServiceResponse<Patient>> AddPatient(Patient patient) {
             patient.Editing = false;
             patient.IsNew = false;
 
             _context.Patients.Add(patient);
             await _context.SaveChangesAsync();
-            return await AdminGetPatientsAsync();
+            return await GetPatientAsync(patient.Id);
         }
 
         public async Task<ServiceResponse<List<Patient>>> DeletePatient(int patientId) {

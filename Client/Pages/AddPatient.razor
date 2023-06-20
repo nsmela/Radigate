@@ -1,9 +1,177 @@
-﻿@page "/addpatient"
-@inject AuthenticationStateProvider AuthState
+﻿@page "/newpatient"
 @attribute [Authorize(CustomRoles.Admin)]
 
-<h3>AddPatient</h3>
+<PageTitle>New Patient</PageTitle>
+<MudGrid>
+        <MudItem xs="12" sm="7" >
+        <!-- Patient Info -->
+        <MudPaper Class="pa-4 ma-2">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" ReadOnly="false">
+                <MudTextField @bind-Value="id" Label="Patient ID" Required="true" RequiredError="Patient ID is required!" />
+                <MudTextField @bind-Value="lastName" Label="Last Name" Required="true" RequiredError="Last Name is required!" />
+                <MudTextField @bind-Value="firstName" Label="First Name" />
+            </MudForm>   
+        </MudPaper>
+
+        <!-- Template Selection -->
+        <MudPaper Class="ma-2 pa-2">
+            <MudExpansionPanel DisableBorders="false" Dense="true">
+            <TitleContent>
+                <div class="d-flex ma-n4"  >
+                    <MudButtonGroup Class="ma-1" Variant="Variant.Outlined">
+                        <MudText Class="pr-2">Add Template: </MudText>
+                    </MudButtonGroup>
+                </div>
+            </TitleContent>
+            <ChildContent>
+            </ChildContent>
+            </MudExpansionPanel>
+        </MudPaper>
+
+        <!-- Groups listing -->
+        <MudPaper Class="ma-2">
+            <!-- Group Importer -->
+            <MudPaper Outlined="true" Class="pa-2">
+                <MudToolBar>
+                    <MudAutocomplete T="string" Label="New Group Name" @bind-Value="newGroupLabel" CoerceText="true" CoerceValue="true"
+                                    ResetValueOnEmptyText="true" />
+                    <MudSpacer />
+                    <MudButton OnClick=@AddGroup> Add </MudButton>
+                </MudToolBar>
+            </MudPaper>
+            <!-- Group Listing -->
+            <MudPaper Class="pa-2">
+                @foreach(var group in groups){
+                    <MudToolBar Style="@($"background:{Colors.BlueGrey.Darken2};")">
+                        <MudText Typo="Typo.h5" >@group.Label</MudText>
+                        <MudSpacer />
+                        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(() => IncrementGroup(group))" />
+                        <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(() => DecrementGroup(group))"  />
+                        <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+                            ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                            <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick="() => RemoveGroup(group)" >Remove Group</MudButton>
+                        </MudMenu>
+                    </MudToolBar>
+                    @foreach (var task in group.Tasks) {
+                        <TaskEditBase Task="@task" GroupChanged="@OnGroupUpdated" Editing="true" />
+                    }
+                    <MudPaper Outlined="true" Class="ma-1 pa-1">
+                        <MudButton FullWidth="true" OnClick="() => AddTask(group)"> Add Task </MudButton>
+                    </MudPaper>
+                }
+            </MudPaper>
+        </MudPaper>
+        <!-- Submit Buttons-->
+        <MudPaper Class="pa-4 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=> Submit())">Submit</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=> Reset())" Class="mx-2">Clear Form</MudButton>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+            @foreach (var error in errors) {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 @code {
-    
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] AuthenticationStateProvider AuthState {get; set; }
+    [Inject] private PatientService PatientService { get; set; }
+
+    private string newGroupLabel = string.Empty;
+
+    bool success { get; set; }
+    string[] errors = { };
+    MudForm? form;
+    string id;
+    string lastName, firstName;
+    List<TaskGroup> groups = new();
+
+    protected override async Task OnInitializedAsync() {
+
+    }
+
+    private async Task AddGroup(){
+        //is this a custom group or importing a group template?
+        if (string.IsNullOrEmpty(newGroupLabel)) return;
+        if (!groups.TrueForAll(g => g.Label != newGroupLabel)) return;
+
+        var group = new TaskGroup { Label = newGroupLabel };
+
+        groups.Add(group);
+        newGroupLabel = string.Empty;
+    }
+
+    private async Task IncrementGroup(TaskGroup group){
+        int index = groups.IndexOf(group);
+        if (index < 1) return;
+
+        groups.Remove(group);
+        groups.Insert(index - 1, group);
+    }
+
+    private async Task DecrementGroup(TaskGroup group){
+        int index = groups.IndexOf(group);
+        if (index >= groups.Count() - 1) return;
+
+        groups.Remove(group);
+        groups.Insert(index + 1, group);
+    }
+
+    private async Task RemoveGroup(TaskGroup group){
+        groups.Remove(group);
+    }
+
+    private async Task AddTask(TaskGroup group){
+        var task = new TaskItem { Label = "New Task", TaskGroup = group };
+        group.Tasks.Add(task);
+    }
+
+    private async Task Submit(){
+        if (!success) return;
+
+        NewPatient patient = new NewPatient {
+            FirstName = firstName is null ? string.Empty : firstName,
+            LastName = lastName,
+            Identifier = id
+        };
+
+        //task groups and tasks
+        var newGroups = new List<string>();
+        var newTasks = new List<NewTaskItem>();
+        foreach(var group in groups){
+            newGroups.Add(group.Label);
+            foreach(var task in group.Tasks){
+                newTasks.Add( new NewTaskItem {
+                    Label = task.Label,
+                    Group = group.Label,
+                    Type = (TaskType)task.Type,
+                    Value = task.Value
+                });
+            }
+        }
+        patient.Groups = newGroups;
+        patient.Tasks = newTasks;
+        PatientService.AddPatient(patient);
+        NavigationManager.NavigateTo("patients");
+    }
+
+    private async Task Reset(){
+        groups.Clear();
+        form.ResetAsync();
+
+    }
+
+    private async Task OnGroupUpdated(TaskGroup group) {
+        int index = groups.FindIndex(g => g.Label == group.Label);
+        if(index < 0) return;
+
+        groups[index] = group;
+    }
+
 }

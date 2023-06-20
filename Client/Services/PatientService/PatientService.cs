@@ -75,6 +75,13 @@
             string connection = $"/api/Patient/update";
             await _http.PutAsJsonAsync(connection, newPatient);
         }
+
+        public async Task<ServiceResponse<Patient>> AddPatient(NewPatient patient) {
+            string connection = $"/api/Patient";
+            var response = await _http.PostAsJsonAsync(connection, patient);
+
+            return await response.Content.ReadFromJsonAsync<ServiceResponse<Patient>>();
+        }
     }
 }
 
