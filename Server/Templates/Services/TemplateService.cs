@@ -1,35 +1,84 @@
-﻿namespace Radigate.Server.Templates.Services {
+﻿using Radigate.Server.Templates.Data;
+
+namespace Radigate.Server.Templates.Services {
     public class TemplateService : ITemplateService {
+        private readonly TemplatesDataContext _context;
+
+        public TemplateService(TemplatesDataContext context) {
+            _context = context;
+        }
+
         public async Task<ServiceResponse<bool>> AddGroupTemplateAsync(NewGroupTemplate newTemplate) {
-            throw new NotImplementedException();
+            var group = new GroupTemplate(newTemplate);
+            await _context.GroupTemplates.AddAsync(group);
+            await _context.SaveChangesAsync();
+            return new ServiceResponse<bool>();
         }
 
         public async Task<ServiceResponse<bool>> AddPatientTemplateAsync(NewPatientTemplate newTemplate) {
-            throw new NotImplementedException();
+            var template = new PatientTemplate(newTemplate);
+            await _context.PatientTemplates.AddAsync(template);
+            await _context.SaveChangesAsync();
+            return new ServiceResponse<bool>();
         }
 
         public async Task<ServiceResponse<List<GroupTemplate>>> GetAllGroupTemplatesAsync() {
-            throw new NotImplementedException();
-        }
+            var response = new ServiceResponse<List<GroupTemplate>> {
+                Data = await _context.GroupTemplates
+                    .ToListAsync()
+            };
 
-        public async Task<ServiceResponse<GroupTemplate>> GetGroupTemplateAsync(int templateId) {
-            throw new NotImplementedException();
+            return response;
         }
 
         public async Task<ServiceResponse<List<PatientTemplate>>> GetAllPatientTemplatesAsync() {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<List<PatientTemplate>> {
+                Data = await _context.PatientTemplates
+                    .Include(t => t.GroupTemplates )
+                    .ToListAsync()
+            };
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<GroupTemplate>> GetGroupTemplateAsync(int templateId) {
+            var result = await _context.GroupTemplates.FindAsync(templateId);
+
+            if (result is null) return new ServiceResponse<GroupTemplate> { Success = false, Message = "Group Template does not exist." };
+            return new ServiceResponse<GroupTemplate> { Data = result };
         }
 
         public async Task<ServiceResponse<PatientTemplate>> GetPatientTemplateAsync(int templateId) {
-            throw new NotImplementedException();
+            var result = await _context.PatientTemplates
+                .Include(p => p.GroupTemplates)
+                .FirstOrDefaultAsync(p => p.Id == templateId);
+
+            if (result is null) return new ServiceResponse<PatientTemplate> { Success = false, Message = "Patient Template does not exist." };
+            return new ServiceResponse<PatientTemplate> { Data = result };
         }
 
         public async Task<ServiceResponse<GroupTemplate>> UpdateGroupTemplate(GroupTemplate updatedTemplate) {
-            throw new NotImplementedException();
+            var result = await _context.GroupTemplates.FindAsync(updatedTemplate.Id);
+
+            if (result is null) return new ServiceResponse<GroupTemplate> { Success = false, Message = "Group Template does not exist." };
+
+            result = updatedTemplate;
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<GroupTemplate> { Data = result };
         }
 
         public async Task<ServiceResponse<PatientTemplate>> UpdatePatientTemplate(PatientTemplate updatedTemplate) {
-            throw new NotImplementedException();
+            var result = await _context.PatientTemplates
+                .Include(p => p.GroupTemplates)
+                .FirstOrDefaultAsync(p => p.Id == updatedTemplate.Id);
+
+            if (result is null) return new ServiceResponse<PatientTemplate> { Success = false, Message = "Patient Template does not exist." };
+
+            result = updatedTemplate;
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<PatientTemplate> { Data = result };
         }
     }
 }

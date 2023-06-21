@@ -5,11 +5,11 @@ global using Radigate.Server.Services.PatientService;
 global using Radigate.Server.Users.Services;
 global using Radigate.Server.Templates.Services;
 using Radigate.Server.Data;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Radigate.Server.Services.TaskService;
 using Radigate.Server.Users.Data;
 using Microsoft.IdentityModel.Tokens;
+using Radigate.Server.Templates.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,9 +28,10 @@ builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {
+        options.TokenValidationParameters = new TokenValidationParameters {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
                 builder.Configuration.GetSection("AppSettings:Token").Value)),
@@ -43,6 +44,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var connectionString = builder.Configuration.GetConnectionString("SQLLiteConnection");
 builder.Services.AddDbContextFactory<PatientDataContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddDbContextFactory<UsersContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddDbContextFactory<TemplatesDataContext>(options => options.UseSqlite(connectionString));
 
 var app = builder.Build();
 
