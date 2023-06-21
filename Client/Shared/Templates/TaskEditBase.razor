@@ -1,14 +1,14 @@
 ﻿﻿@if (!Editing) {
     <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
         <MudIcon Icon="@Icon" Size="Size.Small" />
-        <MudText Typo="Typo.body1" Class="pl-2">@Task.Label</MudText>
+        <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
     </MudToolBar>
 }
 else {
-    @if (true) {
+    @if (false) {
         <MudToolBar Row="true" Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
             <MudIcon Icon="@Icon" Size="Size.Small" />
-            <MudInput @bind-Value="Task.Label" Placeholder="@Task.Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
+            <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
               Variant="Variant.Filled" Immediate="false" TextChanged=@(()=> SubmitTaskEdit()) FullWidth="true" />
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" OnClick=@(()=> SubmitTaskEdit()) />
@@ -19,55 +19,71 @@ else {
         <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
             <MudMenu Dense="true">
                 <ActivatorContent>
-                    <MudChip Icon="@Icon" Size="Size.Small" Color="Color.Primary" />
+                    <MudChip Icon="@Icon" Size="Size.Small" Color="Color.Default" />
                 </ActivatorContent>
                 <ChildContent>
-                    <MudMenuItem Icon="@Icons.Material.Filled.CheckBox" Size="Size.Small" OnClick="@(()=> SelectType(0))">Checkbox</MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Material.Filled.TextSnippet" Size="Size.Small" OnClick="@(()=> SelectType(1))">Text</MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Material.Filled.List" Size="Size.Small" OnClick="@(()=> SelectType(2))">Dropbox</MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" Size="Size.Small" OnClick="@(()=> SelectType(3))">Date</MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Material.Filled.Numbers" Size="Size.Small" OnClick="@(()=> SelectType(4))">Number</MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Material.Filled.Calculate" Size="Size.Small" OnClick="@(()=> SelectType(5))">Calculate</MudMenuItem>
+                    @foreach(var type in TaskTypes){
+                        <MudMenuItem Icon="@TaskToIcon(type)" Size="Size.Small" OnClick="@(()=> SelectType(type))">@TaskToLabel(type)</MudMenuItem>
+                    }
                 </ChildContent>
             </MudMenu>
-            <MudText Typo="Typo.body1" Class="pl-2">@Task.Label</MudText>
+            <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
+                Variant="Variant.Filled" Immediate="false" TextChanged=@(()=> SubmitTaskEdit()) FullWidth="true" />
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(() => IncrementTask())" />
             <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(() => DecrementTask())" />
-            <MudIconButton Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" OnClick="@(()=> EditTask())" />
-            <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" Class="pl-4" OnClick="(() => RemoveTask())" />
+            <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@RemoveTask" />
         </MudToolBar>
     }
 }
 @code {
-    [Parameter] public TaskItem Task { get; set; }
-    [Parameter] public bool Editing { get; set; } = false;
-    [Parameter] public EventCallback<TaskGroup> GroupChanged { get; set; }
+    [Parameter] 
+    public Tuple<string, int>? Task { get; set; }
+    [Parameter] 
+    public GroupTemplate? Group {get;set;}
+    [Parameter] 
+    public bool Editing { get; set; } = false;
+    [Parameter]
+    public EventCallback<GroupTemplate> GroupChanged { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync() {
+        if (Task is null) return;
+
+        Label = Task.Item1;
+        Type = (TaskType)int.Parse(Task.Item2.ToString());
+    }
+
+    string Label { get; set; } = string.Empty;
+    TaskType Type { get; set; } = TaskType.Base;
 
     bool editMode = false; //used to prevent the text field from exiting immediately when using TextChanged event handler
 
-    string Icon => TaskTypeExtensions.ToIcon((TaskType)Task.Type);
-    TaskGroup Group { get => Task.TaskGroup; set => Task.TaskGroup = value; }
+    string Icon => TaskTypeExtensions.ToIcon(Type);
+
+    private TaskType[] TaskTypes => ((TaskType[]) Enum.GetValues(typeof(TaskType))).SkipLast(1).ToArray(); //last entry is Base, a count type
+    private string TaskToIcon(TaskType type) => TaskTypeExtensions.ToIcon(type);
+    private string TaskToLabel(TaskType type) => Enum.GetName(typeof(TaskType), type);
 
     #region Button Functions
-
-    async Task SelectType(int index) {
-        Task.Type = index;
-
+    async Task SelectType(TaskType type) {
+        Type = type;
         await GroupChanged.InvokeAsync(Group);
     }
 
 
     async Task IncrementTask() {
-
+        await GroupChanged.InvokeAsync(Group);
     }
 
     async Task DecrementTask() {
-
+        await GroupChanged.InvokeAsync(Group);
     }
 
     async Task RemoveTask() {
-        Group.Tasks.Remove(Task);
+        var tasks = Group.TaskList();
+        tasks.Remove(Task);
+        Group.Tasks = GroupTemplate.TasksToString(tasks);
+
         await GroupChanged.InvokeAsync(Group);
     }
 
@@ -76,7 +92,12 @@ else {
     }
 
     async Task SubmitTaskEdit() {
+        var tasks = Group.TaskList();
+        var taskIndex = tasks.IndexOf(Task);
+        tasks[taskIndex] = new Tuple<string, int>(Label, (int)Type);
+        Group.Tasks = GroupTemplate.TasksToString(tasks);
 
+        GroupChanged.InvokeAsync();
     }
 
     #endregion

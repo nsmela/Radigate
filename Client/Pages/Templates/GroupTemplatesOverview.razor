@@ -19,44 +19,8 @@
         <MudStack Row=@true>
             <!-- New Group -->
             @if (newGroupOpen) {
-                <MudCard Width="360px" Class="ma-2" Outlined="true" Style="@($"background:{Colors.BlueGrey.Darken4};")">
-                    <MudCardHeader>
-                        <MudTextField @bind-Value="newGroupLabel" Placeholder="New Group" DisableUnderLine="true" />
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <!-- Add Task -->
-                        <MudPaper Elevation="10" Class="mb-1">
-                            <MudToolBar Dense="true" DisableGutters="true" >
-                                <!-- Menu for Task Type -->
-                                <MudMenu Icon="@TaskTypeExtensions.ToIcon((TaskType)newTaskType)" Dense="true">
-                                    @foreach(var type in (TaskType[])Enum.GetValues(typeof(TaskType))){
-                                        @if (type == TaskType.Base) break;
-                                        <MudMenuItem Icon="@TaskTypeExtensions.ToIcon(type)" OnClick="@(() => newTaskType = (int)type)">@TaskTypeExtensions.ToLabel(type)</MudMenuItem>
-                                    }
-                                </MudMenu>
-                                <MudTextField T="string" @bind-Text="newTaskLabel" Variant="Variant.Text" />
-                                <MudSpacer />
-                                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="AddTask"/>
-                            </MudToolBar>
-                        </MudPaper>
-                        <!-- New Tasks -->
-                        @foreach(var task in newTasks){
-                            <MudPaper Elevation="10" Class="mb-1">
-                                <MudToolBar Dense="true" DisableGutters="true" >
-                                    <MudIcon Class="mx-2" Icon="@TaskTypeExtensions.ToIcon((TaskType)task.Item2)" />
-                                    <MudText Variant="Variant.Text">@task.Item1</MudText>
-                                    <MudSpacer />
-                                    <MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" Color="Color.Error" />
-                                </MudToolBar>
-                            </MudPaper>
-                        }
-                    </MudCardContent>
-                    <MudCardActions>
-                        <MudButton OnClick="CancelGroup">Cancel</MudButton>
-                        <MudButton OnClick="AddGroup">Add Group</MudButton>
-                    </MudCardActions>
-                </MudCard>
-            }
+                <GroupTemplateDisplay IsNew="true" />
+             }
             <!-- Template List -->
             @if(isLoading){
                 <MudProgressCircular Color="Color.Default" Indeterminate="true" />
@@ -64,7 +28,7 @@
                 <span>@message</span>
             }else{
                 @foreach (var group in groups) {
-                    <GroupTemplateDisplay GroupTemplate="@group" Edit="false" />
+                    <GroupTemplateDisplay Template="@group" Edit="false" />
                 }
             }
         </MudStack>
@@ -75,16 +39,17 @@
 
     List<GroupTemplate> groups;
     string message = string.Empty;
-    bool newGroupOpen { get; set; } = false;
     string newGroupLabel = string.Empty;
-    List<Tuple<string, int>> newTasks { get; set; } = new();
     string newTaskLabel = string.Empty;
     int newTaskType = -1;
-
+    
     protected override async Task OnInitializedAsync(){
         await GetGroupTemplates();
         isLoading = false;
     }
+
+    List<Tuple<string, int>> newTasks { get; set; } = new();
+    bool newGroupOpen { get; set; } = false;
 
     private async Task GetGroupTemplates() {
         var response = await TemplateService.GetAllGroupTemplatesAsync();
@@ -122,7 +87,21 @@
     }
 
     private async Task AddGroup(){
+        if (string.IsNullOrEmpty(newGroupLabel)) return;
 
+        var group = new NewGroupTemplate {
+            Label = newGroupLabel,
+            Tasks = GroupTemplate.TasksToString(newTasks)
+        };
+
+        var response = await TemplateService.AddGroupTemplate(group);
+        if (!response.Success){
+            message = response.Message;
+            return;
+        }
+
+        CancelGroup();
+        GetGroupTemplates();
     }
 
     private async Task CancelGroup(){

@@ -22,6 +22,7 @@
             var list = new List<Tuple<string, int>>();
             foreach (var task in tasks) {
                 var item = task.Split(',');
+                if (item.Length != 2) continue;
                 list.Add(new Tuple<string, int>(item[0], int.Parse(item[1])));
             }
             return list;
@@ -30,9 +31,11 @@
         public static string TasksToString(List<Tuple<string, int>> list) {
             var text = string.Empty;
             foreach (var item in list) {
-                text += item.Item1 + "," + item.Item2.ToString() + ";";
+                text += TaskToString(item);
             }
             return text;
         }
+
+        public static string TaskToString(Tuple<string, int> task) => task.Item1 + ',' + task.Item2 + ';';
     }
 }
