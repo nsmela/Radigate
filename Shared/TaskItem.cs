@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
@@ -10,8 +11,14 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Radigate.Shared {
-    public enum TaskType { 
-        Bool, Text, Number, List, Date, Calculation, Base 
+    public enum TaskType {
+        [Description("CheckBox")] Bool,
+        [Description("Text")] Text,
+        [Description("Number")] Number,
+        [Description("List")] List,
+        [Description("Date")] Date,
+        [Description("Formula")] Calculation,
+        [Description("Count")] Base 
     }
 
     public class TaskItem {

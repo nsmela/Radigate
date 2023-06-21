@@ -27,10 +27,12 @@
                         <!-- Add Task -->
                         <MudPaper Elevation="10" Class="mb-1">
                             <MudToolBar Dense="true" DisableGutters="true" >
-                                <MudMenu Icon="@Icons.Material.Filled.QuestionMark" Dense="true" >
-                                    <MudMenuItem Icon="@Icons.Material.Filled.CheckBox" OnClick="@(()=> newTaskType = 0)">CheckBox</MudMenuItem>
-                                    <MudMenuItem Icon="@Icons.Material.Filled.ShortText" OnClick="@(()=> newTaskType = 1)">Text Field</MudMenuItem>
-                                    <MudMenuItem Icon="@Icons.Material.Filled.List" OnClick="@(()=> newTaskType = 2)">List</MudMenuItem>
+                                <!-- Menu for Task Type -->
+                                <MudMenu Icon="@TaskTypeExtensions.ToIcon((TaskType)newTaskType)" Dense="true">
+                                    @foreach(var type in (TaskType[])Enum.GetValues(typeof(TaskType))){
+                                        @if (type == TaskType.Base) break;
+                                        <MudMenuItem Icon="@TaskTypeExtensions.ToIcon(type)" OnClick="@(() => newTaskType = (int)type)">@TaskTypeExtensions.ToLabel(type)</MudMenuItem>
+                                    }
                                 </MudMenu>
                                 <MudTextField T="string" @bind-Text="newTaskLabel" Variant="Variant.Text" />
                                 <MudSpacer />
@@ -41,7 +43,7 @@
                         @foreach(var task in newTasks){
                             <MudPaper Elevation="10" Class="mb-1">
                                 <MudToolBar Dense="true" DisableGutters="true" >
-                                    <MudIcon Icon="@TaskTypeExtensions.ToIcon((TaskType)task.Item2)" />
+                                    <MudIcon Class="mx-2" Icon="@TaskTypeExtensions.ToIcon((TaskType)task.Item2)" />
                                     <MudText Variant="Variant.Text">@task.Item1</MudText>
                                     <MudSpacer />
                                     <MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" Color="Color.Error" />
@@ -50,7 +52,7 @@
                         }
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton OnClick="@(()=> {newGroupLabel = string.Empty; newGroupOpen = false;})">Cancel</MudButton>
+                        <MudButton OnClick="CancelGroup">Cancel</MudButton>
                         <MudButton OnClick="AddGroup">Add Group</MudButton>
                     </MudCardActions>
                 </MudCard>
@@ -115,8 +117,18 @@
         newTaskType = -1;
     }
 
+    private async Task RemoveTask(Tuple<string, int> task){
+        newTasks.Remove(task);
+    }
+
     private async Task AddGroup(){
-                
+
+    }
+
+    private async Task CancelGroup(){
+        newTasks = new();
+        newGroupLabel = string.Empty;
+        newGroupOpen = false;
     }
 
     private async Task OnGroupChanged(TaskGroup group) {

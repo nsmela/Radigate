@@ -35,5 +35,8 @@ namespace Radigate.Client.Data.TaskItems {
                     return @Icons.Material.Filled.QuestionMark;
             }
         }
+
+        public static string ToLabel(TaskType type) => Enum.GetName(typeof(TaskType), type);
+        public static string ToLabel(int type) => Enum.GetName(typeof(TaskType), type);
     }
 }
