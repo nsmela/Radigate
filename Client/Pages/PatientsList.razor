@@ -39,6 +39,6 @@
         patientIds = response.Data;
     }
 
-    private void AddPatient() => NavigationManager.NavigateTo($"newpatient");
+    private void AddPatient() => NavigationManager.NavigateTo($"/patients/new");
     private void PatientDataEntry(int id) => NavigationManager.NavigateTo($"patients/{id}");
 }
