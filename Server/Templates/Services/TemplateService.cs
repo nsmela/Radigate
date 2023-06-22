@@ -57,6 +57,31 @@ namespace Radigate.Server.Templates.Services {
             return new ServiceResponse<PatientTemplate> { Data = result };
         }
 
+        public async Task<ServiceResponse<bool>> RemoveGroupTemplateAsync(int templateId) {
+            var result = await _context.GroupTemplates
+                .FirstOrDefaultAsync(p => p.Id == templateId);
+
+            if (result is null) return new ServiceResponse<bool> { Success = false, Message = "Group Template does not exist." };
+
+            _context.GroupTemplates.Remove(result);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<bool> { Data = true };
+        }
+
+        public async Task<ServiceResponse<bool>> RemovePatientTemplateAsync(int templateId) {
+            var result = await _context.PatientTemplates
+                .Include(p => p.GroupTemplates)
+                .FirstOrDefaultAsync(p => p.Id == templateId);
+
+            if (result is null) return new ServiceResponse<bool> { Success = false, Message = "Patient Template does not exist." };
+
+            _context.PatientTemplates.Remove(result);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<bool> { Data = true };
+        }
+
         public async Task<ServiceResponse<GroupTemplate>> UpdateGroupTemplate(GroupTemplate updatedTemplate) {
             var result = await _context.GroupTemplates.FindAsync(updatedTemplate.Id);
 

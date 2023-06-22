@@ -48,5 +48,17 @@ namespace Radigate.Server.Templates.Controllers {
             var result = await _templateService.UpdatePatientTemplate(template);
             return Ok(result);
         }
+
+        [HttpDelete("groups"), Authorize(Roles = CustomRoles.Admin)]
+        public async Task<ActionResult<ServiceResponse<bool>>> RemoveGroupTemplate(int templateId) {
+            var result = _templateService.RemoveGroupTemplateAsync(templateId);
+            return Ok(result);
+        }
+
+        [HttpDelete("patients"), Authorize(Roles = CustomRoles.Admin)]
+        public async Task<ActionResult<ServiceResponse<bool>>> RemovePatientTemplate(int templateId) {
+            var result = _templateService.RemovePatientTemplateAsync(templateId);
+            return Ok(result);
+        }
     }
 }

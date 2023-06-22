@@ -13,5 +13,9 @@
         //create
         Task<ServiceResponse<bool>> AddPatientTemplateAsync(NewPatientTemplate newTemplate);
         Task<ServiceResponse<bool>> AddGroupTemplateAsync(NewGroupTemplate newTemplate);
+
+        //delete
+        Task<ServiceResponse<bool>> RemovePatientTemplateAsync(int templateId);
+        Task<ServiceResponse<bool>> RemoveGroupTemplateAsync(int templateId);
     }
 }
