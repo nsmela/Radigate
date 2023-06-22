@@ -14,6 +14,10 @@
             this.Label = group.Label;
             this.Tasks = group.Tasks;
         }
+        public GroupTemplate(GroupTemplate newGroupTemplate) {
+            this.Label = newGroupTemplate.Label;
+            this.Tasks = newGroupTemplate.Tasks;
+        }
 
         //methods
         public List<Tuple<string, int>> TaskList() {

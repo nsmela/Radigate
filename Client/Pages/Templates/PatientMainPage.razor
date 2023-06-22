@@ -18,7 +18,7 @@
     <MudStack Row=@true>
         <!-- New Patient -->
         @if (newPatientOpen) {
-            <TemplatePatientComponent Editing="true" TemplateChanged="@OnPatientChanged" SearchableGroupNames="@TemplateService.GroupNames" />
+            <TemplatePatientComponent Template="@(new PatientTemplate())" Editing="true" TemplateChanged="@OnPatientChanged" />
         }
         <!-- Template List -->
         @if (isLoading) {
@@ -27,15 +27,15 @@
             <span>No Patient Templates Found</span>
         } else {
             @foreach (var patient in Patients) {
-                <TemplatePatientComponent Editing="@IsTemplateEditing(patient.Id)" TemplateChanged="@OnPatientChanged" Template="@patient" SearchableGroupNames="@TemplateService.GroupNames" />
+                <TemplatePatientComponent Editing="@IsTemplateEditing(patient.Id)" TemplateChanged="@OnPatientChanged" Template="@patient" />
             }
         }
     </MudStack>
 
 </MudItem>
 
-            @code {
-            //https://github.com/Apps72/BlazorGuidelines
+@code {
+    //https://github.com/Apps72/BlazorGuidelines
     #region Private Variables
     bool isLoading = true;
     bool newPatientOpen = false;
@@ -76,7 +76,7 @@
 
     private bool IsTemplateEditing(int templateId) => templateId == editPatientId;
 
-    private async Task<TemplatePatientCallback> OnPatientChanged(){
+    private async Task OnPatientChanged(TemplatePatientCallback template) {
         Console.WriteLine("Patient has changed");
     }
     #endregion

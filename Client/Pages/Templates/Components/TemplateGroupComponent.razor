@@ -59,6 +59,9 @@
         public int? GroupId { get; set; }
         public GroupTemplate? Group { get; set; }
         public bool IsEditing { get; set; } = false;
+        public RequestType Request { get; set; } = RequestType.CANCEL;
+
+        public enum RequestType {OPEN, CANCEL, SAVE, DELETE, ADD}
     }
 
     //internal and protected Methods/Properties
@@ -95,15 +98,18 @@
     private async Task EditGroup(){
         var group = new TemplateGroupCallback {
             GroupId = Template is not null ? Template.Id : -1,
-            Group = new(),
-            IsEditing = true
+            Group = Template,
+            IsEditing = true,
+            Request = TemplateGroupCallback.RequestType.OPEN
         };
         await GroupChanged.InvokeAsync(group);
     }
 
     private async Task RemoveGroup() {
         var group = new TemplateGroupCallback {
-            GroupId = Template.Id
+                GroupId = Template.Id,
+                Group = Template,
+                Request = TemplateGroupCallback.RequestType.DELETE
         };
 
         await GroupChanged.InvokeAsync(group);
@@ -118,13 +124,14 @@
                 Label = Label,
                 Tasks = GroupTemplate.TasksToString(taskList)
             },
-            GroupId = Template is not null ? Template.Id : null
+            GroupId = Template is not null ? Template.Id : null,
+            Request = TemplateGroupCallback.RequestType.SAVE
         };
 
         await GroupChanged.InvokeAsync(group);
     }
 
-    private async Task CancelChanges() => await GroupChanged.InvokeAsync(null);
+    private async Task CancelChanges() => await GroupChanged.InvokeAsync(new TemplateGroupCallback { Request = TemplateGroupCallback.RequestType.CANCEL });
 
     //callbacks
     private async Task OnGroupUpdated(List<Tuple<string, int>> tasks) {

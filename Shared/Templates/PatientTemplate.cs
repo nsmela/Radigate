@@ -5,7 +5,10 @@
         public string Label { get; set; } = "New Patient";
         public List<GroupTemplate> GroupTemplates { get; set; } = new();
 
-        public PatientTemplate() {}
+        public PatientTemplate() {
+            this.Label = "New Patient Template";
+            this.GroupTemplates = new List<GroupTemplate>();
+        }
         public PatientTemplate(NewPatientTemplate template) {
             this.Label = template.Label;
             GroupTemplates = new();

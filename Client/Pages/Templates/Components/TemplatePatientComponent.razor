@@ -1,4 +1,5 @@
-﻿@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent
+﻿@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent.TemplateGroupCallback
+@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent
 
 <MudPaper Width="560px" Class="ma-2" Outlined="true" Style="@($"background:{Colors.BlueGrey.Darken4};")">
     <MudToolBar DisableGutters="true">
@@ -21,12 +22,13 @@
 
     <!-- Groups -->
     @foreach(var group in NewGroups){
-        <TemplateGroupComponent Edit="@Editing" Template="@group" GroupChanged="OnGroupChanged" />
+        <TemplateGroupComponent Edit="@IsOpenToEdit(group)" Template="@group" GroupChanged="OnGroupChanged" />
     }
 
     <!-- Template Controls -->
     @if (Editing) {
         <MudStack Rows="true" Spacing="1">
+            <!-- Add Group Interface -->
             @if(IsNewGroupOpen){
                 <MudPaper Outlined="true" Class="ma-1 pa-1" >
                     <MudToolBar>
@@ -53,17 +55,20 @@
     #endregion
 
     #region [Inject] Properties
+    [Inject]
+    private ITemplateService Templates { get; set; } = default!;
     #endregion
 
     #region [Parameter] Properties
     [Parameter]
     public PatientTemplate Template { get; set; }
+
     [Parameter]
     public bool Editing { get; set; } = false;
+
     [Parameter]
     public EventCallback<TemplatePatientCallback?> TemplateChanged { get; set; }
-    [Parameter]
-    public List<string> SearchableGroupNames { get; set; } = new();
+
     #endregion
 
     #region Public Methods and Properties
@@ -75,6 +80,10 @@
     #endregion
 
     #region Internal and Protected Methods and Properties
+    protected override async Task OnParametersSetAsync() {
+        Label = Template.Label;
+        NewGroups = Template.GroupTemplates;
+    }
     #endregion
 
     #region Private Methods and Properties
@@ -83,9 +92,13 @@
     private List<GroupTemplate> NewGroups { get; set; } = new();
     private bool IsNewGroupOpen { get; set; } = false;
     private string NewGroupLabel { get; set; } = string.Empty;
+    private int EditingGroupIndex { get; set; } = -1;
+
+    private bool IsOpenToEdit(GroupTemplate group) => EditingGroupIndex == NewGroups.IndexOf(group);
 
     private async Task ResetTemplate(){
-
+        Label = Template.Label;
+        NewGroups = Template.GroupTemplates;
     }
 
     private async Task SaveTemplate(){
@@ -97,10 +110,10 @@
     }
 
     private async Task<IEnumerable<string>> SearchGroupNames(string value) {
-        if (SearchableGroupNames is null || SearchableGroupNames.Count < 1) return new List<string>();
-        if (string.IsNullOrEmpty(value)) return SearchableGroupNames;
+        if (Templates.GroupNames is null || Templates.GroupNames.Count < 1) return new List<string>();
+        if (string.IsNullOrEmpty(value)) return Templates.GroupNames;
 
-        var result = SearchableGroupNames.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        var result = Templates.GroupNames.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         return result;
     }
 
@@ -110,6 +123,20 @@
 
     private async Task SubmitNewGroup(){
         if (string.IsNullOrEmpty(NewGroupLabel)) return;
+
+        //use an existing group
+        var group = Templates.Groups.Find(g => g.Label == NewGroupLabel);
+        if (group is not null) { //link the group?
+            NewGroups.Add(new GroupTemplate(group));
+        }
+        else {
+            NewGroups.Add(new GroupTemplate {
+                Label = NewGroupLabel,
+                Tasks = string.Empty
+            });
+        }
+
+        NewGroupLabel = string.Empty;
     }
 
     private async Task CancelNewGroup(){
@@ -117,8 +144,30 @@
         NewGroupLabel = string.Empty;
     }
 
-    private async Task OnGroupChanged(TemplateGroupCallback template){
-
+    private async Task OnGroupChanged(TemplateGroupCallback template) {
+        switch (template.Request) {
+            case RequestType.OPEN:
+                EditingGroupIndex = NewGroups.FindIndex(g => g.Label == template.Group.Label);
+                return;
+            case RequestType.CANCEL:
+                EditingGroupIndex = -1;
+                return;
+            case RequestType.SAVE:
+                if(EditingGroupIndex >=0) NewGroups[EditingGroupIndex] = template.Group;
+                else NewGroups.Add(template.Group);
+                EditingGroupIndex = -1;
+                return;
+            case RequestType.DELETE:
+                var index = NewGroups.FindIndex(g => g.Label == template.Group.Label);
+                if (index < 0) return;
+                NewGroups.RemoveAt(index);
+                EditingGroupIndex = -1;
+                return;
+            case RequestType.ADD:
+                return;
+            default:
+                return;
+        }
     }
     #endregion
 }
