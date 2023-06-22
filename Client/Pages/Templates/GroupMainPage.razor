@@ -1,4 +1,5 @@
 ﻿@page "/templates/group-main"
+@implements IDisposable
 @attribute [Authorize]
 @using Radigate.Client.Pages.Templates.Components
 
@@ -17,17 +18,17 @@
     <MudStack Row=@true>
         <!-- New Group -->
         @if (newGroupOpen) {
-            <TemplateGroupComponent GroupChanged="@OnGroupChanged" />
+            <TemplateGroupComponent GroupChanged="@OnGroupChanged" Edit="@newGroupOpen" />
         }
         <!-- Template List -->
         @if (isLoading) {
             <MudProgressCircular Color="Color.Default" Indeterminate="true" />
         }
-        else if (groups is null || groups.Count < 1) {
+        else if (Groups is null || Groups.Count < 1) {
             <span>@message</span>
         }
         else {
-            @foreach (var group in groups) {
+            @foreach (var group in Groups) {
                 <TemplateGroupComponent Template="@group" Edit="@IsEditing(group.Id)" GroupChanged="@OnGroupChanged" />
             }
         }
@@ -39,7 +40,6 @@
 
     bool isLoading = true;
 
-    List<GroupTemplate> groups;
     string message = string.Empty;
     int groupEditId = -1;
 
@@ -49,32 +49,18 @@
     private ITemplateService TemplateService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync() {
-        await GetGroupTemplates();
+        await TemplateService.GetAllGroupTemplatesAsync();
         isLoading = false;
+        TemplateService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose(){
+        TemplateService.OnChange -= StateHasChanged;
     }
 
     bool newGroupOpen { get; set; } = false;
 
-    private async Task GetGroupTemplates() {
-        var response = await TemplateService.GetAllGroupTemplatesAsync();
-
-        //request failed
-        if (!response.Success) {
-            message = response.Message;
-            return;
-        }
-
-        //no groups in the database to show
-        if (response.Data is null || response.Data.Count < 1) {
-            message = "no entries!";
-            return;
-        }
-
-        message = string.Empty;
-        groups = new();
-        foreach (var group in response.Data) groups.Add(group);
-    }
-
+    private List<GroupTemplate> Groups => TemplateService.Groups;
     private async Task OpenAddGroup() => newGroupOpen = true;
 
     private async Task CancelGroup() => newGroupOpen = false;
@@ -90,10 +76,11 @@
 
         //deleting the group
         if (group.Group is null){
-        //
+            await TemplateService.DeleteGroupTemplate(group.GroupId.Value);
+            return;
         }
 
-        var groupIndex = groups.FindIndex(g => g.Id == group.GroupId);
+        var groupIndex = Groups.FindIndex(g => g.Id == group.GroupId);
 
         //add a new group if the group isn't in the existing group
         if (groupIndex < 0) {
@@ -103,7 +90,6 @@
                 };
 
             await TemplateService.AddGroupTemplate(newGroup);
-            await GetGroupTemplates();
             return;
         }
 
@@ -114,10 +100,7 @@
         }
 
         //update the group
-        var result = await TemplateService.UpdateGroupTemplate(group.Group);
-        if (!result.Success) return;
-
-        groups[groupIndex] = result.Data; //update directly from the server to ensure it's been updated correctly
+        await TemplateService.UpdateGroupTemplate(group.Group);
     }
 }
 

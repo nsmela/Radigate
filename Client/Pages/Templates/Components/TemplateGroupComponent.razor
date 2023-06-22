@@ -48,7 +48,7 @@
 
     //parameter properties
     [Parameter]
-    public GroupTemplate Template { get; set; }
+    public GroupTemplate? Template { get; set; }
     [Parameter]
     public bool Edit { get; set; } = false;
     [Parameter]
@@ -63,10 +63,17 @@
 
     //internal and protected Methods/Properties
     protected override async Task OnParametersSetAsync() {
-        Tasks = Template.Tasks;
-        Label = Template.Label;
+        if (Template is not null){
+            Tasks = Template.Tasks;
+            Label = Template.Label;
+            taskList = Template.TaskList();
+        }else{
+            Tasks = string.Empty;
+            Label = "New Group";
+            taskList = new List<Tuple<string, int>> { new Tuple<string, int>($"New Task {0}", 0) };
+        }
 
-        taskList = Template.TaskList();
+
     }
 
     //Private methods/properties
@@ -86,18 +93,17 @@
     }
 
     private async Task EditGroup(){
-        var group = new TemplateGroupCallback
-            {
-                GroupId = Template.Id,
-                IsEditing = true
-            };
-            await GroupChanged.InvokeAsync(group);
+        var group = new TemplateGroupCallback {
+            GroupId = Template is not null ? Template.Id : -1,
+            Group = new(),
+            IsEditing = true
+        };
+        await GroupChanged.InvokeAsync(group);
     }
 
     private async Task RemoveGroup() {
         var group = new TemplateGroupCallback {
-            GroupId = Template.Id,
-            Group = null
+            GroupId = Template.Id
         };
 
         await GroupChanged.InvokeAsync(group);
@@ -105,15 +111,14 @@
 
     private async Task SaveChanges() {
         var group = new TemplateGroupCallback {
-            Group = new GroupTemplate
-            {
-                Id = Template.Id,
-                CreatedAt = Template.CreatedAt,
-                PatientTemplates = Template.PatientTemplates,
+            Group = new GroupTemplate {
+                Id = Template is not null ? Template.Id : -1,
+                CreatedAt = Template is not null ? Template.CreatedAt : DateTime.Now,
+                PatientTemplates = Template is not null ? Template.PatientTemplates : new(),
                 Label = Label,
                 Tasks = GroupTemplate.TasksToString(taskList)
             },
-            GroupId = Template.Id
+            GroupId = Template is not null ? Template.Id : null
         };
 
         await GroupChanged.InvokeAsync(group);
