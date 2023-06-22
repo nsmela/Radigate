@@ -36,6 +36,17 @@ namespace Radigate.Server.Templates.Controllers {
             var result = await _templateService.AddPatientTemplateAsync(template);
             return Ok(result);
         }
-        
+
+        [HttpPut("groups"), Authorize(Roles = CustomRoles.Admin)]
+        public async Task<ActionResult<ServiceResponse<GroupTemplate>>> UpdateGroupTemplate(GroupTemplate template) {
+            var result = await _templateService.UpdateGroupTemplate(template);
+            return Ok(result);
+        }
+
+        [HttpPut("patients"), Authorize(Roles = CustomRoles.Admin)]
+        public async Task<ActionResult<ServiceResponse<PatientTemplate>>> UpdatePatientTemplate(PatientTemplate template) {
+            var result = await _templateService.UpdatePatientTemplate(template);
+            return Ok(result);
+        }
     }
 }

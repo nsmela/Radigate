@@ -29,5 +29,17 @@
             var response = await _http.GetFromJsonAsync<ServiceResponse<List<PatientTemplate>>>(connection);
             return response;
         }
+
+        public async Task<ServiceResponse<GroupTemplate>> UpdateGroupTemplate(GroupTemplate template) {
+            var connection = $"api/Template/groups";
+            var response = await _http.PutAsJsonAsync(connection, template);
+            return await response.Content.ReadFromJsonAsync<ServiceResponse<GroupTemplate>>();
+        }
+
+        public async Task<ServiceResponse<PatientTemplate>> UpdatePatientTemplate(PatientTemplate template) {
+            var connection = $"api/Template/patients";
+            var response = await _http.PutAsJsonAsync(connection, template);
+            return await response.Content.ReadFromJsonAsync<ServiceResponse<PatientTemplate>>();
+        }
     }
 }

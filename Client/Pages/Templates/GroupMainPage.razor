@@ -114,7 +114,10 @@
         }
 
         //update the group
+        var result = await TemplateService.UpdateGroupTemplate(group.Group);
+        if (!result.Success) return;
 
+        groups[groupIndex] = result.Data; //update directly from the server to ensure it's been updated correctly
     }
 }
 
