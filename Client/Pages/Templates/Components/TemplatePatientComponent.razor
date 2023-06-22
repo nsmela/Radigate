@@ -1,0 +1,124 @@
+﻿@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent
+
+<MudPaper Width="560px" Class="ma-2" Outlined="true" Style="@($"background:{Colors.BlueGrey.Darken4};")">
+    <MudToolBar DisableGutters="true">
+        @if (Editing) {
+            <MudTextField @bind-Value="Label" Placeholder="@Label" Class="pa-2 mb-2 mt-2"
+                Typo="Typo.h5" Variant="Variant.Filled" Immediate="false" />
+            <MudSpacer />
+            
+        }else {
+            <MudText Typo="Typo.h4" Class="pl-1">@Label</MudText>
+            <MudSpacer />
+            <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight"
+                 TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                <MudButton Size="Size.Small" Color="Color.Success" StartIcon="@Icons.Material.Filled.PersonAddAlt1">Create Patient</MudButton>
+                <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick=@RemoveTemplate>Remove Template</MudButton>
+            </MudMenu>
+        }
+
+    </MudToolBar>
+
+    <!-- Groups -->
+    @foreach(var group in NewGroups){
+        <TemplateGroupComponent Edit="@Editing" Template="@group" GroupChanged="OnGroupChanged" />
+    }
+
+    <!-- Template Controls -->
+    @if (Editing) {
+        <MudStack Rows="true" Spacing="1">
+            @if(IsNewGroupOpen){
+                <MudPaper Outlined="true" Class="ma-1 pa-1" >
+                    <MudToolBar>
+                        <MudAutocomplete T="string" Label="New Group Name" @bind-Value="NewGroupLabel" CoerceText="true" CoerceValue="true"
+                                 ResetValueOnEmptyText="true" SearchFunc="@SearchGroupNames" />
+                        <MudSpacer/>
+                        <MudButton OnClick="@SubmitNewGroup"> Add </MudButton>
+                        <MudButton OnClick="@CancelNewGroup"> Cancel </MudButton>
+                    </MudToolBar>
+                </MudPaper>
+            }else {
+                <MudButton OnClick="@OpenNewGroup"> New Group </MudButton>
+            }
+            <MudButton OnClick=@ResetTemplate> Reset </MudButton>
+            <MudButton OnClick=@SaveTemplate> Save </MudButton>
+        </MudStack>
+    }
+</MudPaper>
+
+@code {
+    //https://github.com/Apps72/BlazorGuidelines
+    #region Private Variables
+
+    #endregion
+
+    #region [Inject] Properties
+    #endregion
+
+    #region [Parameter] Properties
+    [Parameter]
+    public PatientTemplate Template { get; set; }
+    [Parameter]
+    public bool Editing { get; set; } = false;
+    [Parameter]
+    public EventCallback<TemplatePatientCallback?> TemplateChanged { get; set; }
+    [Parameter]
+    public List<string> SearchableGroupNames { get; set; } = new();
+    #endregion
+
+    #region Public Methods and Properties
+    public class TemplatePatientCallback {
+        public int PatientID {get;set;} = -1;
+        public PatientTemplate Template {get;set;} = new();
+        public bool IsEditing { get; set; } = false;
+    }
+    #endregion
+
+    #region Internal and Protected Methods and Properties
+    #endregion
+
+    #region Private Methods and Properties
+    private string Label { get; set; } = string.Empty;
+
+    private List<GroupTemplate> NewGroups { get; set; } = new();
+    private bool IsNewGroupOpen { get; set; } = false;
+    private string NewGroupLabel { get; set; } = string.Empty;
+
+    private async Task ResetTemplate(){
+
+    }
+
+    private async Task SaveTemplate(){
+
+    }
+
+    private async Task RemoveTemplate(){
+
+    }
+
+    private async Task<IEnumerable<string>> SearchGroupNames(string value) {
+        if (SearchableGroupNames is null || SearchableGroupNames.Count < 1) return new List<string>();
+        if (string.IsNullOrEmpty(value)) return SearchableGroupNames;
+
+        var result = SearchableGroupNames.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return result;
+    }
+
+    private async Task OpenNewGroup(){
+        IsNewGroupOpen = true;
+    }
+
+    private async Task SubmitNewGroup(){
+        if (string.IsNullOrEmpty(NewGroupLabel)) return;
+    }
+
+    private async Task CancelNewGroup(){
+        IsNewGroupOpen = false;
+        NewGroupLabel = string.Empty;
+    }
+
+    private async Task OnGroupChanged(TemplateGroupCallback template){
+
+    }
+    #endregion
+}

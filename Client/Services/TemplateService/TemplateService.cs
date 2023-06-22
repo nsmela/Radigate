@@ -1,8 +1,14 @@
-﻿namespace Radigate.Client.Services.TemplateService {
+﻿using Radigate.Shared.Templates;
+
+namespace Radigate.Client.Services.TemplateService {
     public class TemplateService : ITemplateService {
         private readonly HttpClient _http;
 
         public List<GroupTemplate> Groups { get; set; } = new();
+        public List<PatientTemplate> Patients { get; set; } = new();
+        public List<string> PatientNames { get; set; }
+        public List<string> GroupNames { get; set; }
+
         public event Action OnChange;
 
         public TemplateService(HttpClient http) {
@@ -18,10 +24,13 @@
             await GetAllGroupTemplatesAsync();
         }
 
-        public async Task<ServiceResponse<bool>> AddPatientTemplate(NewPatientTemplate template) {
+        public async Task AddPatientTemplate(NewPatientTemplate template) {
             var connection = $"api/Template/patients";
             var response = await _http.PostAsJsonAsync(connection, template);
-            return await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+
+            if (result is null) return;
+            await GetAllPatientTemplatesAsync();
         }
 
         public async Task DeleteGroupTemplate(int templateId) {
@@ -33,10 +42,13 @@
             await GetAllGroupTemplatesAsync();
         }
 
-        public async Task<ServiceResponse<bool>> DeletePatientTemplate(int templateId) {
+        public async Task DeletePatientTemplate(int templateId) {
             var connection = $"api/Template/patients{templateId}";
             var response = await _http.DeleteAsync(connection);
-            return await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+
+            if (result is null) return;
+            await GetAllPatientTemplatesAsync();
         }
 
         public async Task GetAllGroupTemplatesAsync() {
@@ -45,13 +57,20 @@
             if (response is null || response.Data is null) return;
 
             Groups = response.Data;
+            GroupNames = new();
+            Groups.ForEach(g => GroupNames.Add(g.Label));
             OnChange?.Invoke();
         }
 
-        public async Task<ServiceResponse<List<PatientTemplate>>> GetAllPatientTemplatesAsync() {
+        public async Task GetAllPatientTemplatesAsync() {
             var connection = $"api/Template/patients";
             var response = await _http.GetFromJsonAsync<ServiceResponse<List<PatientTemplate>>>(connection);
-            return response;
+            if (response is null || response.Data is null) return;
+
+            Patients = response.Data;
+            PatientNames = new();
+            Patients.ForEach(p => PatientNames.Add(p.Label));
+            OnChange?.Invoke();
         }
 
         public async Task UpdateGroupTemplate(GroupTemplate template) {
@@ -66,10 +85,16 @@
             OnChange?.Invoke();
         }
 
-        public async Task<ServiceResponse<PatientTemplate>> UpdatePatientTemplate(PatientTemplate template) {
+        public async Task UpdatePatientTemplate(PatientTemplate template) {
             var connection = $"api/Template/patients";
             var response = await _http.PutAsJsonAsync(connection, template);
-            return await response.Content.ReadFromJsonAsync<ServiceResponse<PatientTemplate>>();
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<PatientTemplate>>();
+
+            if (result is null || result.Data is null) return;
+            var index = Patients.FindIndex(p => p.Id == result.Data.Id);
+            Patients[index] = result.Data;
+
+            OnChange?.Invoke();
         }
     }
 }

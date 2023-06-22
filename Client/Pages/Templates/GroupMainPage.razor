@@ -25,7 +25,7 @@
             <MudProgressCircular Color="Color.Default" Indeterminate="true" />
         }
         else if (Groups is null || Groups.Count < 1) {
-            <span>@message</span>
+            <span>No Groups Found</span>
         }
         else {
             @foreach (var group in Groups) {

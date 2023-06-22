@@ -1,14 +1,18 @@
 ﻿namespace Radigate.Client.Services.TemplateService {
     public interface ITemplateService {
         List<GroupTemplate> Groups { get; set; }
+        List<PatientTemplate> Patients { get; set; }
+        List<string> PatientNames { get; set; }
+        List<string> GroupNames { get; set; }
         event Action OnChange;
-        Task  GetAllGroupTemplatesAsync();
-        Task<ServiceResponse<List<PatientTemplate>>> GetAllPatientTemplatesAsync();
+        
+        Task GetAllGroupTemplatesAsync();
+        Task GetAllPatientTemplatesAsync();
         Task AddGroupTemplate(NewGroupTemplate template);
-        Task<ServiceResponse<bool>> AddPatientTemplate(NewPatientTemplate template);
+        Task AddPatientTemplate(NewPatientTemplate template);
         Task UpdateGroupTemplate(GroupTemplate template);
-        Task<ServiceResponse<PatientTemplate>> UpdatePatientTemplate(PatientTemplate template);
+        Task UpdatePatientTemplate(PatientTemplate template);
         Task DeleteGroupTemplate(int templateId);
-        Task<ServiceResponse<bool>> DeletePatientTemplate(int templateId);   
+        Task DeletePatientTemplate(int templateId);   
     }
 }

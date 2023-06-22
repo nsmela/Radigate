@@ -1,0 +1,83 @@
+﻿@page "/templates/patient-main"
+@implements IDisposable
+@attribute [Authorize]
+@using Radigate.Client.Pages.Templates.Components
+@using static Radigate.Client.Pages.Templates.Components.TemplatePatientComponent
+
+<MudPaper MaxWidth="660px" Class="ma-2">
+    <MudStack Row="true">
+        <MudButton Variant="Variant.Outlined" Color="Color.Success" IconSize="Size.Small"
+                   StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddPatient">Add Group </MudButton>
+        <MudTextField Class="align-self-center" T="string" Label="Search" Variant="Variant.Outlined"
+                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+    </MudStack>
+</MudPaper>
+
+<MudItem Class="pa-1 align-items-baseline">
+    <!-- Existing Groups -->
+    <MudStack Row=@true>
+        <!-- New Patient -->
+        @if (newPatientOpen) {
+            <TemplatePatientComponent Editing="true" TemplateChanged="@OnPatientChanged" SearchableGroupNames="@TemplateService.GroupNames" />
+        }
+        <!-- Template List -->
+        @if (isLoading) {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        } else if (Patients is null || Patients.Count < 1) {
+            <span>No Patient Templates Found</span>
+        } else {
+            @foreach (var patient in Patients) {
+                <TemplatePatientComponent Editing="@IsTemplateEditing(patient.Id)" TemplateChanged="@OnPatientChanged" Template="@patient" SearchableGroupNames="@TemplateService.GroupNames" />
+            }
+        }
+    </MudStack>
+
+</MudItem>
+
+            @code {
+            //https://github.com/Apps72/BlazorGuidelines
+    #region Private Variables
+    bool isLoading = true;
+    bool newPatientOpen = false;
+    int editPatientId = -1;
+
+    #endregion
+
+    #region [Inject] Properties
+    [Inject]
+    private AuthenticationStateProvider AuthState { get; set; } = default!;
+    [Inject]
+    private ITemplateService TemplateService { get; set; } = default!;
+    #endregion
+
+    #region [Parameter] Properties
+    #endregion
+
+    #region Public Methods and Properties
+    public void Dispose(){
+        TemplateService.OnChange -= StateHasChanged;
+    }
+    #endregion
+
+    #region Internal and Protected Methods and Properties
+    protected override async Task OnInitializedAsync() {
+        TemplateService.OnChange += StateHasChanged;
+        isLoading = false;
+    }
+    #endregion
+
+    #region Private Methods and Properties
+    private List<PatientTemplate> Patients => TemplateService.Patients;
+
+    private void OpenAddPatient() {
+        newPatientOpen = true;
+        editPatientId = -1;
+    }
+
+    private bool IsTemplateEditing(int templateId) => templateId == editPatientId;
+
+    private async Task<TemplatePatientCallback> OnPatientChanged(){
+        Console.WriteLine("Patient has changed");
+    }
+    #endregion
+}
