@@ -1,0 +1,120 @@
+﻿@page "/templates/group-main"
+@attribute [Authorize]
+@using Radigate.Client.Pages.Templates.Components
+
+
+<MudPaper MaxWidth="660px" Class="ma-2">
+    <MudStack Row="true">
+        <MudButton Variant="Variant.Outlined" Color="Color.Success" IconSize="Size.Small"
+                   StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddGroup">Add Group </MudButton>
+        <MudTextField Class="align-self-center" T="string" Label="Search" Variant="Variant.Outlined"
+                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+    </MudStack>
+</MudPaper>
+
+<MudItem Class="pa-1 align-items-baseline">
+    <!-- Existing Groups -->
+    <MudStack Row=@true>
+        <!-- New Group -->
+        @if (newGroupOpen) {
+            <TemplateGroupComponent GroupChanged="@OnGroupChanged" />
+        }
+        <!-- Template List -->
+        @if (isLoading) {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else if (groups is null || groups.Count < 1) {
+            <span>@message</span>
+        }
+        else {
+            @foreach (var group in groups) {
+                <TemplateGroupComponent Template="@group" Edit="@IsEditing(group.Id)" GroupChanged="@OnGroupChanged" />
+            }
+        }
+    </MudStack>
+
+</MudItem>
+@code {
+    //https://github.com/Apps72/BlazorGuidelines
+
+    bool isLoading = true;
+
+    List<GroupTemplate> groups;
+    string message = string.Empty;
+    int groupEditId = -1;
+
+    [Inject]
+    private AuthenticationStateProvider AuthState { get; set; } = default!;
+    [Inject]
+    private ITemplateService TemplateService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync() {
+        await GetGroupTemplates();
+        isLoading = false;
+    }
+
+    bool newGroupOpen { get; set; } = false;
+
+    private async Task GetGroupTemplates() {
+        var response = await TemplateService.GetAllGroupTemplatesAsync();
+
+        //request failed
+        if (!response.Success) {
+            message = response.Message;
+            return;
+        }
+
+        //no groups in the database to show
+        if (response.Data is null || response.Data.Count < 1) {
+            message = "no entries!";
+            return;
+        }
+
+        message = string.Empty;
+        groups = new();
+        foreach (var group in response.Data) groups.Add(group);
+    }
+
+    private async Task OpenAddGroup() => newGroupOpen = true;
+
+    private async Task CancelGroup() => newGroupOpen = false;
+    private bool IsEditing(int groupId) => groupId == groupEditId;
+
+    private async Task OnGroupChanged(TemplateGroupComponent.TemplateGroupCallback? group) {
+        //closing all editing
+        newGroupOpen = false;
+        groupEditId = -1;
+
+        //cancel editing
+        if (group is null) return;
+
+        //deleting the group
+        if (group.Group is null){
+        //
+        }
+
+        var groupIndex = groups.FindIndex(g => g.Id == group.GroupId);
+
+        //add a new group if the group isn't in the existing group
+        if (groupIndex < 0) {
+            var newGroup = new NewGroupTemplate {
+                    Label = group.Group.Label,
+                    Tasks = group.Group.Tasks
+                };
+
+            await TemplateService.AddGroupTemplate(newGroup);
+            await GetGroupTemplates();
+            return;
+        }
+
+        //open this group for editing
+        if(group.IsEditing){
+            groupEditId = group.GroupId.Value;
+            return;
+        }
+
+        //update the group
+
+    }
+}
+

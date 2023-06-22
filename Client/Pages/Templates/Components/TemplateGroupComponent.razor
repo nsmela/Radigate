@@ -1,0 +1,130 @@
+﻿<MudPaper Class="ma-2 pb-2" Style="@($"background:{Colors.BlueGrey.Darken1};")" MinWidth="320px">
+    <!-- Tool bar at top -->
+    @if (!Edit) {
+        <MudToolBar DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken2};")">
+            <MudText Typo="Typo.h4" Class="pl-2">@Label</MudText>
+            <MudSpacer />
+            <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+                 ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="@EditGroup">
+                    Edit Group
+                </MudButton>
+                <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick="@RemoveGroup">
+                    Remove Group
+                </MudButton>
+            </MudMenu>
+        </MudToolBar>
+    }
+    else {
+        <MudToolBar DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken2};")">
+            <MudTextField @bind-Value="Label" Placeholder="@Label" Class="pa-2 mb-2 mt-2"
+                      Typo="Typo.h4" Variant="Variant.Filled" Immediate="false" />
+            <MudSpacer />
+        </MudToolBar>
+    }
+
+
+    <!-- Tasks -->
+    @foreach (var task in taskList) {
+        <TemplateTaskComponent Task="@task" Group="@taskList" Editing="@Edit" GroupChanged="@OnGroupUpdated" />
+    }
+    @if (Edit) {
+        <MudButton FullWidth="true" OnClick=@NewTask> New Task </MudButton>
+        <MudButton FullWidth="true" OnClick=@Reset> Reset </MudButton>
+        <MudButton FullWidth="true" OnClick="@SaveChanges"> Save </MudButton>
+        <MudButton FullWidth="true" OnClick=@CancelChanges> Cancel </MudButton>
+        
+    }
+
+</MudPaper>
+
+
+@code {
+    //https://github.com/Apps72/BlazorGuidelines
+
+    //private variables
+    List<Tuple<string, int>> taskList = new();
+    //inject properties
+
+    //parameter properties
+    [Parameter]
+    public GroupTemplate Template { get; set; }
+    [Parameter]
+    public bool Edit { get; set; } = false;
+    [Parameter]
+    public EventCallback<TemplateGroupCallback?> GroupChanged { get; set; }
+
+    //public methods and properties
+    public class TemplateGroupCallback{
+        public int? GroupId { get; set; }
+        public GroupTemplate? Group { get; set; }
+        public bool IsEditing { get; set; } = false;
+    }
+
+    //internal and protected Methods/Properties
+    protected override async Task OnParametersSetAsync() {
+        Tasks = Template.Tasks;
+        Label = Template.Label;
+
+        taskList = Template.TaskList();
+    }
+
+    //Private methods/properties
+    GroupTemplate newGroup { get; set; } = new();
+    string Label { get; set; } = string.Empty;
+    string Tasks { get; set; } = string.Empty;
+
+    private async Task Reset() {
+        Tasks = Template.Tasks;
+        Label = Template.Label;
+
+        taskList = Template.TaskList();
+    }
+
+    private async Task NewTask() {
+        taskList.Add(new Tuple<string, int>($"New Task {taskList.Count}", 0));
+    }
+
+    private async Task EditGroup(){
+        var group = new TemplateGroupCallback
+            {
+                GroupId = Template.Id,
+                IsEditing = true
+            };
+            await GroupChanged.InvokeAsync(group);
+    }
+
+    private async Task RemoveGroup() {
+        var group = new TemplateGroupCallback {
+            GroupId = Template.Id,
+            Group = null
+        };
+
+        await GroupChanged.InvokeAsync(group);
+    }
+
+    private async Task SaveChanges() {
+        var group = new TemplateGroupCallback {
+            Group = new GroupTemplate
+            {
+                Id = Template.Id,
+                CreatedAt = Template.CreatedAt,
+                PatientTemplates = Template.PatientTemplates,
+                Label = Label,
+                Tasks = GroupTemplate.TasksToString(taskList)
+            },
+            GroupId = Template.Id
+        };
+
+        await GroupChanged.InvokeAsync(group);
+    }
+
+    private async Task CancelChanges() => await GroupChanged.InvokeAsync(null);
+
+    //callbacks
+    private async Task OnGroupUpdated(List<Tuple<string, int>> tasks) {
+        if (newGroup is null || tasks is null) return;
+        taskList = tasks;
+    }
+
+}
