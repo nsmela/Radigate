@@ -14,9 +14,9 @@
     </MudStack>
 </MudPaper>
 
-<MudItem Class="pa-1 align-items-baseline">
+<MudItem Class="pa-1 align-items-baseline overflow-x-scroll">
     <!-- Existing Groups -->
-    <MudStack Row=@true>
+    <MudStack Row="true">
         <!-- New Patient -->
         @if (newPatientOpen) {
             <TemplatePatientComponent Template="@(new PatientTemplate())" Editing="true" TemplateChanged="@OnPatientChanged" />

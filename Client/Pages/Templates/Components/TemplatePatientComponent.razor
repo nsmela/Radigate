@@ -157,12 +157,14 @@
         //use an existing group
         var group = Templates.Groups.Find(g => g.Label == NewGroupLabel);
         if (group is not null) { //link the group?
+            group.Public = false;
             NewGroups.Add(new GroupTemplate(group));
         }
         else {
             NewGroups.Add(new GroupTemplate {
                 Label = NewGroupLabel,
-                Tasks = string.Empty
+                Tasks = string.Empty,
+                Public = false
             });
         }
 
