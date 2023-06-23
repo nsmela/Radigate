@@ -124,8 +124,9 @@
                 Label = Label,
                 Tasks = GroupTemplate.TasksToString(taskList)
             },
-            GroupId = Template is not null ? Template.Id : null,
-            Request = TemplateGroupCallback.RequestType.SAVE
+            Request = Template is not null ? 
+                TemplateGroupCallback.RequestType.SAVE : 
+                TemplateGroupCallback.RequestType.ADD
         };
 
         await GroupChanged.InvokeAsync(group);
