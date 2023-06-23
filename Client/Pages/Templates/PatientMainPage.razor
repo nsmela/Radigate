@@ -2,6 +2,7 @@
 @implements IDisposable
 @attribute [Authorize]
 @using Radigate.Client.Pages.Templates.Components
+@using static Radigate.Client.Pages.Templates.Components.TemplatePatientComponent.TemplatePatientCallback
 @using static Radigate.Client.Pages.Templates.Components.TemplatePatientComponent
 
 <MudPaper MaxWidth="660px" Class="ma-2">
@@ -76,8 +77,22 @@
 
     private bool IsTemplateEditing(int templateId) => templateId == editPatientId;
 
-    private async Task OnPatientChanged(TemplatePatientCallback template) {
-        Console.WriteLine("Patient has changed");
+    private async Task OnPatientChanged(TemplatePatientCallback callback) {
+        switch(callback.Request){
+            case RequestType.SAVE:
+                var template = new NewPatientTemplate
+                {
+                    Label = callback.Template.Label,
+                    Groups = callback.Template.GroupTemplates
+                };
+                await TemplateService.AddPatientTemplate(template);
+
+                newPatientOpen = false;
+                editPatientId = -1;
+                break;
+            default:
+                break;
+        }
     }
     #endregion
 }

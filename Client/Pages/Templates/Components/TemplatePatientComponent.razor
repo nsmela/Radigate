@@ -76,13 +76,16 @@
         public int PatientID {get;set;} = -1;
         public PatientTemplate Template {get;set;} = new();
         public bool IsEditing { get; set; } = false;
+        public RequestType Request { get; set; } = RequestType.CANCEL;
+        public enum RequestType {OPEN, CANCEL, SAVE, ADD, DELETE}
     }
     #endregion
 
     #region Internal and Protected Methods and Properties
     protected override async Task OnParametersSetAsync() {
-        Label = Template.Label;
-        NewGroups = Template.GroupTemplates;
+        Label = new string(Template.Label);
+        NewGroups = new();
+        Template.GroupTemplates.ForEach(g => NewGroups.Add(new GroupTemplate(g)));
     }
     #endregion
 
@@ -97,16 +100,32 @@
     private bool IsOpenToEdit(GroupTemplate group) => EditingGroupIndex == NewGroups.IndexOf(group);
 
     private async Task ResetTemplate(){
-        Label = Template.Label;
-        NewGroups = Template.GroupTemplates;
+        Label = new string(Template.Label);
+        NewGroups = new();
+        Template.GroupTemplates.ForEach(g => NewGroups.Add(new GroupTemplate(g)));
     }
 
     private async Task SaveTemplate(){
+        var callback = new TemplatePatientCallback{
+            Template = new PatientTemplate{
+                Id = Template.Id,
+                CreatedAt = Template.CreatedAt,
+                Label = this.Label,
+                GroupTemplates = this.NewGroups
+            },
+            Request = TemplatePatientCallback.RequestType.SAVE
+        };
 
+        TemplateChanged.InvokeAsync(callback);
     }
 
     private async Task RemoveTemplate(){
+        var callback = new TemplatePatientCallback {
+            Template = Template,
+            Request = TemplatePatientCallback.RequestType.DELETE
+        };
 
+        TemplateChanged.InvokeAsync(callback);
     }
 
     private async Task<IEnumerable<string>> SearchGroupNames(string value) {

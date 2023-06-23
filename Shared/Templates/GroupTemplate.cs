@@ -4,6 +4,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string Label { get; set;} = "New Group";
         public string Tasks { get; set; } = "NewTask,0;"; //tasks saved as "{label},{Type};"
+        public bool Public { get; set; } = false;
 
         //relational
         public List<PatientTemplate> PatientTemplates { get; set; } = new();
