@@ -43,7 +43,7 @@ namespace Radigate.Client.Services.TemplateService {
         }
 
         public async Task DeletePatientTemplate(int templateId) {
-            var connection = $"api/Template/patients{templateId}";
+            var connection = $"api/Template/patients/{templateId}";
             var response = await _http.DeleteAsync(connection);
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 

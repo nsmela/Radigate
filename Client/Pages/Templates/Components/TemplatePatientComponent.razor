@@ -14,6 +14,7 @@
             <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight"
                  TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
                 <MudButton Size="Size.Small" Color="Color.Success" StartIcon="@Icons.Material.Filled.PersonAddAlt1">Create Patient</MudButton>
+                <MudButton Size="Size.Small" Color="Color.Info" StartIcon="@Icons.Material.Filled.Edit" OnClick=@EditTemplate>Open Template</MudButton>
                 <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick=@RemoveTemplate>Remove Template</MudButton>
             </MudMenu>
         }
@@ -73,9 +74,7 @@
 
     #region Public Methods and Properties
     public class TemplatePatientCallback {
-        public int PatientID {get;set;} = -1;
         public PatientTemplate Template {get;set;} = new();
-        public bool IsEditing { get; set; } = false;
         public RequestType Request { get; set; } = RequestType.CANCEL;
         public enum RequestType {OPEN, CANCEL, SAVE, ADD, DELETE}
     }
@@ -105,18 +104,30 @@
         Template.GroupTemplates.ForEach(g => NewGroups.Add(new GroupTemplate(g)));
     }
 
-    private async Task SaveTemplate(){
+    private async Task EditTemplate(){
         var callback = new TemplatePatientCallback{
-            Template = new PatientTemplate{
+            Template = this.Template,
+            Request = TemplatePatientCallback.RequestType.OPEN
+        };
+
+        await TemplateChanged.InvokeAsync(callback);
+    }
+
+    private async Task SaveTemplate(){
+        //is this a new template or updating an older template?
+        bool isNew = Template.Id < 0;
+
+        var callback = new TemplatePatientCallback {
+            Template = new PatientTemplate {
                 Id = Template.Id,
                 CreatedAt = Template.CreatedAt,
                 Label = this.Label,
                 GroupTemplates = this.NewGroups
             },
-            Request = TemplatePatientCallback.RequestType.SAVE
+            Request = isNew ? TemplatePatientCallback.RequestType.ADD : TemplatePatientCallback.RequestType.SAVE
         };
 
-        TemplateChanged.InvokeAsync(callback);
+        await TemplateChanged.InvokeAsync(callback);
     }
 
     private async Task RemoveTemplate(){
@@ -125,7 +136,7 @@
             Request = TemplatePatientCallback.RequestType.DELETE
         };
 
-        TemplateChanged.InvokeAsync(callback);
+        await TemplateChanged.InvokeAsync(callback);
     }
 
     private async Task<IEnumerable<string>> SearchGroupNames(string value) {
@@ -166,7 +177,9 @@
     private async Task OnGroupChanged(TemplateGroupCallback template) {
         switch (template.Request) {
             case RequestType.OPEN:
-                EditingGroupIndex = NewGroups.FindIndex(g => g.Label == template.Group.Label);
+                if (Editing){
+                    EditingGroupIndex = NewGroups.FindIndex(g => g.Label == template.Group.Label);
+                }
                 return;
             case RequestType.CANCEL:
                 EditingGroupIndex = -1;

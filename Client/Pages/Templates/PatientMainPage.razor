@@ -63,6 +63,8 @@
     #region Internal and Protected Methods and Properties
     protected override async Task OnInitializedAsync() {
         TemplateService.OnChange += StateHasChanged;
+        await TemplateService.GetAllPatientTemplatesAsync();
+        await TemplateService.GetAllGroupTemplatesAsync();
         isLoading = false;
     }
     #endregion
@@ -79,13 +81,34 @@
 
     private async Task OnPatientChanged(TemplatePatientCallback callback) {
         switch(callback.Request){
+            case RequestType.OPEN:
+                newPatientOpen = false;
+                editPatientId = callback.Template.Id;
+                break;
+            case RequestType.CANCEL:
+                newPatientOpen = false;
+                editPatientId = -1;
+                break;
             case RequestType.SAVE:
+                await TemplateService.UpdatePatientTemplate(callback.Template);
+
+                newPatientOpen = false;
+                editPatientId = -1;
+                break;
+            case RequestType.ADD:
                 var template = new NewPatientTemplate
                 {
                     Label = callback.Template.Label,
                     Groups = callback.Template.GroupTemplates
                 };
                 await TemplateService.AddPatientTemplate(template);
+
+                newPatientOpen = false;
+                editPatientId = -1;
+                break;
+            case RequestType.DELETE:
+                var id = callback.Template.Id;
+                await TemplateService.DeletePatientTemplate(id);
 
                 newPatientOpen = false;
                 editPatientId = -1;

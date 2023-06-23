@@ -1,4 +1,6 @@
-﻿namespace Radigate.Shared.Templates {
+﻿using System.Text.Json.Serialization;
+
+namespace Radigate.Shared.Templates {
     public class GroupTemplate {
         public int Id { get;set;}
         public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -7,17 +9,20 @@
         public bool Public { get; set; } = false;
 
         //relational
+        [JsonIgnore]
         public List<PatientTemplate> PatientTemplates { get; set; } = new();
 
         //constructors
         public GroupTemplate() {}
-        public GroupTemplate(NewGroupTemplate group) {
+        public GroupTemplate(NewGroupTemplate newGroup) {
+            this.Label = newGroup.Label;
+            this.Tasks = newGroup.Tasks;
+            this.Public = newGroup.IsPublic;
+        }
+        public GroupTemplate(GroupTemplate group) {
             this.Label = group.Label;
             this.Tasks = group.Tasks;
-        }
-        public GroupTemplate(GroupTemplate newGroupTemplate) {
-            this.Label = newGroupTemplate.Label;
-            this.Tasks = newGroupTemplate.Tasks;
+            this.Public = group.Public;
         }
 
         //methods

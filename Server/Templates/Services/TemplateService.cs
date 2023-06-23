@@ -9,6 +9,11 @@ namespace Radigate.Server.Templates.Services {
         }
 
         public async Task<ServiceResponse<bool>> AddGroupTemplateAsync(NewGroupTemplate newTemplate) {
+            string label = newTemplate.Label;
+            if (_context.GroupTemplates.Any(g => g.Label == label)) {
+                return new ServiceResponse<bool> { Success = false, Data = false, Message = "A group with the same label already exists!" };
+            }
+
             var group = new GroupTemplate(newTemplate);
             await _context.GroupTemplates.AddAsync(group);
             await _context.SaveChangesAsync();
@@ -25,6 +30,7 @@ namespace Radigate.Server.Templates.Services {
         public async Task<ServiceResponse<List<GroupTemplate>>> GetAllGroupTemplatesAsync() {
             var response = new ServiceResponse<List<GroupTemplate>> {
                 Data = await _context.GroupTemplates
+                    .Where(g => g.Public == true)
                     .ToListAsync()
             };
 

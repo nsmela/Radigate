@@ -2,6 +2,7 @@
 @implements IDisposable
 @attribute [Authorize]
 @using Radigate.Client.Pages.Templates.Components
+@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent.TemplateGroupCallback
 
 
 <MudPaper MaxWidth="660px" Class="ma-2">
@@ -71,36 +72,31 @@
         newGroupOpen = false;
         groupEditId = -1;
 
-        //cancel editing
-        if (group is null) return;
-
-        //deleting the group
-        if (group.Group is null){
-            await TemplateService.DeleteGroupTemplate(group.GroupId.Value);
-            return;
-        }
-
-        var groupIndex = Groups.FindIndex(g => g.Id == group.GroupId);
-
-        //add a new group if the group isn't in the existing group
-        if (groupIndex < 0) {
-            var newGroup = new NewGroupTemplate {
+        switch (group.Request) {
+            case RequestType.OPEN:
+                groupEditId = group.GroupId.Value;
+                return;
+            case RequestType.CANCEL:
+                return;
+            case RequestType.SAVE:
+                group.Group.Public = true;
+                await TemplateService.UpdateGroupTemplate(group.Group);
+                return;
+            case RequestType.DELETE:
+                await TemplateService.DeleteGroupTemplate(group.GroupId.Value);
+                return;
+            case RequestType.ADD:
+                var newGroup = new NewGroupTemplate {
                     Label = group.Group.Label,
-                    Tasks = group.Group.Tasks
+                    Tasks = group.Group.Tasks,
+                    IsPublic = true
                 };
 
-            await TemplateService.AddGroupTemplate(newGroup);
-            return;
+                await TemplateService.AddGroupTemplate(newGroup);
+                return;
+            default:
+                return;
         }
-
-        //open this group for editing
-        if(group.IsEditing){
-            groupEditId = group.GroupId.Value;
-            return;
-        }
-
-        //update the group
-        await TemplateService.UpdateGroupTemplate(group.Group);
     }
 }
 

@@ -9,6 +9,7 @@ namespace Radigate.Shared.Templates {
     public class NewGroupTemplate {
         [Required] public string Label { get; set; } = "New Group Template";
         public string Tasks { get; set; } = string.Empty;
+        public bool IsPublic { get; set; } = false;
 
         public List<Tuple<string, int>> TaskList() {
             var tasks = Tasks.Split(';');
