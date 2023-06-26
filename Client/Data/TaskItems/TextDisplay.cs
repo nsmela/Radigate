@@ -22,7 +22,17 @@ namespace Radigate.Client.Data.TaskItems {
                 };
             }
 
+        public ITaskItem Copy() => new TextDisplay {
+            Id = this.Id,
+            Label = this.Label,
+            Comments = this.Comments,
+            SortOrder = this.SortOrder,
+            TaskGroup = this.TaskGroup,
+            Value = this.Value
+        };
+
         //non-inherited
+        public TextDisplay() { }
         public TextDisplay(string label) {
             Label = label;
             Value = string.Empty;

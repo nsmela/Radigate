@@ -43,10 +43,19 @@ namespace Radigate.Client.Data.TaskItems {
                 TaskGroupId = this.TaskGroup.Id,
             };
         }
+        public ITaskItem Copy() => new ListDisplay {
+            Id = this.Id,
+            Label = this.Label,
+            Comments = this.Comments,
+            SortOrder = this.SortOrder,
+            TaskGroup = this.TaskGroup,
+            Value = this.Value
+        };
 
         //non-inherited
         public List<string> Options { get; set; } = new();
         public string SelectedOption { get; set; } = string.Empty;
+        public ListDisplay() { }
         public ListDisplay(string label) {
             Label = label;
             Options = new List<string> { "Option 1", "Option 2", "Option 3" };
@@ -59,5 +68,6 @@ namespace Radigate.Client.Data.TaskItems {
             this.Comments = task.Comments;
             this.Value = task.Value;
         }
+
     }
 }

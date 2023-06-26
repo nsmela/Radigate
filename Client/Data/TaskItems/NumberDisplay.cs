@@ -29,9 +29,18 @@ namespace Radigate.Client.Data.TaskItems {
                 TaskGroupId = this.TaskGroup.Id,
             };
         }
+        public ITaskItem Copy() => new NumberDisplay {
+            Id = this.Id,
+            Label = this.Label,
+            Comments = this.Comments,
+            SortOrder = this.SortOrder,
+            TaskGroup = this.TaskGroup,
+            Value = this.Value
+        };
 
         //non-inherited
         public double NumberValue { get; set; } = 0.0f;
+        public NumberDisplay() { }
         public NumberDisplay(string label) {
             Label = label;
             NumberValue = 0.0f;
@@ -43,6 +52,7 @@ namespace Radigate.Client.Data.TaskItems {
             this.Comments = task.Comments;
             this.Value = task.Value;
         }
+
     }
 }
 

@@ -1,7 +1,8 @@
 ﻿@page "/patients/edit/{id:int}"
 @attribute [Authorize(Roles = CustomRoles.Admin)]
+@using Radigate.Client.Pages.Patients.Components
 
-@if (patient is null) {
+@if (Patient is null) {
         <MudProgressCircular>Loading Patient</MudProgressCircular>
 }
 else {
@@ -10,133 +11,13 @@ else {
             <MudPaper Width="440px">
                 <!-- Patient info Header -->
                 <MudPaper Elevation="2" Class="pa-2 ma-2">
-                    <MudTextField @bind-Value="patient.LastName" Label="Last Name" />
-                    <MudTextField @bind-Value="patient.FirstName" Label="First Name" />
-                    <MudTextField @bind-Value="patient.Identifier" Label="Patient ID" />
+                    <MudTextField @bind-Value="Patient.LastName" Label="Last Name" />
+                    <MudTextField @bind-Value="Patient.FirstName" Label="First Name" />
+                    <MudTextField @bind-Value="Patient.Identifier" Label="Patient ID" />
                 </MudPaper>
             @foreach (var group in Groups) {
-                        <MudPaper Elevation="0" MinHeight="80px" Class="pa-2 ma-4 d-flex flex-column mud-background-gray rounded-lg">
-                            <MudToolBar DisableGutters="true" Class="@(group.EditName ? "mud-secondary pa-4 ma-n2" : "mud-primary pa-4 ma-n2")">
-                        @if (group.EditName) {
-                                        <MudTextField @bind-Value="group.NewLabel" Placeholder="@group.Group.Label" Label="Edit Group Name"
-                                  DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2" TextChanged="(() => OnTextFieldChangedHandler(group))" />
-                        }
-                        else {
-                                        <MudText Typo="Typo.subtitle1"><b>@group.Group.Label</b></MudText>
-                        }
-                                <MudSpacer />
-                                <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                                    <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="(()=> DeleteGroup(group))">Delete Section</MudButton>
-                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="(()=> EditGroupName(group))">Rename Section</MudButton>
-                                </MudMenu>
-                            </MudToolBar>
-                            <MudStack Class="pt-4">
-                                <!-- Each task listing -->
-                        @foreach (var task in group.Tasks) {
-                                        <!-- to see if the task is open -->
-                            @if (task.Edit) {
-                                                <!-- task list editing view -->
-                                @if (task.Task.Type == TaskType.List) {
-                                                        <MudPaper >
-                                                            <!-- Type Menu -->
-                                                            <MudToolBar Class="ma-n4">
-                                                                <MudMenu Icon="@task.Task.Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> ChangeTaskType(task, TaskType.Bool))></MudButton>
-                                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> ChangeTaskType(task, TaskType.Text))></MudButton>
-                                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> ChangeTaskType(task, TaskType.Date)) />
-                                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> ChangeTaskType(task, TaskType.List)) />
-                                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> ChangeTaskType(task, TaskType.Number)) />
-                                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> ChangeTaskType(task, TaskType.Calculation))></MudButton>
-                                                                </MudMenu>
-                                                                <MudTextField @bind-Value="task.NewLabel" Placeholder="@task.Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
-                                                TextChanged="(() => {EditTaskName(task); task.Edit = true;})"></MudTextField>
-                                                                <MudSpacer />
-                                                                <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="(()=> {EditTaskName(task); task.Edit = false;})" Size="Size.Small" />
-                                                                <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(()=> RaiseTask(task))" Class="invisible"/>
-                                                                <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(()=> LowerTask(task))" Class="invisible"/>
-                                                                <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
-                                                Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
-                                                            </MudToolBar>
-                                        @{
-                                            var list = (ListDisplay)task.Task; 
-                                            @foreach (var option in list.Options) {
-                                                                            <MudStack Row="true" Class="width:48px;">
-                                                                                <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline" OnClick="@(() => RemoveTaskListItem(list, option))"
-                                                    Color="Color.Error" Size="Size.Small" />
-                                                                                <MudTextField T="string"  Margin="Margin.Dense" Class="ml-n2 mr-2 mt-n2"
-                                                        TextChanged="((value) => EditTaskListLabel(task, option, value))" Text="@option" />
-                                                                            </MudStack>
-                                            }
-                                        }
-
-                                                            <MudButton FullWidth="true" OnClick="@(() => AddTaskListItem(task))">Add Option</MudButton>
-                                                        </MudPaper>
-                                }
-                                else {
-                                                    <!-- default view for editing a task -->
-                                                    <!-- Type Menu -->
-                                                        <MudToolBar Class="ma-n4">
-                                                            <MudMenu Icon="@task.Task.Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> ChangeTaskType(task, TaskType.Bool))></MudButton>
-                                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> ChangeTaskType(task, TaskType.Text))></MudButton>
-                                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> ChangeTaskType(task, TaskType.Date)) />
-                                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> ChangeTaskType(task, TaskType.List)) />
-                                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> ChangeTaskType(task, TaskType.Number)) />
-                                                                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> ChangeTaskType(task, TaskType.Calculation))></MudButton>
-                                                            </MudMenu>
-                                                            <MudTextField @bind-Value="task.NewLabel" Placeholder="@task.Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
-                                            TextChanged="(() => EditTaskName(task))"></MudTextField>
-                                                            <MudSpacer />
-                                                            <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="(()=> {EditTaskName(task); task.Edit = false;})" Size="Size.Small" />
-                                                            <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(()=> RaiseTask(task))" Class="invisible"/>
-                                                            <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(()=> LowerTask(task))" Class="invisible"/>
-                                                            <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
-                                            Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
-                                                        </MudToolBar>
-                                }
-                            }
-                            else {
-                                                <!-- Normal Task View -->
-                                                <MudToolBar Class="ma-n4">
-                                                    <MudIcon Icon="@task.Task.Icon" Size="Size.Small" Class="pr-1" />
-                                                    <MudText Typo="Typo.body1"><b>@task.Task.Label</b></MudText>
-                                                    <MudSpacer />
-                                                    <MudIconButton Icon="@Icons.Material.Sharp.Edit" OnClick="(()=> EditTask(task))" Size="Size.Small" />
-                                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(()=> RaiseTask(task))" />
-                                                    <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(()=> LowerTask(task))" />
-                                                    <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline"
-                                        Color="Color.Error" Size="Size.Small" OnClick="(()=> DeleteTask(group, task))" />
-                                                </MudToolBar>
-                            }
-
-
-                        }
-                                <!-- Add Task Section -->
-                        @if (group.IsNewTaskOpen) {
-                                        <MudPaper Elevation="25" Class="pa-2 rounded-lg">
-                                            <MudToolBar Dense="true">
-                                                <MudMenu Icon="@group.NewTaskIcon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick=@(()=> {group.NewTaskType = TaskType.Bool;})></MudButton>
-                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick=@(()=> {group.NewTaskType = TaskType.Text;})></MudButton>
-                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick=@(()=> {group.NewTaskType = TaskType.Date;}) />
-                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick=@(()=> {group.NewTaskType = TaskType.List;}) />
-                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick=@(()=> {group.NewTaskType = TaskType.Number;}) />
-                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick=@(()=> {group.NewTaskType = TaskType.Calculation;})></MudButton>
-                                                </MudMenu>
-                                                <MudTextField @bind-Value="group.NewTaskLabel" Placeholder="New Task" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
-                                        TextChanged="@(() => {if(!String.IsNullOrEmpty(group.NewTaskLabel)) { AddTaskItem(group); }})"></MudTextField>
-                                            </MudToolBar>
-                                            <MudButton OnClick="@(() => AddTaskItem(group))" Size="Size.Small" Color="Color.Primary" FullWidth="true">Add Task</MudButton>
-                                            <MudButton OnClick="@(() => group.IsNewTaskOpen = false)" Size="Size.Small" Color="Color.Primary" FullWidth="true">Hide</MudButton>
-                                        </MudPaper>
-                        }
-                        else {
-                                        <MudButton OnClick="@(() => group.IsNewTaskOpen = true)" StartIcon="@Icons.Material.Filled.Add" FullWidth="true" Class="rounded-lg py-2">Add Task</MudButton>
-                        }
-                            </MudStack>
-                        </MudPaper>
+                <GroupModifyComponent Group="@group" GroupChanged="@OnGroupUpdated" />
             }
-
                 <MudPaper Class="pa-4" Elevation="0">
                 @if (AddGroupOpen) {
                             <MudPaper Elevation="0" Class="pa-4 d-flex flex-column mud-background-gray rounded-lg">

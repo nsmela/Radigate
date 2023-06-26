@@ -14,7 +14,7 @@
             <MudTextField @bind-Value="TaskLabel" Placeholder="@Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
                     TextChanged="@EditTaskName"></MudTextField>
             <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="@EditTaskName" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="@EditTask" Size="Size.Small" />
             <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@RaiseTask" Class="invisible" />
             <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@LowerTask" Class="invisible" />
             <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="@DeleteTask" />
@@ -41,9 +41,9 @@ else {
         <MudIcon Icon="@Icon" Size="Size.Small" Class="pr-1" />
         <MudText Typo="Typo.body1"><b>@Task.Label</b></MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="@EditTaskName" Size="Size.Small" />
-        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@RaiseTask" Class="invisible" />
-        <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@LowerTask" Class="invisible" />
+        <MudIconButton Icon="@Icons.Material.Filled.Check" OnClick="@EditTask" Size="Size.Small" />
+        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@RaiseTask" />
+        <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@LowerTask"  />
         <MudIconButton icon="@Icons.Material.Sharp.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="@DeleteTask" />
     </MudToolBar>
 }

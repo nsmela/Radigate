@@ -19,7 +19,7 @@ namespace Radigate.Client.Pages.Patients.Components
         [Parameter]
         public EventCallback<ITaskItem> TaskItemChanged { get; set; } = default!;
         [Parameter]
-        public EventCallback<bool> EditModeChanged { get; set; } = default!;
+        public EventCallback<ITaskItem> EditModeChanged { get; set; } = default!;
         #endregion
 
         #region Public Methods and Properties
@@ -46,14 +46,19 @@ namespace Radigate.Client.Pages.Patients.Components
             await UpdateParent();
         }
 
-        private void ChangeTaskType(TaskType type) { }
+        private async Task ChangeTaskType(TaskType type) {
+            TaskItemType = type;
+            await UpdateParent();
+        }
         private async Task DeleteTask() {
-            await TaskItemChanged.InvokeAsync(null);
+            this.Task.SortOrder = -1;
+            await TaskItemChanged.InvokeAsync(Task);
         }
 
         //open or close the editing of the task
-        private async Task EditTask(bool value) {
-            await EditModeChanged.InvokeAsync(value);
+        private async Task EditTask() {
+            if (Edit) await UpdateParent();
+            else await EditModeChanged.InvokeAsync(this.Task);
         }
 
         private async void EditTaskListLabel(string originalValue, string value) {
@@ -91,16 +96,22 @@ namespace Radigate.Client.Pages.Patients.Components
         }
 
         private async Task UpdateParent() {
-            var task = new TaskItem {
-                Id = this.Task.Id,
-                Type = (int)this.TaskItemType,
-                SortingOrder = this.SortOrder,
-                Label = this.TaskLabel,
-                Comments = this.Task.Comments,
-                Value = this.Task.Value
-            };
+            if (Task.Type != TaskItemType) {
+                Task = GroupDisplay.Convert(new TaskItem {
+                    Id = this.Task.Id,
+                    Type = (int)this.TaskItemType,
+                    SortingOrder = this.SortOrder,
+                    Label = this.TaskLabel,
+                    Comments = this.Task.Comments,
+                    Value = this.Task.Value
+                });
+            }
+            else {
+                Task.Label = TaskLabel;
+                Task.SortOrder = SortOrder;
+            }
 
-            await TaskItemChanged.InvokeAsync(GroupDisplay.Convert(task));
+            await TaskItemChanged.InvokeAsync(Task);
         }
 
         #endregion

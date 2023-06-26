@@ -21,8 +21,17 @@ namespace Radigate.Client.Data.TaskItems {
                 TaskGroupId = this.TaskGroup.Id,
             };
         }
+        public ITaskItem Copy() => new FormulaDisplay {
+            Id = this.Id,
+            Label = this.Label,
+            Comments = this.Comments,
+            SortOrder = this.SortOrder,
+            TaskGroup = this.TaskGroup,
+            Value = this.Value
+        };
 
         //non-inherited
+        public FormulaDisplay() { }
         public FormulaDisplay(string label) {
             Label = label;
             Value = string.Empty;
@@ -34,5 +43,6 @@ namespace Radigate.Client.Data.TaskItems {
             this.Comments = task.Comments;
             this.Value = task.Value;
         }
+
     }
 }

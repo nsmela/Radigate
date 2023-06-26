@@ -24,6 +24,14 @@ namespace Radigate.Client.Data.TaskItems {
                 TaskGroupId = this.TaskGroup.Id,
             };
         }
+        public ITaskItem Copy() => new CheckboxDisplay {
+            Id = this.Id, 
+            Label = this.Label, 
+            Comments = this.Comments, 
+            SortOrder = this.SortOrder,
+            TaskGroup = this.TaskGroup,
+            Value = this.Value
+        };
 
         //non-inherited
         public bool IsChecked { get; set; } = false;
@@ -44,5 +52,6 @@ namespace Radigate.Client.Data.TaskItems {
             this.Comments = task.Comments;
             this.Value = task.Value;
         }
+
     }
 }

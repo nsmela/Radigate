@@ -27,9 +27,18 @@ namespace Radigate.Client.Data.TaskItems {
                 TaskGroupId = this.TaskGroup.Id,
             };
         }
+        public ITaskItem Copy() => new DateDisplay {
+            Id = this.Id,
+            Label = this.Label,
+            Comments = this.Comments,
+            SortOrder = this.SortOrder,
+            TaskGroup = this.TaskGroup,
+            Value = this.Value
+        };
 
         //non-inherited
         public DateTime? DateValue { get; set; } = DateTime.Today;
+        public DateDisplay() { }
         public DateDisplay(string label) {
             Label = label;
             DateValue = DateTime.Today;
@@ -41,5 +50,6 @@ namespace Radigate.Client.Data.TaskItems {
             this.Comments = task.Comments;
             this.Value = task.Value;
         }
+
     }
 }

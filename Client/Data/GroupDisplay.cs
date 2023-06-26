@@ -2,9 +2,9 @@
 
 namespace Radigate.Client.Data {
     public class GroupDisplay {
-        public Patient Parent { get; init; }
+        public Patient Parent { get; init; } = default!;
         public int PatientId { get; set; }
-        public List<ITaskItem> Tasks { get; set; }
+        public List<ITaskItem> Tasks { get; set; } = new();
 
         public int Id { get; set; } = -1;
         public int SortingOrder { get; set; }

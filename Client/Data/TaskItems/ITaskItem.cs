@@ -14,6 +14,7 @@ namespace Radigate.Client.Data.TaskItems {
         public string Value { get; set; }
 
         public TaskItem ToTaskItem();
+        public ITaskItem Copy();
     }
 
     public static class TaskTypeExtensions {
