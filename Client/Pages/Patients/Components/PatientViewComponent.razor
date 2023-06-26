@@ -1,0 +1,66 @@
+﻿@attribute [Authorize]
+
+@if (PatientId is null || Patient is null) {
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="360px" Width="360px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+            <MudStack Row="true">
+                <MudSkeleton Width="128px" Height="40px" Class="ml-2" />
+                <MudSkeleton Width="48px" Height="40px" Class="ml-2" />
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
+}
+else {
+    <MudPaper Class="pa-1 mb-1 ma-1" Width="440px" Style="@($"background:{Colors.Indigo.Darken4};min-width:360px")">
+        <!-- Header -->
+        <MudExpansionPanel Style="@($"background:{Colors.Indigo.Darken3}")" Dense="true" DisableGutters="true">
+            <TitleContent>
+                <MudToolBar Class="ml-n4" Dense=true DisableGutters=true>
+                    <MudText Typo="Typo.h5">@Name.ToUpper()</MudText>
+                    <MudSpacer />
+                    <MudIconButton Icon="@Icons.Material.Filled.Preview" Size="Size.Small" OnClick="@EditPatient" />
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                        <MudMenuItem Icon="@Icons.Material.Filled.ModeEdit" OnClick="@ModifyPatient">Edit Tasks</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.Archive">Archive Patient</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.RemoveCircleOutline" IconColor="Color.Error">Remove Patient</MudMenuItem>
+                    </MudMenu>
+                </MudToolBar>
+            </TitleContent>
+            <ChildContent>
+                <MudPaper Class="ma-0 pa-2" Style="@($"background:{Colors.Indigo.Darken3}")" Square="true" Elevation="0" Outlined="true">
+                    <MudText><b>Patient ID:</b> @Patient.Identifier</MudText>
+                </MudPaper>
+            </ChildContent>
+        </MudExpansionPanel>
+
+        @foreach (var group in Patient.TaskGroups) {
+            <!-- Task Group -->
+            <MudGrid Class="pa-1 mt-2 d-flex flex-column" Style="@($"background:{Colors.Indigo.Darken2}")" Spacing="1">
+                <MudItem>
+                    <MudText>@group.Label</MudText>
+                </MudItem>
+                @foreach (var result in group.Tasks) {
+                    <MudPaper MaxHeight="22px" Class="mx-1 pl-1 mt-1 d-flex flex-grow-1 justify-space-between">
+                        <MudText Class="d-inline-flex flex-grow-1" Typo="Typo.body2" Style="height:24px"><b>@result.Label</b></MudText>
+                        @if (result.Type == TaskType.Bool) {
+                            var checkbox = (CheckboxDisplay)result;
+                            <MudCheckBox Class="mt-n3 mr-n2 d-inline-flex" Checked="@checkbox.IsChecked" ReadOnly="true" LabelPosition="LabelPosition.Start" T="bool" Style="height:18px;" />
+                        }
+                        else if (result.Type == TaskType.List) {
+                            var list = (ListDisplay)result;
+                            <MudText Class="mr-1 d-inline-flex" Typo="Typo.body2" Style="height:18px;">@list.SelectedOption</MudText>
+                        }
+                        else {
+                            <MudText Class="mr-1 d-inline-flex flex-nowrap" Typo="Typo.body2" Style="height:18px;">@result.Value</MudText>
+                        }
+
+                    </MudPaper>
+                }
+            </MudGrid>
+        }
+    </MudPaper>
+}
