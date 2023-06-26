@@ -3,7 +3,7 @@
 @attribute [Authorize]
 
 @if(Patient is null){
-
+    <MudProgressCircular Size="Size.Large" />
 }else{
     <MudPaper Class="pa-2 ml-2 mt-1 rounded-t-xl rounded-0" MinHeight="240px"
           Style="background-image: linear-gradient(0.85turn, #3949ab, #311b92);">

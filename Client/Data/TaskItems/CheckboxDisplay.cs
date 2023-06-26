@@ -32,6 +32,11 @@ namespace Radigate.Client.Data.TaskItems {
             Value = "false";
         }
 
+        public CheckboxDisplay() {
+            this.Label = "new Task";
+            this.IsChecked = false;
+        }
+
         public CheckboxDisplay(TaskItem task) {
             this.TaskGroup = task.TaskGroup;
             this.Id = task.Id;
