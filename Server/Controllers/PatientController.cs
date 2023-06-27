@@ -57,7 +57,7 @@ namespace Radigate.Server.Controllers {
             return Ok(result);
         }
 
-        [HttpDelete("admin"), Authorize(Roles = CustomRoles.Admin)]
+        [HttpDelete("{patientId}"), Authorize(Roles = CustomRoles.Admin)]
         public async Task<ActionResult<ServiceResponse<List<Patient>>>> DeletePatient(int patientId) {
             var result = await _patientService.DeletePatient(patientId);
             return Ok(result);

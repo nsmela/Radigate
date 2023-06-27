@@ -48,8 +48,9 @@ namespace Radigate.Client.Pages.Patients.Components
 
         private async Task ChangeTaskType(TaskType type) {
             TaskItemType = type;
-            await UpdateParent();
+            //await UpdateParent();
         }
+
         private async Task DeleteTask() {
             this.Task.SortOrder = -1;
             await TaskItemChanged.InvokeAsync(Task);

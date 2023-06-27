@@ -7,7 +7,7 @@ namespace Radigate.Client.Pages.Patients.Components
         #region Private Variables and Constants
         #endregion
 
-        #region [Inject] Properties
+        #region Inject Properties
 
         [Inject] 
         private IPatientService PatientService { get; set; }
@@ -53,6 +53,7 @@ namespace Radigate.Client.Pages.Patients.Components
 
         private void EditPatient() => NavigationManager.NavigateTo($"patients/view/{Patient.Id}");
         private async Task ModifyPatient() => NavigationManager.NavigateTo($"patients/edit/{Patient.Id}");
+        private async Task DeletePatient() => PatientService.DeletePatient(PatientId.Value);
         #endregion
     }
 }

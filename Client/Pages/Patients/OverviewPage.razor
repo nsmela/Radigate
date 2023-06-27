@@ -1,11 +1,12 @@
 ﻿@page "/patients/overview"
 @using Radigate.Client.Pages.Patients.Components
 @attribute [Authorize]
+@implements IDisposable
 
 <!-- Add Patient and Search Bar -->
 <div >
     <MudPaper Class="d-flex pa-1 ma-2" Style="@($"background:{Colors.Indigo.Darken3};")" MaxWidth="560px">
-        <MudButton Class="d-inline-flex" StartIcon="@Icons.Material.Filled.Add" Size="Size.Medium" Variant="Variant.Outlined" >Add Patient</MudButton>
+        <MudButton Class="d-inline-flex" StartIcon="@Icons.Material.Filled.Add" Size="Size.Medium" Variant="Variant.Outlined" OnClick="@AddPatient">Add Patient</MudButton>
         <MudTextField Class="d-inline-flex px-1" T="string" Label="Search" Variant="Variant.Outlined" FullWidth="true"
             Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
     </MudPaper>

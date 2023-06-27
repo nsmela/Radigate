@@ -3,7 +3,8 @@
         private readonly HttpClient _http;
 
         public List<PatientDisplay> Patients { get; set; } = new();
-
+        public List<int?> PatientIds { get; set; } = new();
+        public event Action OnChange;
         public PatientService(HttpClient http) {
             _http = http;
         }
@@ -19,7 +20,7 @@
             if (result is not null && result.Data is not null) {
                 foreach(var patient in result.Data) Patients.Add(new PatientDisplay(patient)); //refactored
             }
-
+            OnChange?.Invoke();
         }
 
         public async Task<ServiceResponse<PatientDisplay>> GetPatient(int patientId) {
@@ -64,11 +65,15 @@
             }
         }
 
-        public async Task<ServiceResponse<List<int>>> GetPatientsId() {
+        public async Task GetPatientsId() {
             string requestString = $"/api/Patient/ids";
             var result = await _http.GetFromJsonAsync<ServiceResponse<List<int>>>(requestString);
 
-            return result;
+            PatientIds = new();
+            if(result is null || result.Data is null || result.Data.Count < 1) return;
+            foreach (var id in result.Data) PatientIds.Add((int?)id);
+
+            OnChange?.Invoke();
         }
 
         public async Task UpdatePatient(PatientValueItem newPatient) {
@@ -82,6 +87,20 @@
 
             return await response.Content.ReadFromJsonAsync<ServiceResponse<Patient>>();
         }
+
+        public async Task DeletePatient(int taskId) {
+            string connection = $"/api/Patient/{taskId}";
+            var response = await _http.DeleteAsync(connection);
+
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<List<Patient>>>();
+            Patients = new();
+
+            if (result is not null && result.Data is not null) {
+                foreach (var patient in result.Data) Patients.Add(new PatientDisplay(patient)); //refactored
+            }
+            OnChange?.Invoke();
+        }
+
     }
 }
 

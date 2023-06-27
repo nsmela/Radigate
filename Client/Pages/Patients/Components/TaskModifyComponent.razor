@@ -1,16 +1,10 @@
-﻿<!-- to see if the task is open -->
+﻿@using Radigate.Client.Components.Tasks
+<!-- to see if the task is open -->
 @if (Edit) {
     <MudPaper>
         <!-- Type Menu -->
         <MudToolBar Class="ma-n4">
-            <MudMenu Icon="@Icon" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Outlined.CheckBox" OnClick="@(()=> ChangeTaskType(TaskType.Bool))"></MudButton>
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.TextSnippet" OnClick="@(()=> ChangeTaskType(TaskType.Text))"></MudButton>
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.CalendarMonth" OnClick="@(()=> ChangeTaskType(TaskType.Date))" />
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.List" OnClick="@(()=> ChangeTaskType(TaskType.List))" />
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Numbers" OnClick="@(()=> ChangeTaskType(TaskType.Number))" />
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Filled.Calculate" OnClick="@(()=> ChangeTaskType(TaskType.Calculation))"></MudButton>
-            </MudMenu>
+            <TaskTypeSelectionComponent TaskTypeItem="@TaskItemType" TaskTypeItemChanged="@ChangeTaskType" />
             <MudTextField @bind-Value="TaskLabel" Placeholder="@Task.Label" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"
                     TextChanged="@EditTaskName"></MudTextField>
             <MudSpacer />
