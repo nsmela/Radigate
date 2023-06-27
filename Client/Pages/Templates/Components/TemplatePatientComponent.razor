@@ -1,4 +1,5 @@
-﻿@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent.TemplateGroupCallback
+﻿@using Radigate.Client.Components.Templates
+@using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent.TemplateGroupCallback
 @using static Radigate.Client.Pages.Templates.Components.TemplateGroupComponent
 
 <MudPaper Width="560px" Class="ma-2" Outlined="true" Style="@($"background:{Colors.Teal.Darken4};")">
@@ -31,15 +32,7 @@
         <MudStack Rows="true" Spacing="1">
             <!-- Add Group Interface -->
             @if(IsNewGroupOpen){
-                <MudPaper Outlined="true" Class="ma-1 pa-1" >
-                    <MudToolBar>
-                        <MudAutocomplete T="string" Label="New Group Name" @bind-Value="NewGroupLabel" CoerceText="true" CoerceValue="true"
-                                 ResetValueOnEmptyText="true" SearchFunc="@SearchGroupNames" />
-                        <MudSpacer/>
-                        <MudButton OnClick="@SubmitNewGroup"> Add </MudButton>
-                        <MudButton OnClick="@CancelNewGroup"> Cancel </MudButton>
-                    </MudToolBar>
-                </MudPaper>
+                <GroupTemplateSelectComponent OnSubmitNewGroup="@SubmitNewGroup" OnCancel="@CancelNewGroup" />
             }else {
                 <MudButton OnClick="@OpenNewGroup"> New Group </MudButton>
             }
@@ -160,29 +153,14 @@
         IsNewGroupOpen = true;
     }
 
-    private async Task SubmitNewGroup(){
-        if (string.IsNullOrEmpty(NewGroupLabel)) return;
+    private async Task SubmitNewGroup(GroupTemplate group){
+        if (group is null) return;
 
-        //use an existing group
-        var group = Templates.Groups.Find(g => g.Label == NewGroupLabel);
-        if (group is not null) { //link the group?
-            group.Public = false;
-            NewGroups.Add(new GroupTemplate(group));
-        }
-        else {
-            NewGroups.Add(new GroupTemplate {
-                Label = NewGroupLabel,
-                Tasks = string.Empty,
-                Public = false
-            });
-        }
-
-        NewGroupLabel = string.Empty;
+        NewGroups.Add(group);
     }
 
     private async Task CancelNewGroup(){
         IsNewGroupOpen = false;
-        NewGroupLabel = string.Empty;
     }
 
     private async Task OnGroupChanged(TemplateGroupCallback template) {

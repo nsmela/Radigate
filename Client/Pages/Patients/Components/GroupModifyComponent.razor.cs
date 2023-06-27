@@ -34,7 +34,9 @@ namespace Radigate.Client.Pages.Patients.Components
                 Tasks.Add(taskItem);
             }
             Tasks.OrderBy(t => t.SortOrder).ToList();
+            
             NewLabel = this.Group.Label;
+            SortingOrder = Group.SortingOrder;
     }
 
         #endregion
@@ -70,9 +72,23 @@ namespace Radigate.Client.Pages.Patients.Components
             IsEditingName = false;
         }
 
-        private void DeleteGroup() { }
+        private async void DeleteGroup() {
+            SortingOrder = -1;
+            await UpdateParent();
+        }
+
         private void EditGroupName() {
             IsEditingName = true;
+        }
+
+        private async Task RaiseGroup() { 
+            if(SortingOrder > 0) SortingOrder--;
+            await UpdateParent();
+        }
+
+        private async Task LowerGroup() {
+            SortingOrder++;
+            await UpdateParent();
         }
 
         private async Task OnTaskUpdated(ITaskItem task) {

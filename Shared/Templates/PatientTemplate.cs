@@ -10,6 +10,7 @@
             this.GroupTemplates = new List<GroupTemplate>();
             this.Id = -1;
         }
+
         public PatientTemplate(NewPatientTemplate template) {
             this.Label = template.Label;
             GroupTemplates = new();

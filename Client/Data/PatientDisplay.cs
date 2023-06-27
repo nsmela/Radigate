@@ -22,7 +22,14 @@
             this.Archived = patient.Archived;
 
             TaskGroups = new();
-            foreach(var group in patient.TaskGroups) TaskGroups.Add(new GroupDisplay(group));
+            patient.TaskGroups.OrderBy(g => g.SortingOrder);
+            foreach (var group in patient.TaskGroups) {
+                var newGroup = new GroupDisplay(group);
+                newGroup.SortingOrder = TaskGroups.Count;
+                TaskGroups.Add(newGroup);
+
+            }
+
         }
     }
 }

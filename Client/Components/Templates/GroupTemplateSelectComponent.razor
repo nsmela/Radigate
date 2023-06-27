@@ -1,0 +1,52 @@
+﻿<MudPaper Outlined="true" Class="ma-1 pa-1" >
+    <MudToolBar>
+        <MudAutocomplete T="string" Label="New Group Name" @bind-Value="NewGroupLabel" CoerceText="true" CoerceValue="true"
+                    ResetValueOnEmptyText="true" SearchFunc="@SearchGroupNames" />
+        <MudSpacer/>
+        <MudButton OnClick="@SubmitNewGroup"> Add </MudButton>
+        <MudButton OnClick="@CancelNewGroup"> Cancel </MudButton>
+    </MudToolBar>
+</MudPaper>
+
+@code {
+    [Inject]
+    private ITemplateService Templates { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<GroupTemplate> OnSubmitNewGroup { get; set; } = default!;
+    [Parameter]
+    public EventCallback OnCancel { get; set; } = default!;
+
+    private string NewGroupLabel { get; set; } = string.Empty;
+
+    private async Task<IEnumerable<string>> SearchGroupNames(string value) {
+        if (Templates.GroupNames is null || Templates.GroupNames.Count < 1) return new List<string>();
+        if (string.IsNullOrEmpty(value)) return Templates.GroupNames;
+
+        var result = Templates.GroupNames.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return result;
+    }
+
+    private async Task SubmitNewGroup(){
+        if (string.IsNullOrEmpty(NewGroupLabel)) return;
+
+        //use an existing group
+        var group = Templates.Groups.Find(g => g.Label == NewGroupLabel);
+        if (group is null) { //link the group?
+            group = new GroupTemplate
+            {
+                Label = NewGroupLabel,
+                Tasks = string.Empty,
+                Public = false
+            };
+        }
+
+        await OnSubmitNewGroup.InvokeAsync(group);
+    }
+
+    private async Task CancelNewGroup(){
+        NewGroupLabel = string.Empty;
+        await OnCancel.InvokeAsync();
+    }
+
+}

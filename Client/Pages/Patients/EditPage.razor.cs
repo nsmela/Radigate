@@ -54,7 +54,29 @@ namespace Radigate.Client.Pages.Patients
 
         private async Task OnGroupUpdated(GroupDisplay newGroup) {
             var index = Groups.IndexOf(newGroup);
-            Groups[index] = newGroup;
+            if (index < 0) return;
+
+            if(newGroup.SortingOrder < 0) {
+                Groups.RemoveAt(index);
+                Groups.ForEach(g => g.SortingOrder = Groups.IndexOf(g));
+                StateHasChanged();
+                return;
+            }
+
+
+            //position was changed
+            if (Groups.Any(g => g.SortingOrder == newGroup.SortingOrder)) {
+                if (newGroup.SortingOrder > Groups.Count - 1) return; //invalid sort position
+
+                Groups.RemoveAt(index);
+                Groups.Insert(newGroup.SortingOrder, newGroup);
+                Groups.ForEach(g => g.SortingOrder = Groups.IndexOf(g));
+            }
+            else {
+                //update the group
+                Groups[index] = newGroup;
+            }
+
             StateHasChanged();
         }
         #endregion
