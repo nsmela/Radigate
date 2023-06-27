@@ -63,9 +63,18 @@ namespace Radigate.Client.Pages.Patients.Components
             NewTaskLabel = String.Empty;
             NewTaskType = default!;
         }
-        private void OnTextFieldChangedHandler() { }
+        private void OnTextFieldChangedHandler(bool force = false) {
+            if (!force && NewLabel == Group.Label) return;
+
+            Group.Label = NewLabel;
+            IsEditingName = false;
+        }
+
         private void DeleteGroup() { }
-        private void EditGroupName() { }
+        private void EditGroupName() {
+            IsEditingName = true;
+        }
+
         private async Task OnTaskUpdated(ITaskItem task) {
             EditingIndex = -1;
 

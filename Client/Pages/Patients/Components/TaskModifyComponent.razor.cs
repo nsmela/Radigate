@@ -43,7 +43,7 @@ namespace Radigate.Client.Pages.Patients.Components
         private async Task AddTaskListItem() { 
             var list = (ListDisplay)Task;
             list.Options.Add($"Option {list.Options.Count + 1}");
-            await UpdateParent();
+            //await UpdateParent();
         }
 
         private async Task ChangeTaskType(TaskType type) {
@@ -92,7 +92,7 @@ namespace Radigate.Client.Pages.Patients.Components
             list.Options.Remove(option);
 
             if (list.SelectedOption == option) list.SelectedOption = "INVALID SELECTION";
-            await UpdateParent();
+            //await UpdateParent();
         }
 
         private async Task UpdateParent() {

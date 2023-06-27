@@ -2,16 +2,18 @@
     <MudToolBar DisableGutters="true" Class="@(IsEditingName ? "mud-secondary pa-4 ma-n2" : "mud-primary pa-4 ma-n2")">
         @if (IsEditingName) {
             <MudTextField @bind-Value="NewLabel" Placeholder="@Group.Label" Label="Edit Group Name"
-                      DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2" TextChanged="@OnTextFieldChangedHandler" />
+                      DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2" TextChanged="@(()=> OnTextFieldChangedHandler())" />
+            <MudSpacer />
+            <MudIconButton Color="Color.Info" Icon="@Icons.Material.Filled.Edit" OnClick="@(()=> OnTextFieldChangedHandler(true))"/>
         }
         else {
-            <MudText Typo="Typo.subtitle1"><b>@NewLabel</b></MudText>
+            <MudText Typo="Typo.subtitle1" onclick="@(()=> OnTextFieldChangedHandler())"><b>@NewLabel</b></MudText>
+            <MudSpacer />
+            <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="@EditGroupName">Rename Section</MudButton>
+                <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="@DeleteGroup">Delete Section</MudButton>
+            </MudMenu>
         }
-        <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-            <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="@DeleteGroup">Delete Section</MudButton>
-            <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="@EditGroupName">Rename Section</MudButton>
-        </MudMenu>
     </MudToolBar>
     <MudStack Class="pt-4">
         <!-- Each task listing -->
