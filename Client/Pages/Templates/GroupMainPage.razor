@@ -30,7 +30,7 @@
         }
         else {
             @foreach (var group in Groups) {
-                <TemplateGroupComponent Template="@group" Edit="@IsEditing(group.Id)" GroupChanged="@OnGroupChanged" />
+                <TemplateGroupComponent Template="@group" IsEditing="@IsEditing(group.Id)" IsEditable="true" GroupChanged="@OnGroupChanged" />
             }
         }
     </MudStack>

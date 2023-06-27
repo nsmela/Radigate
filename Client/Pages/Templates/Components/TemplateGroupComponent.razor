@@ -1,18 +1,21 @@
 ﻿<MudPaper Class="ma-2 pb-2" Style="@($"background:{Colors.BlueGrey.Darken1};")" MinWidth="320px">
     <!-- Tool bar at top -->
-    @if (!Edit) {
+    @if (!IsEditing) {
         <MudToolBar DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken2};")">
             <MudText Typo="Typo.h4" Class="pl-2">@Label</MudText>
-            <MudSpacer />
-            <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+            @if (IsEditable)
+            {
+                <MudSpacer />
+                <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
                  ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="@EditGroup">
-                    Edit Group
-                </MudButton>
-                <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick="@RemoveGroup">
-                    Remove Group
-                </MudButton>
-            </MudMenu>
+                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Edit" OnClick="@EditGroup">
+                        Edit Group
+                    </MudButton>
+                    <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick="@RemoveGroup">
+                        Remove Group
+                    </MudButton>
+                </MudMenu>
+            }
         </MudToolBar>
     }
     else {
@@ -26,9 +29,9 @@
 
     <!-- Tasks -->
     @foreach (var task in taskList) {
-        <TemplateTaskComponent Task="@task" Group="@taskList" Editing="@Edit" GroupChanged="@OnGroupUpdated" />
+        <TemplateTaskComponent Task="@task" Group="@taskList" Editing="@IsEditing" GroupChanged="@OnGroupUpdated" />
     }
-    @if (Edit) {
+    @if (IsEditing) {
         <MudButton FullWidth="true" OnClick=@NewTask> New Task </MudButton>
         <MudButton FullWidth="true" OnClick=@Reset> Reset </MudButton>
         <MudButton FullWidth="true" OnClick="@SaveChanges"> Save </MudButton>
@@ -50,7 +53,9 @@
     [Parameter]
     public GroupTemplate? Template { get; set; }
     [Parameter]
-    public bool Edit { get; set; } = false;
+    public bool IsEditing { get; set; } = false;
+    [Parameter]
+    public bool IsEditable { get; set; } = false;
     [Parameter]
     public EventCallback<TemplateGroupCallback?> GroupChanged { get; set; }
 

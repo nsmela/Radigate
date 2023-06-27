@@ -23,7 +23,7 @@
 
     <!-- Groups -->
     @foreach(var group in NewGroups){
-        <TemplateGroupComponent Edit="@IsOpenToEdit(group)" Template="@group" GroupChanged="OnGroupChanged" />
+        <TemplateGroupComponent IsEditing="@IsOpenToEdit(group)" IsEditable="@Editing" Template="@group" GroupChanged="OnGroupChanged" />
     }
 
     <!-- Template Controls -->
@@ -45,6 +45,7 @@
             }
             <MudButton OnClick=@ResetTemplate> Reset </MudButton>
             <MudButton OnClick=@SaveTemplate> Save </MudButton>
+            <MudButton OnClick=@CancelChanges> Cancel </MudButton>
         </MudStack>
     }
 </MudPaper>
@@ -102,6 +103,17 @@
         Label = new string(Template.Label);
         NewGroups = new();
         Template.GroupTemplates.ForEach(g => NewGroups.Add(new GroupTemplate(g)));
+    }
+
+    private async Task CancelChanges(){
+        await ResetTemplate();
+
+        var callback = new TemplatePatientCallback {
+                Template = Template,
+                Request = TemplatePatientCallback.RequestType.CANCEL
+            };
+
+        await TemplateChanged.InvokeAsync(callback);
     }
 
     private async Task EditTemplate(){
