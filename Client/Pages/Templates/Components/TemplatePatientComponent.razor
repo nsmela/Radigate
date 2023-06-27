@@ -55,14 +55,14 @@
 
     #endregion
 
-    #region [Inject] Properties
+    #region Inject Properties
     [Inject]
     private ITemplateService Templates { get; set; } = default!;
     #endregion
 
-    #region [Parameter] Properties
+    #region Parameter Properties
     [Parameter]
-    public PatientTemplate Template { get; set; }
+    public PatientTemplate Template { get; set; } = default!;
 
     [Parameter]
     public bool Editing { get; set; } = false;
@@ -117,13 +117,10 @@
         //is this a new template or updating an older template?
         bool isNew = Template.Id < 0;
 
+        Template.Label = this.Label;
+        Template.GroupTemplates = this.NewGroups;
         var callback = new TemplatePatientCallback {
-            Template = new PatientTemplate {
-                Id = Template.Id,
-                CreatedAt = Template.CreatedAt,
-                Label = this.Label,
-                GroupTemplates = this.NewGroups
-            },
+            Template = this.Template,
             Request = isNew ? TemplatePatientCallback.RequestType.ADD : TemplatePatientCallback.RequestType.SAVE
         };
 

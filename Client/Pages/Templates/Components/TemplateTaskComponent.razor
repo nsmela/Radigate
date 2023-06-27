@@ -1,4 +1,6 @@
-﻿﻿@if (!Editing) {
+﻿@using Radigate.Client.Components.Tasks
+
+﻿@if (!Editing) {
     <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
         <MudIcon Icon="@Icon" Size="Size.Small" />
         <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
@@ -6,16 +8,7 @@
 }
 else {
     <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
-        <MudMenu Dense="true">
-            <ActivatorContent>
-                <MudChip Icon="@Icon" Size="Size.Small" Color="Color.Default" />
-            </ActivatorContent>
-            <ChildContent>
-                @foreach (var type in TaskTypes) {
-                    <MudMenuItem Icon="@TaskToIcon(type)" Size="Size.Small" OnClick="@(()=> SelectType(type))">@TaskToLabel(type)</MudMenuItem>
-                }
-            </ChildContent>
-        </MudMenu>
+        <TaskTypeSelectionComponent @bind-TaskTypeItem="TypeBound" />
         <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
               Variant="Variant.Filled" Immediate="false" TextChanged=@(()=> SubmitTaskEdit()) FullWidth="true" />
         <MudSpacer />
@@ -44,7 +37,14 @@ else {
     }
 
     string Label { get; set; } = string.Empty;
-    TaskType Type { get; set; } = TaskType.Base;
+    private TaskType Type { get; set; } = default!;
+    private TaskType TypeBound {
+        get => this.Type;
+        set {
+            this.Type = value;
+            SubmitTaskEdit();
+        }
+    }
 
     string Icon => TaskTypeExtensions.ToIcon(Type);
 

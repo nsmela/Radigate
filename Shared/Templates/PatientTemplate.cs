@@ -15,5 +15,10 @@
             GroupTemplates = new();
             foreach(var group in template.Groups) GroupTemplates.Add(group);
         }
+
+        public void Update(PatientTemplate template) {
+            this.Label = template.Label;
+            this.GroupTemplates = template.GroupTemplates;
+        }
     }
 }

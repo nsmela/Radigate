@@ -1,0 +1,27 @@
+﻿<MudMenu Dense="true">
+    <ActivatorContent>
+        <MudChip Icon="@Icon(TaskTypeItem)" Size="Size.Small" Color="Color.Default" />
+    </ActivatorContent>
+    <ChildContent>
+        @foreach (var type in TaskTypes) {
+            <MudMenuItem Icon="@TaskToIcon(type)" Size="Size.Small" OnClick="@(()=> SelectType(type))">@TaskToLabel(type)</MudMenuItem>
+        }
+    </ChildContent>
+</MudMenu>
+
+@code {
+    [Parameter]
+    public TaskType TaskTypeItem { get; set; } = default!;
+    [Parameter]
+    public EventCallback<TaskType> TaskTypeItemChanged { get; set; } = default!;
+
+    private TaskType[] TaskTypes => ((TaskType[])Enum.GetValues(typeof(TaskType))).SkipLast(1).ToArray(); //last entry is Base, a count type
+    private string TaskToIcon(TaskType type) => TaskTypeExtensions.ToIcon(type);
+    private string TaskToLabel(TaskType type) => Enum.GetName(typeof(TaskType), type);
+    private string Icon(TaskType type) => TaskTypeExtensions.ToIcon(type);
+
+    private async Task SelectType(TaskType type){
+        TaskTypeItem = type;
+        await TaskTypeItemChanged.InvokeAsync(TaskTypeItem);
+    }
+}

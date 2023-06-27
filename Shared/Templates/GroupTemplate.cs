@@ -47,5 +47,11 @@ namespace Radigate.Shared.Templates {
         }
 
         public static string TaskToString(Tuple<string, int> task) => task.Item1 + ',' + task.Item2 + ';';
+
+        public void Update(GroupTemplate group) {
+            this.Label = group.Label;
+            this.Tasks = group.Tasks;
+            this.Public= group.Public;
+        }
     }
 }

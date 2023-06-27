@@ -93,7 +93,7 @@ namespace Radigate.Server.Templates.Services {
 
             if (result is null) return new ServiceResponse<GroupTemplate> { Success = false, Message = "Group Template does not exist." };
 
-            result = updatedTemplate;
+            result.Update(updatedTemplate); //to ensure the entity's changes are detected
             await _context.SaveChangesAsync();
 
             return new ServiceResponse<GroupTemplate> { Data = result };
@@ -106,7 +106,7 @@ namespace Radigate.Server.Templates.Services {
 
             if (result is null) return new ServiceResponse<PatientTemplate> { Success = false, Message = "Patient Template does not exist." };
 
-            result = updatedTemplate;
+            result.Update(updatedTemplate);//to ensure the entity's changes are detected
             await _context.SaveChangesAsync();
 
             return new ServiceResponse<PatientTemplate> { Data = result };
