@@ -15,9 +15,9 @@
     </MudCard>
 }
 else {
-    <MudPaper Class="pa-1 mb-1 ma-1" Width="440px" Style="@($"background:{Colors.Indigo.Darken4};min-width:360px")">
+    <MudPaper Class="pa-1 mb-1 ma-1" Width="440px" Style="@($"background:{Colors.Cyan.Darken4};min-width:360px")">
         <!-- Header -->
-        <MudExpansionPanel Style="@($"background:{Colors.Indigo.Darken3}")" Dense="true" DisableGutters="true">
+        <MudExpansionPanel Style="@($"background:{Colors.Cyan.Darken2}")" Dense="true" DisableGutters="true">
             <TitleContent>
                 <MudToolBar Class="ml-n4" Dense=true DisableGutters=true>
                     <MudText Typo="Typo.h5">@Name.ToUpper()</MudText>
@@ -31,7 +31,7 @@ else {
                 </MudToolBar>
             </TitleContent>
             <ChildContent>
-                <MudPaper Class="ma-0 pa-2" Style="@($"background:{Colors.Indigo.Darken3}")" Square="true" Elevation="0" Outlined="true">
+                <MudPaper Class="ma-0 pa-2" Style="@($"background:{Colors.Cyan.Darken3}")" Square="true" Elevation="0" Outlined="true">
                     <MudText><b>Patient ID:</b> @Patient.Identifier</MudText>
                 </MudPaper>
             </ChildContent>
@@ -39,7 +39,7 @@ else {
 
         @foreach (var group in Patient.TaskGroups) {
             <!-- Task Group -->
-            <MudGrid Class="pa-1 mt-2 d-flex flex-column" Style="@($"background:{Colors.Indigo.Darken2}")" Spacing="1">
+            <MudGrid Class="pa-1 ma-1 d-flex flex-column" Style="@($"background:{Colors.Cyan.Darken3}")" Spacing="1">
                 <MudItem>
                     <MudText>@group.Label</MudText>
                 </MudItem>
