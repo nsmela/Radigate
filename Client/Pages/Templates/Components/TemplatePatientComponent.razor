@@ -93,6 +93,8 @@
     private bool IsOpenToEdit(GroupTemplate group) => EditingGroupIndex == NewGroups.IndexOf(group);
 
     private async Task ResetTemplate(){
+        EditingGroupIndex = -1;
+        IsNewGroupOpen = false;
         Label = new string(Template.Label);
         NewGroups = new();
         Template.GroupTemplates.ForEach(g => NewGroups.Add(new GroupTemplate(g)));
@@ -100,7 +102,7 @@
 
     private async Task CancelChanges(){
         await ResetTemplate();
-
+        EditingGroupIndex = -1;
         var callback = new TemplatePatientCallback {
                 Template = Template,
                 Request = TemplatePatientCallback.RequestType.CANCEL

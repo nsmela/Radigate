@@ -1,4 +1,5 @@
-﻿using Radigate.Server.Templates.Data;
+﻿using Microsoft.AspNetCore.Mvc.TagHelpers;
+using Radigate.Server.Templates.Data;
 
 namespace Radigate.Server.Templates.Services {
     public class TemplateService : ITemplateService {
@@ -22,7 +23,17 @@ namespace Radigate.Server.Templates.Services {
 
         public async Task<ServiceResponse<bool>> AddPatientTemplateAsync(NewPatientTemplate newTemplate) {
             var template = new PatientTemplate(newTemplate);
-            await _context.PatientTemplates.AddAsync(template);
+            for (int i = 0; i < template.GroupTemplates.Count; i++) {
+                var newGroup = template.GroupTemplates[i];
+                if (newGroup.Id > 0) {
+                    var oldGroup = await _context.GroupTemplates.FindAsync(newGroup.Id);
+                    if (oldGroup is not null) {
+                        template.GroupTemplates[i] = oldGroup;
+                    }
+                }
+            }
+
+            var result = await _context.PatientTemplates.AddAsync(template);
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool>();
         }

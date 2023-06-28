@@ -15,6 +15,7 @@ namespace Radigate.Client {
             _localStorage = localStorage;
             _http = http;
         }
+
         public override async Task<AuthenticationState> GetAuthenticationStateAsync() {
             string authToken = await _localStorage.GetItemAsStringAsync("authToken");
 

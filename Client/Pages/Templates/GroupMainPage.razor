@@ -8,9 +8,9 @@
 <MudPaper MaxWidth="660px" Class="ma-2">
     <MudStack Row="true" Class="pa-2 overflow-x-scroll">
         <MudButton Variant="Variant.Outlined" Color="Color.Success" IconSize="Size.Small"
-                   StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddGroup">Add Group </MudButton>
+                    StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddGroup">Add Group </MudButton>
         <MudTextField Class="align-self-center" T="string" Label="Search" Variant="Variant.Outlined"
-                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+                        Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
     </MudStack>
 </MudPaper>
 
@@ -19,7 +19,7 @@
     <MudStack Row=@true>
         <!-- New Group -->
         @if (newGroupOpen) {
-            <TemplateGroupComponent GroupChanged="@OnGroupChanged" Edit="@newGroupOpen" />
+            <TemplateGroupComponent GroupChanged="@OnGroupChanged" IsEditing="@newGroupOpen" />
         }
         <!-- Template List -->
         @if (isLoading) {
@@ -36,6 +36,7 @@
     </MudStack>
 
 </MudItem>
+
 @code {
     //https://github.com/Apps72/BlazorGuidelines
 
