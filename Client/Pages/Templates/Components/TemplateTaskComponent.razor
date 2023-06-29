@@ -1,23 +1,31 @@
 ﻿@using Radigate.Client.Components.Tasks
 
-﻿@if (!Editing) {
-    <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
-        <MudIcon Icon="@Icon" Size="Size.Small" />
-        <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
-    </MudToolBar>
-}
-else {
-    <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
-        <TaskTypeSelectionComponent @bind-TaskTypeItem="TypeBound" />
-        <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
-              Variant="Variant.Filled" Immediate="false" TextChanged=@(()=> SubmitTaskEdit()) FullWidth="true" />
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(() => IncrementTask())" />
-        <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(() => DecrementTask())" />
-        <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@RemoveTask" />
-    </MudToolBar>
+<MudPaper>
+    ﻿@if (!Editing) {
+        <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
+            <MudIcon Icon="@Icon" Size="Size.Small" />
+            <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
+        </MudToolBar>
+    }
+    else {
+        <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
+            <TaskTypeSelectionComponent @bind-TaskTypeItem="TypeBound" />
+            <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
+                    Variant="Variant.Filled" Immediate="false" TextChanged=@(()=> SubmitTaskEdit()) FullWidth="true" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(() => IncrementTask())" />
+            <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(() => DecrementTask())" />
+            <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@RemoveTask" />
+        </MudToolBar>
+        @if (Type == TaskType.List)
+        {
+            
+            <MudDivider />
 
-}
+        }
+    }
+</MudPaper>
+
 @code {
     [Parameter]
     public Tuple<string, int>? Task { get; set; }
