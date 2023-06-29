@@ -25,8 +25,7 @@
                     <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@(() => RemoveOption(option))" />
                     <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@(() => IncrementOption(option))" />
                     <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@(() => DecrementOption(option))" />
-                    <MudText Class="ml-2">@option</MudText> 
-
+                    <MudTextField Class="ml-2" T="string" FullWidth="true" Text="@option" TextChanged="@((value)=> UpdateText(ListItems.IndexOf(option), value))" />
                 </MudStack>
             }
             <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.AddCircle" Size="Size.Small" OnClick="@AddOption" />
@@ -78,7 +77,16 @@
     private TaskType[] TaskTypes => ((TaskType[])Enum.GetValues(typeof(TaskType))).SkipLast(1).ToArray(); //last entry is Base, a count type
     private string TaskToIcon(TaskType type) => TaskTypeExtensions.ToIcon(type);
     private string TaskToLabel(TaskType type) => Enum.GetName(typeof(TaskType), type);
-    private Tuple<string, int> NewTask => new Tuple<string, int>(Label, (int)Type);
+    private Tuple<string, int> NewTask {
+        get{
+            if(Type == TaskType.List){
+                var label = Label;
+                foreach (var option in ListItems) label += '|' + option;
+                return new Tuple<string, int>(label, (int)Type);
+            }
+            return new Tuple<string, int>(Label, (int)Type);
+        }
+    }
 
     #region Button Functions
     private async Task SelectType(TaskType type) {
@@ -119,6 +127,7 @@
     private async Task SubmitTaskEdit() {
         var taskIndex = Group.IndexOf(Task);
         if (taskIndex < 0) return;
+
         Group[taskIndex] = NewTask;
 
         await GroupChanged.InvokeAsync(Group);
@@ -126,6 +135,8 @@
 
     private async Task AddOption(){
         ListItems.Add($"Option {ListItems.Count}");
+
+        SubmitTaskEdit();
     }
 
     private async Task RemoveOption(string option){
@@ -133,6 +144,8 @@
         if (index < 0) return;
 
         ListItems.RemoveAt(index);
+
+        SubmitTaskEdit();
     }
     private async Task IncrementOption(string option){
         int index = ListItems.IndexOf(option);
@@ -149,6 +162,12 @@
         ListItems.RemoveAt(index);
         index++;
         ListItems.Insert(index, option);
+    }
+
+    private async Task UpdateText(int index, string value){
+        ListItems[index] = value;
+
+        SubmitTaskEdit();
     }
     #endregion
 
