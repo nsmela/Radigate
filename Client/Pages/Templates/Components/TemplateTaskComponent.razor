@@ -2,26 +2,34 @@
 
 <MudPaper>
     ﻿@if (!Editing) {
-        <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
+        <MudToolBar Class="pa-2 mb-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
             <MudIcon Icon="@Icon" Size="Size.Small" />
             <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
         </MudToolBar>
     }
     else {
-        <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
+        <MudToolBar Class="pa-2 mb-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
             <TaskTypeSelectionComponent @bind-TaskTypeItem="TypeBound" />
             <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
-                    Variant="Variant.Filled" Immediate="false" TextChanged=@(()=> SubmitTaskEdit()) FullWidth="true" />
+                    Variant="Variant.Filled" Immediate="false" TextChanged="@(()=> SubmitTaskEdit())" FullWidth="true" />
             <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(() => IncrementTask())" />
-            <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(() => DecrementTask())" />
+            <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@(() => IncrementTask())" />
+            <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@(() => DecrementTask())" />
             <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@RemoveTask" />
         </MudToolBar>
         @if (Type == TaskType.List)
         {
-            
             <MudDivider />
+            @foreach(var option in ListItems){
+                <MudStack Row="true">
+                    <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@(() => RemoveOption(option))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@(() => IncrementOption(option))" />
+                    <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@(() => DecrementOption(option))" />
+                    <MudText Class="ml-2">@option</MudText> 
 
+                </MudStack>
+            }
+            <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.AddCircle" Size="Size.Small" OnClick="@AddOption" />
         }
     }
 </MudPaper>
@@ -39,12 +47,23 @@
     protected override async Task OnParametersSetAsync() {
         if (Task is null) Task = new Tuple<string, int>(string.Empty, -1);
         if (Group is null) Group = new();
+        ListItems = new();
 
-        Label = Task.Item1;
         Type = (TaskType)int.Parse(Task.Item2.ToString());
+
+        if(TaskType.List == Type){
+            var list = GroupTemplate.TaskListToList(Task);
+            Label = list[0];
+            list.RemoveAt(0);
+
+            foreach (var option in list) ListItems.Add(option);
+        }else {
+            Label = Task.Item1;
+        }
     }
 
-    string Label { get; set; } = string.Empty;
+    private string Label { get; set; } = string.Empty;
+    private List<string> ListItems { get; set; } = new();
     private TaskType Type { get; set; } = default!;
     private TaskType TypeBound {
         get => this.Type;
@@ -54,7 +73,7 @@
         }
     }
 
-    string Icon => TaskTypeExtensions.ToIcon(Type);
+    private string Icon => TaskTypeExtensions.ToIcon(Type);
 
     private TaskType[] TaskTypes => ((TaskType[])Enum.GetValues(typeof(TaskType))).SkipLast(1).ToArray(); //last entry is Base, a count type
     private string TaskToIcon(TaskType type) => TaskTypeExtensions.ToIcon(type);
@@ -105,6 +124,32 @@
         await GroupChanged.InvokeAsync(Group);
     }
 
+    private async Task AddOption(){
+        ListItems.Add($"Option {ListItems.Count}");
+    }
+
+    private async Task RemoveOption(string option){
+        int index = ListItems.IndexOf(option);
+        if (index < 0) return;
+
+        ListItems.RemoveAt(index);
+    }
+    private async Task IncrementOption(string option){
+        int index = ListItems.IndexOf(option);
+        if (index < 1) return;
+
+        ListItems.RemoveAt(index);
+        index--;
+        ListItems.Insert(index, option);
+    }
+
+    private async Task DecrementOption(string option){
+        int index = ListItems.IndexOf(option);
+        if (index > ListItems.Count - 2) return;
+        ListItems.RemoveAt(index);
+        index++;
+        ListItems.Insert(index, option);
+    }
     #endregion
 
 }

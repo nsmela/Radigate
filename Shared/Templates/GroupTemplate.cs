@@ -47,6 +47,10 @@ namespace Radigate.Shared.Templates {
         }
 
         public static string TaskToString(Tuple<string, int> task) => task.Item1 + ',' + task.Item2 + ';';
+        public static List<string> TaskListToList(Tuple<string, int> task) {
+            if (task.Item2 != (int)TaskType.List) return new List<string>(); //not a list
+            return task.Item1.Split('|').ToList();
+        }
 
         public void Update(GroupTemplate group) {
             this.Label = group.Label;
