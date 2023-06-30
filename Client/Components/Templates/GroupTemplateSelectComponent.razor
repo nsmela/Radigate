@@ -19,6 +19,10 @@
 
     private string NewGroupLabel { get; set; } = string.Empty;
 
+    protected override async Task OnInitializedAsync() {
+        await Templates.GetAllGroupTemplatesAsync();
+    }
+
     private async Task<IEnumerable<string>> SearchGroupNames(string value) {
         if (Templates.GroupNames is null || Templates.GroupNames.Count < 1) return new List<string>();
         if (string.IsNullOrEmpty(value)) return Templates.GroupNames;

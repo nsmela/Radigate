@@ -27,9 +27,7 @@ namespace Radigate.Client.Services.TemplateService {
         public async Task AddPatientTemplate(NewPatientTemplate template) {
             var connection = $"api/Template/patients";
             var response = await _http.PostAsJsonAsync(connection, template);
-            //var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
-            //if (result is null) return;
             await GetAllPatientTemplatesAsync();
         }
 

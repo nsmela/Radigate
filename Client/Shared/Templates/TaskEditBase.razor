@@ -1,10 +1,10 @@
 ﻿﻿@if (!Editing) {
-    <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
+    <MudToolBar Class="pa-2" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
         <MudIcon Icon="@Icon" Size="Size.Small" />
         <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
     </MudToolBar>
 } else {
-    <MudToolBar Class="pa-2 ma-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" >
+    <MudToolBar Class="pa-2" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" >
         <MudMenu Dense="true">
             <ActivatorContent>
                 <MudChip Icon="@Icon" Size="Size.Small" Color="Color.Default" />
