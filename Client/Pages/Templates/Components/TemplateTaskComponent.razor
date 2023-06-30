@@ -1,14 +1,16 @@
 ﻿@using Radigate.Client.Components.Tasks
 
-<MudPaper>
+<MudPaper Class="mx-1 pl-1 mt-1 d-flex justify-start"
+    Style="@($"background:{Colors.BlueGrey.Darken3};")">
     ﻿@if (!Editing) {
-        <MudToolBar Class="pa-2 mb-1" DisableGutters="true" Style="@($"background:{Colors.BlueGrey.Darken3};")" Dense="true">
-            <MudIcon Icon="@Icon" Size="Size.Small" />
+        <MudToolBar Dense="true">
+            <MudIcon Class="pl-n2" Icon="@Icon" Size="Size.Small" />
             <MudText Typo="Typo.body1" Class="pl-2">@Label</MudText>
         </MudToolBar>
     }
     else {
-        <MudToolBar Class="pa-2 mb-1" DisableGutters="true" Dense="true" Style="@($"background:{Colors.BlueGrey.Darken3};")">
+    <MudPaper Class="d-flex flex-column">
+        <MudToolBar DisableGutters="true" Dense="true" >
             <TaskTypeSelectionComponent @bind-TaskTypeItem="TypeBound" />
             <MudInput @bind-Value="Label" Placeholder="@Label" Margin="Margin.Normal" Class="mb-n2 mt-n2 pr-8n pl-1 pt-1"
                     Variant="Variant.Filled" Immediate="false" TextChanged="@(()=> SubmitTaskEdit())" FullWidth="true" />
@@ -20,16 +22,19 @@
         @if (Type == TaskType.List)
         {
             <MudDivider />
+
             @foreach(var option in ListItems){
-                <MudStack Row="true">
+                <MudToolBar DisableGutters="true" Dense="true"  >
                     <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.RemoveCircle" Size="Size.Small" OnClick="@(() => RemoveOption(option))" />
                     <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="@(() => IncrementOption(option))" />
                     <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="@(() => DecrementOption(option))" />
+                        <MudSpacer />
                     <MudTextField Class="ml-2" T="string" FullWidth="true" Text="@option" TextChanged="@((value)=> UpdateText(ListItems.IndexOf(option), value))" />
-                </MudStack>
+                </MudToolBar>
             }
             <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.AddCircle" Size="Size.Small" OnClick="@AddOption" />
         }
+            </MudPaper>
     }
 </MudPaper>
 
