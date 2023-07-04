@@ -36,25 +36,7 @@
             <!-- Group Listing -->
             <MudPaper Class="pa-2">
                 @foreach (var group in groups) {
-                    <MudToolBar Style="@($"background:{Colors.BlueGrey.Darken2};")">
-                        <MudText Typo="Typo.h5">@group.Label</MudText>
-                        <MudSpacer />
-                        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small" OnClick="(() => IncrementGroup(group))" />
-                        <MudIconButton Icon="@Icons.Material.Sharp.KeyboardArrowDown" Size="Size.Small" OnClick="(() => DecrementGroup(group))" />
-                        <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
-                                 ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
-                            <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick="() => RemoveGroup(group)">Remove Group</MudButton>
-                        </MudMenu>
-                    </MudToolBar>
-                    <!-- Tasks Listing -->
-                    @foreach (var task in group.Tasks) {
-                        <MudPaper Class="ml-8 pa-1">
-                            <TaskEditBase Editing="true" Task="@TaskToTuple(task)"/>
-                        </MudPaper>
-                    }
-                    <MudPaper Outlined="true" Class="ml-8 pa-1">
-                        <MudButton FullWidth="true" OnClick="() => AddTask(group)"> Add Task </MudButton>
-                    </MudPaper>
+                    <Radigate.Client.Pages.Patients.Components.GroupModifyComponent Edit="true" Group="group" GroupChanged="@OnGroupDisplayUpdated" />
                 }
             </MudPaper>
         </MudPaper>
@@ -87,11 +69,7 @@
     MudForm? form;
     string id;
     string lastName, firstName;
-    List<TaskGroup> groups = new();
-
-    protected override async Task OnInitializedAsync() {
-
-    }
+    List<GroupDisplay> groups = new();
 
     private async Task AddGroup(GroupTemplate template) {
         var tasks = new List<TaskItem>();
@@ -104,9 +82,9 @@
                 list.RemoveAt(0);
                 task.Type = t.Item2;
 
-                var text = string.Empty;
+                var text = "";
                 list.ForEach(s => text += ',' + s);
-                text += ';';
+                task.Value = text;
             }
             else {
                 task.Label = t.Item1;
@@ -114,45 +92,19 @@
             }
 
             tasks.Add(task);
+
         }
 
         //is this a custom group or importing a group template?
-        var group = new TaskGroup
-        {
-            Label = template.Label,
-            Tasks = tasks
-        };
-        groups.Add(group);
         newGroupLabel = string.Empty;
+        groups.Add(new GroupDisplay(new TaskGroup {
+                Label = template.Label,
+                Tasks = tasks
+            }));
+
+        foreach (var g in groups) g.SortingOrder = groups.IndexOf(g);
         StateHasChanged();
     }
-
-    private async Task IncrementGroup(TaskGroup group) {
-        int index = groups.IndexOf(group);
-        if (index < 1) return;
-
-        groups.Remove(group);
-        groups.Insert(index - 1, group);
-    }
-
-    private async Task DecrementGroup(TaskGroup group) {
-        int index = groups.IndexOf(group);
-        if (index >= groups.Count() - 1) return;
-
-        groups.Remove(group);
-        groups.Insert(index + 1, group);
-    }
-
-    private async Task RemoveGroup(TaskGroup group) {
-        groups.Remove(group);
-    }
-
-    private async Task AddTask(TaskGroup group) {
-        var task = new TaskItem { Label = "New Task", TaskGroup = group };
-        group.Tasks.Add(task);
-    }
-
-    private Tuple<string, int> TaskToTuple(TaskItem task) => new Tuple<string, int>(task.Label, task.Type);
 
     private async Task Submit() {
         if (!success) return;
@@ -169,31 +121,48 @@
         foreach (var group in groups) {
             newGroups.Add(group.Label);
             foreach (var task in group.Tasks) {
-                newTasks.Add(new NewTaskItem {
-                        Label = task.Label,
-                        Group = group.Label,
-                        Type = (TaskType)task.Type,
-                        Value = task.Value
-                    });
+                var newTask = new NewTaskItem
+                {
+                    Label = task.Label,
+                    Group = group.Label,
+                    Type = (TaskType)task.Type,
+                    Value = task.Value
+                };
+
+                newTasks.Add(newTask);
             }
         }
         patient.Groups = newGroups;
         patient.Tasks = newTasks;
         await PatientService.AddPatient(patient);
-        NavigationManager.NavigateTo("patients");
+        NavigationManager.NavigateTo("patients/overview");
     }
 
     private async Task Reset() {
-        groups.Clear();
+        groups = new();
         form.ResetAsync();
-
     }
 
-    private async Task OnGroupUpdated(TaskGroup group) {
+    private async Task OnGroupDisplayUpdated(GroupDisplay group) {
         int index = groups.FindIndex(g => g.Label == group.Label);
         if (index < 0) return;
 
-        groups[index] = group;
+        //if negative sort order, delete the group
+        if (group.SortingOrder != index){
+            if (group.SortingOrder > groups.Count - 1) groups[index] = group; //ignore increment, too high
+            else {
+                groups.RemoveAt(index);
+                if (group.SortingOrder >= 0) groups.Insert(group.SortingOrder, group);
+
+            }
+
+            //reset sort order variable
+            foreach (var g in groups) g.SortingOrder = groups.IndexOf(g);
+        } else {
+            groups[index] = group;
+        }
+
+
     }
 
 }
