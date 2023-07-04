@@ -94,10 +94,15 @@
 
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<List<Patient>>>();
             Patients = new();
+            PatientIds = new();
 
             if (result is not null && result.Data is not null) {
-                foreach (var patient in result.Data) Patients.Add(new PatientDisplay(patient)); //refactored
+                foreach (var patient in result.Data) {
+                    Patients.Add(new PatientDisplay(patient)); //refactored
+                    PatientIds.Add(patient.Id);
+                }
             }
+
             OnChange?.Invoke();
         }
 
