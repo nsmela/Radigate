@@ -19,9 +19,13 @@ namespace Radigate.Client.Data {
             this.SortingOrder = group.SortingOrder;
             this.Label = group.Label;
             this.PatientId = group.PatientId;
+            this.Parent = group.Patient;
 
             Tasks = new();
-            foreach (var task in group.Tasks) Tasks.Add(Convert(task));
+            foreach (var task in group.Tasks) {
+                task.TaskGroup = group;
+                Tasks.Add(Convert(task));
+            }
         }
 
         public static ITaskItem Convert(TaskItem task) {

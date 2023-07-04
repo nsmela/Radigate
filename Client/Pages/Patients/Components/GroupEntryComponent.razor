@@ -27,14 +27,16 @@
                     <!-- NUMBER FIELD -->
                     case TaskType.Number:
                         var number = task as NumberDisplay;
-                        <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
-                            <MudText Class="d-inline-flex align-self-center pl-2">@number.Label</MudText>
-                            <MudNumericField Class="d-inline-flex align-self-center px-2 text-align-right"
-                                 Style="text-align:right;padding-bottom:16px;height:24px;"
-                                 Variant="Variant.Filled" DisableUnderLine="true" Margin="Margin.Dense"
-                                 HideSpinButtons="true" T="double" Value="@number.NumberValue"
-                                 ValueChanged="@((value) => {number.NumberValue = value; UpdatePatientTask(number, value.ToString());})" />
-                        </MudPaper>
+                        <MudTooltip Text="@(Group.Label + Group.Tasks.IndexOf(task))" Arrow="true" Placement="Placement.Left">
+                            <MudPaper Class="d-flex justify-content-between mt-1" Outlined="true">
+                                <MudText Class="d-inline-flex align-self-center pl-2">@number.Label</MudText>
+                                <MudNumericField Class="d-inline-flex align-self-center px-2 text-align-right"
+                                     Style="text-align:right;padding-bottom:16px;height:24px;"
+                                     Variant="Variant.Filled" DisableUnderLine="true" Margin="Margin.Dense"
+                                     HideSpinButtons="true" T="double" Value="@number.NumberValue"
+                                     ValueChanged="@((value) => {number.NumberValue = value; UpdatePatientTask(number, value.ToString());})" />
+                            </MudPaper>
+                        </MudTooltip>
                         break;
                     <!-- FORMULA FIELD -->
                     case TaskType.Calculation:
@@ -44,7 +46,7 @@
                                 <MudPaper Class="d-flex justify-content-between ma-0" Outlined="true">
                                     <MudText Class="d-inline-flex align-self-center pl-2">@formula.Label</MudText>
                                     <MudText Class="d-inline-flex align-self-center px-2 text-align-right"
-                                 Style="margin-left:auto;padding-bottom:16px;height:24px;"><b>NOT IMPLEMENTED</b></MudText>
+                                 Style="margin-left:auto;padding-bottom:16px;height:24px;"><b>@formula.Calculate()</b></MudText>
                                 </MudPaper>
                             </TitleContent>
                             <ChildContent>

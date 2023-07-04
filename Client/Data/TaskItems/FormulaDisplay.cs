@@ -1,8 +1,9 @@
 ﻿using MudBlazor;
+using System.Data;
 
 namespace Radigate.Client.Data.TaskItems {
     public class FormulaDisplay : ITaskItem {
-        public Radigate.Shared.TaskGroup TaskGroup { get; set; }
+        public TaskGroup TaskGroup { get; set; }
         public int? Id { get; set; } = null;
         public int SortOrder { get; set; }
         public string Label { get; set; }
@@ -11,6 +12,7 @@ namespace Radigate.Client.Data.TaskItems {
 
         public TaskType Type => TaskType.Calculation;
         public string Icon => Icons.Material.Filled.Calculate;
+        public Patient Patient => TaskGroup.Patient;
         public TaskItem ToTaskItem() {
             return new TaskItem {
                 Id = Id,
@@ -42,6 +44,25 @@ namespace Radigate.Client.Data.TaskItems {
             this.Label = task.Label;
             this.Comments = task.Comments;
             this.Value = task.Value;
+        }
+
+        public string Calculate() {
+            var cells = new List<Tuple<string, double>>();
+            var text = Value.ToString();
+
+            foreach (var group in Patient.TaskGroups) {
+                for (int i = 0; i < TaskGroup.Tasks.Count; i++) {
+                    if (TaskGroup.Tasks.ElementAt(i).Type != (int)TaskType.Number) continue;
+                    var number = new NumberDisplay(TaskGroup.Tasks.ElementAt(i));
+                    var label = TaskGroup.Label.Replace(" ", "") + i;
+                    text = text.Replace(label, number.NumberValue.ToString());
+                }
+            }
+
+            var dt = new DataTable();
+            return dt.Compute(text, "").ToString();
+
+
         }
 
     }

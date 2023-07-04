@@ -24,7 +24,9 @@
             TaskGroups = new();
             patient.TaskGroups.OrderBy(g => g.SortingOrder);
             foreach (var group in patient.TaskGroups) {
+                group.Patient = patient;
                 var newGroup = new GroupDisplay(group);
+
                 newGroup.SortingOrder = TaskGroups.Count;
                 TaskGroups.Add(newGroup);
 
